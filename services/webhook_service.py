@@ -16,16 +16,15 @@ class WebhookService:
 
     def log_and_respond(self, event_name: str):
         data = request.json
-        url = data.get('response', {}).get('URL')
 
-        if url:
-            self.logger.info("Received Event %s: URL - %s", event_name, url)
-            return jsonify({"status": "success", "message": "Event processed", "url": url}), 200
-        else:
-            self.logger.warning("Received Event %s: URL not found in request data", event_name)
-            return jsonify({"status": "failure", "message": "URL not found"}), 400
+        url = data.get('url') or data.get('response', {}).get('url')
 
-        return jsonify({"status": "success", "message": f"Event {event_name} processed"}), 200
+        if url is None:
+            self.app.logger.warning("Received Event Generic Webhook: URL not found in request data")
+            return jsonify({"status": "error", "message": "URL not found in request data"}), 400
+
+        self.logger.info(f"Received Event {event_name} - URL: {url}")
+        return jsonify({"status": "success", "message": "Event processed", "url": url}), 200
 
     def register_routes(self):
         @self.app.route('/api/v1/rg-tir-mensal-parceiro', methods=['POST'])
