@@ -16,7 +16,7 @@ class WebhookService:
 
     def log_and_respond(self, event_name: str):
         data = request.json
-        url = data.get('URL')
+        url = data.get('response', {}).get('URL')
 
         if url:
             self.logger.info("Received Event %s: URL - %s", event_name, url)
