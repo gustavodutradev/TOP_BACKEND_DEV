@@ -20,8 +20,10 @@ class WebhookService:
 
         if url:
             self.logger.info("Received Event %s: URL - %s", event_name, url)
+            return jsonify({"status": "success", "message": "Event processed", "url": url}), 200
         else:
             self.logger.warning("Received Event %s: URL not found in request data", event_name)
+            return jsonify({"status": "failure", "message": "URL not found"}), 400
 
         return jsonify({"status": "success", "message": f"Event {event_name} processed"}), 200
 
