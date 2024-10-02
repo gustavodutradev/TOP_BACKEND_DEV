@@ -48,3 +48,7 @@ class WebhookService:
         @self.app.route('/healthz')
         def health_check():
             return 'OK', 200
+        
+        @self.app.route('/')
+        def home():
+            return "API is running!"
