@@ -1,5 +1,6 @@
 from flask import Flask
 from services.webhook_service import WebhookService
+import os
 
 app = Flask(__name__)
 
@@ -7,4 +8,5 @@ app = Flask(__name__)
 webhook_service = WebhookService(app)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='localhost', port=5000)  # Executa o servidor localmente
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
