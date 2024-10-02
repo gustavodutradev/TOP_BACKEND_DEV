@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from services.token_service import TokenService
+import logging
 
 class WebhookService:
 
@@ -7,43 +8,47 @@ class WebhookService:
         self.app = app
         self.token_service = TokenService()
         self.register_routes()
+        self.setup_logging()
+
+    def setup_logging(self):
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+
+    def log_and_respond(self, event_name: str):
+        data = request.json
+        url = data.get('URL')
+
+        if url:
+            self.logger.info("Received Event %s: URL - %s", event_name, url)
+        else:
+            self.logger.warning("Received Event %s: URL not found in request data", event_name)
+
+        return jsonify({"status": "success", "message": f"Event {event_name} processed"}), 200
 
     def register_routes(self):
         @self.app.route('/api/v1/rg-tir-mensal-parceiro', methods=['POST'])
-        def webhook_event1():
-            data = request.json
-            print("Received Event RG - TIR_MENSAL:", data)
-            return jsonify({"status": "success", "message": "Event TIR_MENSAL processed"}), 200
+        def webhook_monthly_tir():
+            return self.log_and_respond("RG - TIR_MENSAL")
 
         @self.app.route('/api/v1/rg-posicoes', methods=['POST'])
-        def webhook_event2():
-            data = request.json
-            print("Received Event RG - Posições:", data)
-            return jsonify({"status": "success", "message": "Event Posicoes processed"}), 200
+        def webhook_positions():
+            return self.log_and_respond("RG - POSICOES")
 
         @self.app.route('/api/v1/rg-base-btg', methods=['POST'])
-        def webhook_event3():
-            data = request.json
-            print("Received Event RG - BASE_BTG:", data)
-            return jsonify({"status": "success", "message": "Event BASE BTG processed"}), 200
+        def webhook_base_btg():
+            return self.log_and_respond("RG - BASE BTG")
 
         @self.app.route('/api/v1/rg-nnm-gerencial', methods=['POST'])
-        def webhook_event4():
-            data = request.json
-            print("Received Event RG - NNM Gerencial:", data)
-            return jsonify({"status": "success", "message": "Event NNM Gerencial processed"}), 200
+        def webhook_nnm_gerencial():
+            return self.log_and_respond("RG - NNM GERENCIAL")
 
         @self.app.route('/api/v1/rg-fundos', methods=['POST'])
-        def webhook_event5():
-            data = request.json
-            print("Received Event RG - Fundos:", data)
-            return jsonify({"status": "success", "message": "Event Fundos processed"}), 200
+        def webhook_fundos():
+            return self.log_and_respond("RG - FUNDOS")
         
         @self.app.route('/api/v1/webhook-receiver', methods=['POST'])
         def webhook_receiver():
-            data = request.json
-            print("Received Event:", data)
-            return jsonify({"status": "success", "message": "Event processed"}), 200
+            return self.log_and_respond("Generic Webhook")
         
         @self.app.route('/healthz')
         def health_check():
