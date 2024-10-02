@@ -44,3 +44,7 @@ class WebhookService:
             data = request.json
             print("Received Event:", data)
             return jsonify({"status": "success", "message": "Event processed"}), 200
+        
+        @self.app.route('/healthz')
+        def health_check():
+            return 'OK', 200
