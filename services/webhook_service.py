@@ -16,12 +16,14 @@ class WebhookService:
 
     def log_and_respond(self, event_name: str):
         data = request.json
-
         url = data.get('url') or data.get('response', {}).get('url')
 
         if url is None:
+            error = data.get('errors')
+            message = error[0].get('message')
+            code = error[0]
             self.app.logger.warning("Received Event Generic Webhook: URL not found in request data")
-            return jsonify({"status": "error", "message": "URL not found in request data"}), 400
+            return jsonify({"status": f'{code}', "message": f'{message}'}), 400
 
         self.logger.info(f"Received Event {event_name} - URL: {url}")
         return jsonify({"status": "success", "message": "Event processed", "url": url}), 200
