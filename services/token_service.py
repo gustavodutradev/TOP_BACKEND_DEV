@@ -4,6 +4,7 @@ import uuid
 import time
 import json
 import os
+from datetime import datetime
 
 class TokenService:
 
@@ -31,11 +32,23 @@ class TokenService:
 
         response = requests.post(self.__auth_url, headers=self.__headers, data=self.__body)
 
+        # Adicione esta linha para imprimir a resposta da API
+        print(f"Status Code: {response.status_code}, Response Text: {response.text}")
+
         if response.status_code == 200:
-            token_data = response.json()
-            access_token = token_data['access_token']
-            expires_in = token_data['expires']
-            token_expires_at = time.time() + expires_in
+            access_token = response.headers.get('access_token')
+
+            if not access_token:
+                raise Exception("Access Token não encontrado nos Headers da resposta")
+            
+
+            expires_in = response.headers.get('expires')
+
+            if expires_in:
+                # Converte a string de data para um objeto datetime
+                expires_at = datetime.strptime(expires_in, '%a, %d %b %Y %H:%M:%S %Z')
+                token_expires_at = expires_at.timestamp()  # Converte para timestamp em segundos
+
 
             self.__save_token_to_cache(access_token, token_expires_at)
 
