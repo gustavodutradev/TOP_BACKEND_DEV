@@ -51,7 +51,7 @@ class WebhookService:
         def fundos():
             return self.log_and_respond("RG - FUNDOS")
         
-        @self.app.route('api/v1/rg-cra-cri', methods=['POST'])
+        @self.app.route('/api/v1/rg-cra-cri', methods=['POST'])
         def cra_cri():
             return self.log_and_respond("RG - CRA/CRI")
         
