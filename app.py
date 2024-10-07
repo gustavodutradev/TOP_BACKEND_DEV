@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
-from services.webhook_service import WebhookService
-from services.requests_service import RequestsService
+from adapters.controllers.webhook_service import WebhookService
+from core.services.requests_service import RequestsService
 import os
 
 app = Flask(__name__)
@@ -10,6 +10,14 @@ webhook_service = WebhookService(app)
 
 # Inicializa o serviço de requests
 requests_service = RequestsService()
+
+@app.route('/healthz')
+def health_check():
+    return 'OK', 200
+
+@app.route('/')
+def home():
+    return "API is running!"
 
 @app.route('/api/v1/get-suitability/<account_number>', methods=['GET'])
 def get_suitability(account_number):

@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from services.token_service import TokenService
+from core.services.token_service import TokenService
 import logging
 
 class WebhookService:
@@ -52,11 +52,4 @@ class WebhookService:
         @self.app.route('/api/v1/webhook-receiver', methods=['POST'])
         def webhook_receiver():
             return self.log_and_respond("Generic Webhook")
-        
-        @self.app.route('/healthz')
-        def health_check():
-            return 'OK', 200
-        
-        @self.app.route('/')
-        def home():
-            return "API is running!"
+
