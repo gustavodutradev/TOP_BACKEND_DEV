@@ -2,7 +2,7 @@ import requests
 import json
 import os
 import uuid
-from core.services.token_service import TokenService
+from app.services.token_service import TokenService
 
 class RequestsService:
 

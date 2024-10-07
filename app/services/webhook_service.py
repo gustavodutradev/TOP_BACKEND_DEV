@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from core.services.token_service import TokenService
+from app.services.token_service import TokenService
 import logging
 
 class WebhookService:
