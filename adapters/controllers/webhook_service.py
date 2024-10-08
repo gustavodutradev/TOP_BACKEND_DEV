@@ -91,4 +91,14 @@ class WebhookService:
         @self.app.route('/api/v1/monthly-product-profit', methods=['POST'])
         def monthly_product_profit():
             return self.log_and_respond("Monthly Product Profit")
+        
+        ## Reservas de IPO
+        @self.app.route('/api/v1/push-ofertas-ativas', methods=['POST'])
+        def push_ofertas_ativas():
+            return self.log_and_respond("Ofertas Ativas de IPO")
+        
+        @self.app.route('/api/v1/reservas-ofertas-ativas', methods=['POST'])
+        def reservas_ofertas_ativas():
+            return self.log_and_respond("Reservas de Ofertas Ativas")
+
 
