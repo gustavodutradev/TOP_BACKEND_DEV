@@ -8,16 +8,18 @@ class DebenturesService(ConfigService):
         super().__init__()
 
 
-    def get_anbima_debentures(self, date):
-        endpoint = f"/iaas-debenture/api/v1/debenture/{date}/"
+    def get_anbima_debentures(self, reference_date):
+        endpoint = f"/iaas-debenture/api/v1/debenture"
         url = f"{self._base_url}{endpoint}"
+
+        params = { "referenceDate": reference_date }
 
         print(url)
 
         try:
             self._headers = self.get_headers()
 
-            response = requests.get(url, headers=self._headers)
+            response = requests.get(url, headers=self._headers, params=params)
 
             # Logando status code e response text
             print(f"Status Code: {response.status_code}")
