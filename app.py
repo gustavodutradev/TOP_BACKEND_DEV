@@ -41,6 +41,7 @@ def get_registration_data(account_number):
 def get_account_base():
     return account_base_controller.get_account_base()
 
+
 @app.route("/api/v1/get-anbima-debentures/<date>", methods=["GET"])
 def anbima_debentures(date):
     return debentures_controller.get_anbima_debentures(date)

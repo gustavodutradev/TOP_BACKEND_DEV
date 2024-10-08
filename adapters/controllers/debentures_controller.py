@@ -1,7 +1,8 @@
 from flask import jsonify
 from core.services.debentures_service import DebenturesService
 
-class DebenturesController():
+
+class DebenturesController:
     def __init__(self) -> None:
         self.debentures_service = DebenturesService()
 
