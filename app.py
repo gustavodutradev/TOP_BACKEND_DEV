@@ -1,6 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask
 from adapters.controllers.webhook_service import WebhookService
-from core.services.requests_service import RequestsService
+from adapters.controllers.suitability_controller import SuitabilityController
+from adapters.controllers.registration_data_controller import RegistrationDataController
+from adapters.controllers.account_base_controller import AccountBaseController
 import os
 
 app = Flask(__name__)
@@ -8,33 +10,35 @@ app = Flask(__name__)
 # Inicializa o serviço de webhook
 webhook_service = WebhookService(app)
 
-# Inicializa o serviço de requests
-requests_service = RequestsService()
+suitability_controller = SuitabilityController()
+registration_data_controller = RegistrationDataController()
+account_base_controller = AccountBaseController()
 
-@app.route('/healthz')
+
+@app.route("/healthz")
 def health_check():
-    return 'OK', 200
+    return "OK", 200
 
-@app.route('/')
+
+@app.route("/")
 def home():
     return "API is running!"
 
-@app.route('/api/v1/get-suitability/<account_number>', methods=['GET'])
+
+@app.route("/api/v1/get-suitability/<account_number>", methods=["GET"])
 def get_suitability(account_number):
-    suitability = requests_service.get_suitability(account_number)
-    return jsonify(suitability)
+    return suitability_controller.get_suitability(account_number)
 
-@app.route('/api/v1/get-registration-data/<account_number>', methods=['GET'])
+
+@app.route("/api/v1/get-registration-data/<account_number>", methods=["GET"])
 def get_registration_data(account_number):
-    registration_data = requests_service.get_registration_data(account_number)
-    return jsonify(registration_data)
+    return registration_data_controller.get_registration_data(account_number)
 
-@app.route('/api/v1/get-account-base', methods=['GET'])
+
+@app.route("/api/v1/get-account-base", methods=["GET"])
 def get_account_base():
-    account_base = requests_service.get_account_base()
-    return jsonify(account_base)
+    return account_base_controller.get_account_base()
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
