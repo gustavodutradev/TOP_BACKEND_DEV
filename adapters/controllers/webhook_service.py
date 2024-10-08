@@ -123,6 +123,6 @@ class WebhookService:
             return self.log_and_respond("Operations (All Accounts)")
         
         ## Relacionamento de Conta e Parceiro
-        @self.app.route('api/v1/relationship-accounts-advisors', methods=['POST'])
+        @self.app.route('/api/v1/relationship-accounts-advisors', methods=['POST'])
         def relationship_accounts_advisors():
             return self.log_and_respond("Relationship Accounts and Advisors")
