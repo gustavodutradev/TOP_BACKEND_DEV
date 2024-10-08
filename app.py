@@ -4,6 +4,9 @@ from adapters.controllers.suitability_controller import SuitabilityController
 from adapters.controllers.registration_data_controller import RegistrationDataController
 from adapters.controllers.account_base_controller import AccountBaseController
 from adapters.controllers.debentures_controller import DebenturesController
+from adapters.controllers.recommended_equities_controller import (
+    RecommendedEquitiesController,
+)
 import os
 
 app = Flask(__name__)
@@ -15,6 +18,7 @@ suitability_controller = SuitabilityController()
 registration_data_controller = RegistrationDataController()
 account_base_controller = AccountBaseController()
 debentures_controller = DebenturesController()
+recommended_equities_controller = RecommendedEquitiesController()
 
 
 @app.route("/healthz")
@@ -45,6 +49,11 @@ def get_account_base():
 @app.route("/api/v1/get-anbima-debentures/<date>", methods=["GET"])
 def anbima_debentures(date):
     return debentures_controller.get_anbima_debentures(date)
+
+
+@app.route("/api/v1/get-recommended-equities/<date>", methods=["GET"])
+def get_recommended_equities():
+    return recommended_equities_controller.get_recommended_equities()
 
 
 if __name__ == "__main__":
