@@ -92,6 +92,11 @@ class WebhookService:
         def monthly_product_profit():
             return self.log_and_respond("Monthly Product Profit")
         
+        ## Pré Operações
+        @self.app.route('/api/v1/pre-operations', methods=['POST'])
+        def pre_operations():
+            return self.log_and_respond("Pre-Operations")
+        
         ## Reservas de IPO
         @self.app.route('/api/v1/push-ofertas-ativas', methods=['POST'])
         def push_ofertas_ativas():
@@ -100,5 +105,13 @@ class WebhookService:
         @self.app.route('/api/v1/reservas-ofertas-ativas', methods=['POST'])
         def reservas_ofertas_ativas():
             return self.log_and_respond("Reservas de Ofertas Ativas")
-
-
+        
+        ## Ordens da Bolsa
+        @self.app.route('/api/v1/orders', methods=['POST'])
+        def orders():
+            return self.log_and_respond("Orders")
+        
+        ## Operações
+        @self.app.route('/api/v1/operations', methods=['POST'])
+        def operations_all_accounts():
+            return self.log_and_respond("Operations (All Accounts)")
