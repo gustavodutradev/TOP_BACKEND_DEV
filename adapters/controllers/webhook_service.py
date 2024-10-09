@@ -17,28 +17,40 @@ class WebhookService:
 
     def log_and_respond(self, event_name: str):
         data = request.json
-
+    
         # Verifica se 'data' é uma lista e pega o primeiro item
-        if isinstance(data, list):
+        if isinstance(data, list) and len(data) > 0:
             data = data[0]
-
+    
         url = data.get("url") or data.get("response", {}).get("url")
-
+    
         if url is None:
-            error = data.get("errors", [{}])  # Default a lista com um dicionário vazio
-            message = error[0].get("message", "Unknown error")
-            code = error[0].get("code", "Unknown code")
-
+            # Verificação segura para acessar a lista 'errors', garantindo que sempre tenha um fallback
+            errors = data.get("errors", [{}])
+            if isinstance(errors, list) and len(errors) > 0:
+                error = errors[0]
+            else:
+                error = {}
+    
+            # Coleta a mensagem e código do erro com valores padrão
+            message = error.get("message", "Unknown error")
+            code = error.get("code", "Unknown code")
+    
+            # Log detalhado quando o URL não é encontrado
             self.app.logger.warning(
-                "Received Event Generic Webhook: URL not found in request data"
+                f"Received Event {event_name} - URL not found in request data. "
+                f"Error Code: {code}, Message: {message}"
             )
+    
+            # Responde com o status e mensagem apropriados
             return jsonify({"status": f"{code}", "message": f"{message}"}), 400
-
+    
+        # Loga o evento com o URL encontrado
         self.logger.info(f"Received Event {event_name} - URL: {url}")
-        return (
-            jsonify({"status": "success", "message": "Event processed", "url": url}),
-            200,
-        )
+    
+        # Retorna sucesso quando o evento é processado corretamente
+        return jsonify({"status": "success", "message": "Event processed", "url": url}), 200
+
 
     def register_routes(self):
 
