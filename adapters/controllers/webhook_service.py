@@ -12,47 +12,71 @@ class WebhookService:
         self.setup_logging()
 
     def setup_logging(self):
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.DEBUG)
         self.logger = logging.getLogger(__name__)
 
     def log_and_respond(self, event_name: str):
-        data = request.json
+        try:
+            # Captura o JSON da requisição e verifica se está no formato esperado
+            data = request.get_json(force=True, silent=True)
 
-        # Verifica se 'data' é uma lista e pega o primeiro item
-        if isinstance(data, list) and len(data) > 0:
-            data = data[0]
+            # Se o JSON não estiver presente ou for inválido, retorna um erro 400
+            if not data:
+                self.app.logger.error(
+                    f"Received Event {event_name} - No JSON payload found"
+                )
+                return (
+                    jsonify(
+                        {
+                            "status": "Invalid request",
+                            "message": "No JSON payload found",
+                        }
+                    ),
+                    400,
+                )
 
-        url = data.get("url") or data.get("response", {}).get("url")
+            # Verifica se 'data' é uma lista e pega o primeiro item, se aplicável
+            if isinstance(data, list) and len(data) > 0:
+                data = data[0]
 
-        if url is None:
-            # Verificação segura para acessar a lista 'errors', garantindo que sempre tenha um fallback
-            errors = data.get("errors", [{}])
-            if isinstance(errors, list) and len(errors) > 0:
-                error = errors[0]
-            else:
-                error = {}
+            # Tenta obter a URL diretamente ou via campo 'response'
+            url = data.get("url") or data.get("response", {}).get("url")
 
-            # Coleta a mensagem e código do erro com valores padrão
-            message = error.get("message", "Unknown error")
-            code = error.get("code", "Unknown code")
+            if not url:
+                # Acessa com segurança a lista 'errors' e verifica se há pelo menos um erro
+                errors = data.get("errors", [{}])
+                error = errors[0] if isinstance(errors, list) and errors else {}
 
-            # Log detalhado quando o URL não é encontrado
-            self.app.logger.warning(
-                f"Received Event {event_name} - URL not found in request data. "
-                f"Error Code: {code}, Message: {message}"
+                # Coleta a mensagem e código de erro, com valores padrão
+                message = error.get("message", "Unknown error")
+                code = error.get("code", "Unknown code")
+
+                # Log detalhado do evento e erro
+                self.app.logger.warning(
+                    f"Received Event {event_name} - URL not found in request data. "
+                    f"Error Code: {code}, Message: {message}, Full Payload: {data}"
+                )
+
+                # Responde com o código de erro apropriado
+                return jsonify({"status": code, "message": message}), 400
+
+            # Loga o sucesso com a URL recebida
+            self.logger.info(
+                f"Received Event {event_name} - URL: {url}, Full Payload: {data}"
             )
 
-            # Responde com o status e mensagem apropriados
-            return jsonify({"status": f"{code}", "message": f"{message}"}), 400
+            # Retorna sucesso quando o evento é processado corretamente
+            return (
+                jsonify(
+                    {"status": "success", "message": "Event processed", "url": url}
+                ),
+                200,
+            )
 
-        # Loga o evento com o URL encontrado
-        self.logger.info(f"Received Event {event_name} - URL: {url}")
-
-        # Retorna sucesso quando o evento é processado corretamente
-        return (
-            jsonify({"status": "success", "message": "Event processed", "url": url}),
-            200,
-        )
+        except Exception as e:
+            # Loga a exceção ocorrida durante o processamento da requisição
+            self.app.logger.error(f"Exception on {event_name} - {str(e)}")
+            return jsonify({"status": "error", "message": "Internal server error"}), 500
 
     def register_routes(self):
 
