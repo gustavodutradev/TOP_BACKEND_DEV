@@ -8,25 +8,32 @@ from datetime import datetime
 
 
 class TokenService:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(TokenService, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self) -> None:
-        self.__auth_url = "https://api.btgpactual.com/iaas-auth/api/v1/authorization/oauth2/accesstoken"
-        load_dotenv()
-        self.__auth_base64 = os.getenv("AUTH_BASE64")
-        self.__uuid = uuid.uuid4()
-        self.__headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "*/*",
-            "Authorization": f"Basic {self.__auth_base64}",
-            "x-id-partner-request": str(self.__uuid),
-        }
-        self.__body = {"grant_type": "client_credentials"}
-        self.__cache_file = "token_cache.json"
+        if not hasattr(self, 'initialized'):  # Verifica se já foi inicializado
+            self.__auth_url = "https://api.btgpactual.com/iaas-auth/api/v1/authorization/oauth2/accesstoken"
+            load_dotenv()
+            self.__auth_base64 = os.getenv("AUTH_BASE64")
+            self.__uuid = uuid.uuid4()
+            self.__headers = {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "*/*",
+                "Authorization": f"Basic {self.__auth_base64}",
+                "x-id-partner-request": str(self.__uuid),
+            }
+            self.__body = {"grant_type": "client_credentials"}
+            self.__cache_file = "token_cache.json"
+            self.initialized = True  # Marca como inicializado
 
     def __get_access_token(self):
         cached_token = self.__load_cached_token()
         if cached_token and not self.__is_token_expired(cached_token):
-            print("Using cached token")
             return cached_token["access_token"]
 
         response = requests.post(
@@ -45,11 +52,10 @@ class TokenService:
             expires_in = response.headers.get("expires")
 
             if expires_in:
-                # Converte a string de data para um objeto datetime
                 expires_at = datetime.strptime(expires_in, "%a, %d %b %Y %H:%M:%S %Z")
                 token_expires_at = (
                     expires_at.timestamp()
-                )  # Converte para timestamp em segundos
+                )
 
             self.__save_token_to_cache(access_token, token_expires_at)
 
