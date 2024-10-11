@@ -1,6 +1,7 @@
 import uuid
 from core.services.token_service import TokenService
 
+
 class ConfigService:
     def __init__(self) -> None:
         self.token_service = TokenService()  # Obtém a instância singleton

@@ -16,7 +16,7 @@ class TokenService:
         return cls._instance
 
     def __init__(self) -> None:
-        if not hasattr(self, 'initialized'):  # Verifica se já foi inicializado
+        if not hasattr(self, "initialized"):  # Verifica se já foi inicializado
             self.__auth_url = "https://api.btgpactual.com/iaas-auth/api/v1/authorization/oauth2/accesstoken"
             load_dotenv()
             self.__auth_base64 = os.getenv("AUTH_BASE64")
@@ -53,9 +53,7 @@ class TokenService:
 
             if expires_in:
                 expires_at = datetime.strptime(expires_in, "%a, %d %b %Y %H:%M:%S %Z")
-                token_expires_at = (
-                    expires_at.timestamp()
-                )
+                token_expires_at = expires_at.timestamp()
 
             self.__save_token_to_cache(access_token, token_expires_at)
 
