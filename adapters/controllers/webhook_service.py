@@ -8,7 +8,7 @@ class WebhookService:
         self.app = app
         self.token_service = TokenService()
         self.register_routes()
-        self.Logger = Logger()
+        self.Logger = Logger(app)
         # self.setup_logging()
 
     # def setup_logging(self):
