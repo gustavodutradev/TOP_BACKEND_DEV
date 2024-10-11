@@ -2,7 +2,7 @@ from flask import jsonify
 from core.services.stock_orders_service import StockOrdersService
 from core.services.token_service import TokenService
 from utils.logging import Logger
-
+import traceback
 
 class StockOrdersController:
 
@@ -17,22 +17,25 @@ class StockOrdersController:
         @self.app.route("/api/v1/orders", methods=["POST"])
         def orders():
             try:
-                # Loga o recebimento da requisição
-                self.logger.log_and_respond("Pending Stock Orders")
+                # Loga o início do processamento da requisição
+                self.logger.log_and_respond("Pending Stock Orders - Request Received")
 
                 # Obtém as ordens pendentes de aprovação
                 pending_orders = self.orders_service.get_stock_orders()
 
                 # Caso não tenha ordens pendentes, retorna 204 (No Content)
                 if not pending_orders:
-                    return (
-                        jsonify({"message": "Nenhuma ordem pendente encontrada."}),
-                        204,
-                    )
+                    self.logger.logger.info("Nenhuma ordem pendente encontrada.")
+                    return jsonify({"message": "Nenhuma ordem pendente encontrada."}), 204
 
                 # Caso tenha ordens, retorna as ordens em formato JSON
+                self.logger.logger.info(f"Ordens pendentes encontradas: {pending_orders}")
                 return jsonify(pending_orders), 200
 
             except Exception as e:
-                # Retorna um erro genérico caso algo dê errado
-                return jsonify({"error": str(e)}), 500
+                # Loga a exceção com detalhes
+                self.logger.logger.error(f"Erro ao processar ordens pendentes: {str(e)}")
+                self.logger.logger.error(traceback.format_exc())
+
+                # Retorna um erro genérico com status 500
+                return jsonify({"error": "Internal server error"}), 500

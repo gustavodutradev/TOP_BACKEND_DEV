@@ -20,4 +20,6 @@ class EmailService:
             print(f"Body: {response.body}")
             print(f"Headers: {response.headers}")
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error: {str(e)}")
+            if hasattr(e, 'body'):
+                print(f"Body: {e.body}")
