@@ -32,8 +32,6 @@ class StockOrdersService(ConfigService):
                 print(f"Erro na requisição: {response.status_code} - {response.text}")
                 return None
 
-            time.sleep(10)
-
             if response.content:
                 try:
                     response_data = response.json()
@@ -44,7 +42,7 @@ class StockOrdersService(ConfigService):
                 print("Resposta sem conteúdo.")
                 return None
 
-            result = response_data.get("result")
+            result = response_data.get("result", {})
             csv_url = result.get("url")
 
             if not csv_url:

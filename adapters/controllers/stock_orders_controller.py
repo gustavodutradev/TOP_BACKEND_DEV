@@ -3,6 +3,7 @@ from core.services.stock_orders_service import StockOrdersService
 from core.services.token_service import TokenService
 from utils.logging import Logger
 import traceback
+import time
 
 class StockOrdersController:
 
@@ -22,6 +23,8 @@ class StockOrdersController:
 
                 # Obtém as ordens pendentes de aprovação
                 pending_orders = self.orders_service.get_stock_orders()
+
+                time.sleep(10)
 
                 # Caso não tenha ordens pendentes, retorna 204 (No Content)
                 if not pending_orders:
