@@ -83,90 +83,90 @@ class WebhookService:
         ## Relatórios Gerenciais
         @self.app.route("/api/v1/rg-tir-mensal-parceiro", methods=["POST"])
         def monthly_tir():
-            return Logger.log_and_respond("RG - TIR_MENSAL")
+            return self.Logger.log_and_respond("RG - TIR_MENSAL")
 
         @self.app.route("/api/v1/rg-posicoes", methods=["POST"])
         def positions():
-            return Logger.log_and_respond("RG - POSICOES")
+            return self.Logger.log_and_respond("RG - POSICOES")
 
         @self.app.route("/api/v1/rg-base-btg", methods=["POST"])
         def base_btg():
-            return Logger.log_and_respond("RG - BASE BTG")
+            return self.Logger.log_and_respond("RG - BASE BTG")
 
         @self.app.route("/api/v1/rg-nnm-gerencial", methods=["POST"])
         def nnm_gerencial():
-            return Logger.log_and_respond("RG - NNM GERENCIAL")
+            return self.Logger.log_and_respond("RG - NNM GERENCIAL")
 
         @self.app.route("/api/v1/rg-fundos", methods=["POST"])
         def fundos():
-            return Logger.log_and_respond("RG - FUNDOS")
+            return self.Logger.log_and_respond("RG - FUNDOS")
 
         @self.app.route("/api/v1/rg-cra-cri", methods=["POST"])
         def cra_cri():
-            return Logger.log_and_respond("RG - CRA/CRI")
+            return self.Logger.log_and_respond("RG - CRA/CRI")
 
         ## Rentabilidade Diária
         @self.app.route("/api/v1/daily-profit", methods=["POST"])
         def daily_profit():
-            return Logger.log_and_respond("Daily Profit")
+            return self.Logger.log_and_respond("Daily Profit")
 
         @self.app.route("/api/v1/daily-profit-by-date", methods=["POST"])
         def daily_profit_by_date():
-            return Logger.log_and_respond("Daily Profit by Date")
+            return self.Logger.log_and_respond("Daily Profit by Date")
 
         ## Relatórios de Custódia
         @self.app.route("/api/v1/custody", methods=["POST"])
         def custody():
-            return Logger.log_and_respond("Custody")
+            return self.Logger.log_and_respond("Custody")
 
         @self.app.route("/api/v1/custody-by-date", methods=["POST"])
         def custody_by_date():
-            return Logger.log_and_respond("Custody by Date")
+            return self.Logger.log_and_respond("Custody by Date")
 
         ## Relatório STVM New NET Money
         @self.app.route("/api/v1/stvm", methods=["POST"])
         def stvm():
-            return Logger.log_and_respond("STVM")
+            return self.Logger.log_and_respond("STVM")
 
         ## Comissoes dos ultimos 4 dias
         @self.app.route("/api/v1/comissions", methods=["POST"])
         def commissions():
-            return Logger.log_and_respond("Commissions")
+            return self.Logger.log_and_respond("Commissions")
 
         ## Rentabilidade Mensal
         @self.app.route("/api/v1/monthly-customer-profit", methods=["POST"])
         def monthly_customer_profit():
-            return Logger.log_and_respond("Monthly Customer Profit")
+            return self.Logger.log_and_respond("Monthly Customer Profit")
 
         @self.app.route("/api/v1/monthly-product-profit", methods=["POST"])
         def monthly_product_profit():
-            return Logger.log_and_respond("Monthly Product Profit")
+            return self.Logger.log_and_respond("Monthly Product Profit")
 
         ## Pré Operações
         @self.app.route("/api/v1/pre-operations", methods=["POST"])
         def pre_operations():
-            return Logger.log_and_respond("Pre-Operations")
+            return self.Logger.log_and_respond("Pre-Operations")
 
         ## Reservas de IPO
         @self.app.route("/api/v1/push-ofertas-ativas", methods=["POST"])
         def push_ofertas_ativas():
-            return Logger.log_and_respond("Ofertas Ativas de IPO")
+            return self.Logger.log_and_respond("Ofertas Ativas de IPO")
 
         @self.app.route("/api/v1/reservas-ofertas-ativas", methods=["POST"])
         def reservas_ofertas_ativas():
-            return Logger.log_and_respond("Reservas de Ofertas Ativas")
+            return self.Logger.log_and_respond("Reservas de Ofertas Ativas")
 
         ## Ordens da Bolsa
         # @self.app.route("/api/v1/orders", methods=["POST"])
         # def orders():
-        #     return Logger.log_and_respond("Orders")
+        #     return self.Logger.log_and_respond("Orders")
 
         ## Operações
         @self.app.route("/api/v1/operations", methods=["POST"])
         def operations_all_accounts():
-            return Logger.log_and_respond("Operations (All Accounts)")
+            return self.Logger.log_and_respond("Operations (All Accounts)")
 
         ## Relacionamento de Conta e Parceiro
         @self.app.route("/api/v1/relationship-accounts-advisors", methods=["POST"])
         def relationship_accounts_advisors():
-            return Logger.log_and_respond("Relationship Accounts and Advisors")
+            return self.Logger.log_and_respond("Relationship Accounts and Advisors")

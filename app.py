@@ -4,6 +4,7 @@ from adapters.controllers.suitability_controller import SuitabilityController
 from adapters.controllers.registration_data_controller import RegistrationDataController
 from adapters.controllers.account_base_controller import AccountBaseController
 from adapters.controllers.debentures_controller import DebenturesController
+from adapters.controllers.stock_orders_controller import StockOrdersController
 from adapters.controllers.recommended_equities_controller import (
     RecommendedEquitiesController,
 )
@@ -19,6 +20,7 @@ registration_data_controller = RegistrationDataController()
 account_base_controller = AccountBaseController()
 debentures_controller = DebenturesController()
 recommended_equities_controller = RecommendedEquitiesController()
+stock_order_controller = StockOrdersController(app)
 
 
 @app.route("/healthz")
@@ -52,8 +54,8 @@ def anbima_debentures(date):
 
 
 @app.route("/api/v1/get-recommended-equities/<date>", methods=["GET"])
-def get_recommended_equities():
-    return recommended_equities_controller.get_recommended_equities()
+def get_recommended_equities(date):
+    return recommended_equities_controller.get_recommended_equities(date)
 
 
 if __name__ == "__main__":

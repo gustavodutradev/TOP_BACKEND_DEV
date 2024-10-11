@@ -1,4 +1,5 @@
 import logging
+import traceback
 from flask import request, jsonify
 
 
@@ -15,8 +16,6 @@ class Logger:
         try:
             # Captura o JSON da requisição e verifica se está no formato esperado
             data = request.get_json(force=True)
-
-            print(type(data))
 
             # Se o JSON não estiver presente ou for inválido, retorna um erro 400
             if not data:
@@ -40,7 +39,9 @@ class Logger:
                 self.app.logger.debug(f"Payload Recebido: {data}")
 
             # Tenta obter a URL diretamente ou via campo 'response'
-            url = data.get("result").get("url")
+            url = data.get("result", {}).get(
+                "url"
+            )  # Acesso mais seguro ao JSON aninhado
 
             if not url:
                 # Acessa com segurança a lista 'errors' e verifica se há pelo menos um erro
@@ -74,6 +75,7 @@ class Logger:
             )
 
         except Exception as e:
-            # Loga a exceção ocorrida durante o processamento da requisição
+            # Loga a exceção ocorrida durante o processamento da requisição, com traceback
             self.app.logger.error(f"Exception on {event_name} - {str(e)}")
+            self.app.logger.error(traceback.format_exc())
             return jsonify({"status": "error", "message": "Internal server error"}), 500

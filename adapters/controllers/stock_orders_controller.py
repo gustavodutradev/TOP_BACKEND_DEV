@@ -1,5 +1,6 @@
 from flask import jsonify
 from core.services.stock_orders_service import StockOrdersService
+from core.services.token_service import TokenService
 from utils.logging import Logger
 
 
@@ -7,16 +8,17 @@ class StockOrdersController:
 
     def __init__(self, app) -> None:
         self.orders_service = StockOrdersService()
+        self.token_service = TokenService()
         self.app = app
         self.register_routes()
-        self.Logger = Logger()
+        self.logger = Logger(app)
 
     def register_routes(self):
         @self.app.route("/api/v1/orders", methods=["POST"])
         def orders():
             try:
                 # Loga o recebimento da requisição
-                Logger.log_and_respond("Pending Stock Orders")
+                self.logger.log_and_respond("Pending Stock Orders")
 
                 # Obtém as ordens pendentes de aprovação
                 pending_orders = self.orders_service.get_stock_orders()
