@@ -3,7 +3,15 @@ from core.services.token_service import TokenService
 
 
 class ConfigService:
-    def __init__(self) -> None:
+    _instance = None  # Singleton
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(ConfigService, cls).__new__(cls, *args, **kwargs)
+            cls._instance._initialize()
+        return cls._instance
+
+    def _initialize(self):
         self.token_service = TokenService()  # Obtém a instância singleton
         self._base_url = "https://api.btgpactual.com"
         self._uuid = uuid.uuid4()

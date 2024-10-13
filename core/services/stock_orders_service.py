@@ -1,5 +1,6 @@
 from core.services.config_service import ConfigService
 from core.services.email_service import EmailService
+
 # from datetime import datetime
 import io
 import os
@@ -9,9 +10,9 @@ import requests
 import time
 
 
-class StockOrdersService(ConfigService):
+class StockOrdersService:
     def __init__(self) -> None:
-        super().__init__()
+        self.config_service = ConfigService()
         self.email_service = EmailService()  # Inicializa o serviço de email
 
     def get_stock_orders(self):
@@ -22,10 +23,10 @@ class StockOrdersService(ConfigService):
         start_date = end_date = "2024-10-11"
 
         try:
-            self._headers = self.get_headers()
+            headers = self.config_service.get_headers()
             response = requests.post(
                 url,
-                headers=self._headers,
+                headers=headers,
                 json={"startDate": start_date, "endDate": end_date},
             )
 

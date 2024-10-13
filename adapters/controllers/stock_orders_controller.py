@@ -1,9 +1,10 @@
-from flask import jsonify
+from flask import jsonify, request
 from core.services.stock_orders_service import StockOrdersService
 from core.services.token_service import TokenService
 from utils.logging import Logger
 import traceback
 import time
+
 
 class StockOrdersController:
 
@@ -21,23 +22,37 @@ class StockOrdersController:
                 # Loga o início do processamento da requisição
                 self.logger.log_and_respond("Pending Stock Orders - Request Received")
 
+                # Verifica se o payload foi enviado corretamente
+                # payload = request.get_json()
+                # if not payload:
+                #     self.logger.logger.warning("Requisição sem payload JSON válido.")
+                #     return jsonify({"error": "Bad Request, payload not found"}), 400
+
                 # Obtém as ordens pendentes de aprovação
                 pending_orders = self.orders_service.get_stock_orders()
 
+                # Aguarda um tempo artificial para processamento (pode ser removido se não necessário)
                 time.sleep(10)
 
-                # Caso não tenha ordens pendentes, retorna 204 (No Content)
+                # Se não houver ordens pendentes, retorna 204 (No Content)
                 if not pending_orders:
                     self.logger.logger.info("Nenhuma ordem pendente encontrada.")
-                    return jsonify({"message": "Nenhuma ordem pendente encontrada."}), 204
+                    return (
+                        jsonify({"message": "Nenhuma ordem pendente encontrada."}),
+                        204,
+                    )
 
                 # Caso tenha ordens, retorna as ordens em formato JSON
-                self.logger.logger.info(f"Ordens pendentes encontradas: {pending_orders}")
+                self.logger.logger.info(
+                    f"Ordens pendentes encontradas: {pending_orders}"
+                )
                 return jsonify(pending_orders), 200
 
             except Exception as e:
                 # Loga a exceção com detalhes
-                self.logger.logger.error(f"Erro ao processar ordens pendentes: {str(e)}")
+                self.logger.logger.error(
+                    f"Erro ao processar ordens pendentes: {str(e)}"
+                )
                 self.logger.logger.error(traceback.format_exc())
 
                 # Retorna um erro genérico com status 500
