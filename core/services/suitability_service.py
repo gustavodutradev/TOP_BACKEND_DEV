@@ -3,7 +3,7 @@ import requests
 import json
 
 
-class SuitabilityService():
+class SuitabilityService:
     def __init__(self) -> None:
         self.config_service = ConfigService()
 
@@ -15,7 +15,9 @@ class SuitabilityService():
 
         try:
             # Atualiza os headers para garantir que o token mais recente seja usado
-            headers = self.config_service.get_headers()  # Obtenha os headers atualizados
+            headers = (
+                self.config_service.get_headers()
+            )  # Obtenha os headers atualizados
 
             response = requests.get(url, headers=headers)
 

@@ -3,7 +3,7 @@ import requests
 import json
 
 
-class DebenturesService():
+class DebenturesService:
     def __init__(self):
         self.config_service = ConfigService()
 

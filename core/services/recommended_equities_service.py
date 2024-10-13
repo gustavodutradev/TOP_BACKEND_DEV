@@ -3,7 +3,7 @@ import requests
 import json
 
 
-class RecommendedEquitiesService():
+class RecommendedEquitiesService:
     def __init__(self):
         self.config_service = ConfigService()
 

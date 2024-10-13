@@ -3,7 +3,7 @@ import requests
 from core.services.config_service import ConfigService
 
 
-class AccountBaseService():
+class AccountBaseService:
     def __init__(self):
         self.config_service = ConfigService()
 
