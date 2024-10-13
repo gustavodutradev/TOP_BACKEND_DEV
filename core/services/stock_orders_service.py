@@ -17,7 +17,7 @@ class StockOrdersService:
 
     def get_stock_orders(self):
         endpoint = f"/iaas-stock-order/api/v1/stock-order/orders"
-        url = f"{self._base_url}{endpoint}"
+        url = f"{self.config_service._base_url}{endpoint}"
 
         # start_date = end_date = datetime.now().strftime("%Y-%m-%d")
         start_date = end_date = "2024-10-11"
