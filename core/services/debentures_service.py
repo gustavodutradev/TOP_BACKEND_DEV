@@ -3,22 +3,22 @@ import requests
 import json
 
 
-class DebenturesService(ConfigService):
+class DebenturesService():
     def __init__(self):
-        super().__init__()
+        self.config_service = ConfigService()
 
     def get_anbima_debentures(self, reference_date):
         endpoint = f"/iaas-debenture/api/v1/debenture"
-        url = f"{self._base_url}{endpoint}"
+        url = f"{self.config_service._base_url}{endpoint}"
 
         params = {"referenceDate": reference_date}
 
         print(url)
 
         try:
-            self._headers = self.get_headers()
+            headers = self.config_service.get_headers()
 
-            response = requests.get(url, headers=self._headers, params=params)
+            response = requests.get(url, headers=headers, params=params)
 
             # Logando status code e response text
             print(f"Status Code: {response.status_code}")

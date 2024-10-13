@@ -3,20 +3,20 @@ import requests
 import json
 
 
-class RecommendedEquitiesService(ConfigService):
+class RecommendedEquitiesService():
     def __init__(self):
-        super().__init__()
+        self.config_service = ConfigService()
 
     def get_recommended_equities(self):
         endpoint = "/iaas-recommended-equities-allocation/api/v1/recommended-equities-allocation"
-        url = f"{self._base_url}{endpoint}"
+        url = f"{self.config_service._base_url}{endpoint}"
 
         print(url)
 
         try:
-            self._headers = self.get_headers()
+            headers = self.config_service.get_headers()
 
-            response = requests.get(url, headers=self._headers)
+            response = requests.get(url, headers=headers)
 
             # Logando status code e response text
             print(f"Status Code: {response.status_code}")

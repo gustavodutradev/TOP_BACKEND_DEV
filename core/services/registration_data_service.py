@@ -5,18 +5,18 @@ import requests
 
 class RegistrationDataService(ConfigService):
     def __init__(self) -> None:
-        super().__init__()
+        self.config_service = ConfigService()
 
     def get_registration_data(self, account_number: str):
         endpoint = f"/iaas-account-management/api/v1/account-management/account/{account_number}/information"
-        url = f"{self._base_url}{endpoint}"
+        url = f"{self.config_service._base_url}{endpoint}"
 
         print(url)
 
         try:
-            self._headers = self.get_headers()
+            headers = self.config_service.get_headers()
 
-            response = requests.get(url, headers=self._headers)
+            response = requests.get(url, headers=headers)
 
             # Logando status code e response text
             print(f"Status Code: {response.status_code}")
