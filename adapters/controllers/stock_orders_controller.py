@@ -64,6 +64,9 @@ class StockOrdersController:
                 return jsonify({"message": "Nenhuma ordem pendente encontrada."}), 204
             # Loga e retorna as ordens encontradas.
             self.logger.logger.info(f"Ordens pendentes encontradas: {pending_orders}")
+            # Envia um email com as ordens pendentes.
+            self.orders_service.send_pending_orders_email(pending_orders)
+            # Retorna as ordens em formato JSON.
             return jsonify(pending_orders), 200
         except Exception as e:
             self.logger.logger.error(
