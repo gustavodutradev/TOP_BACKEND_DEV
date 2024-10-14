@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from core.services.stock_orders_service import StockOrdersService
 from core.services.token_service import TokenService
-from utils.logging import Logger
+from utils.logging_requests import Logger
 import traceback
 import time
 
@@ -19,22 +19,12 @@ class StockOrdersController:
         @self.app.route("/api/v1/orders", methods=["POST"])
         def orders():
             try:
-                # Loga o início do processamento da requisição
+                pending_orders = self.orders_service.get_stock_orders()
+                
+                
                 self.logger.log_and_respond("Pending Stock Orders - Request Received")
 
-                # Verifica se o payload foi enviado corretamente
-                # payload = request.get_json()
-                # if not payload:
-                #     self.logger.logger.warning("Requisição sem payload JSON válido.")
-                #     return jsonify({"error": "Bad Request, payload not found"}), 400
 
-                # Obtém as ordens pendentes de aprovação
-                pending_orders = self.orders_service.get_stock_orders()
-
-                # Aguarda um tempo artificial para processamento (pode ser removido se não necessário)
-                time.sleep(10)
-
-                # Se não houver ordens pendentes, retorna 204 (No Content)
                 if not pending_orders:
                     self.logger.logger.info("Nenhuma ordem pendente encontrada.")
                     return (
@@ -49,7 +39,6 @@ class StockOrdersController:
                 return jsonify(pending_orders), 200
 
             except Exception as e:
-                # Loga a exceção com detalhes
                 self.logger.logger.error(
                     f"Erro ao processar ordens pendentes: {str(e)}"
                 )
