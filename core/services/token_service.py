@@ -74,7 +74,10 @@ class TokenService:
             )
 
     def __is_token_expired(self, cached_token) -> bool:
-        return time.time() > cached_token["expires_at"]
+        """Verifica se o token está expirado comparando com o timestamp atual."""
+        current_time = time.time()
+        expires_at = cached_token["expires_at"]
+        return current_time >= expires_at
 
     def __save_token_to_cache(self, access_token, expires_at):
         token_data = {"access_token": access_token, "expires_at": expires_at}
