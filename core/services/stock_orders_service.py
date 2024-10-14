@@ -1,7 +1,6 @@
 from core.services.config_service import ConfigService
 from core.services.email_service import EmailService
-
-# from datetime import datetime
+from datetime import datetime
 import io
 import os
 import csv
@@ -13,14 +12,13 @@ import time
 class StockOrdersService:
     def __init__(self) -> None:
         self.config_service = ConfigService()
-        self.email_service = EmailService()  # Inicializa o serviço de email
+        self.email_service = EmailService()
 
     def get_stock_orders(self):
         endpoint = f"/iaas-stock-order/api/v1/stock-order/orders"
         url = f"{self.config_service._base_url}{endpoint}"
 
-        # start_date = end_date = datetime.now().strftime("%Y-%m-%d")
-        start_date = end_date = "2024-10-11"
+        start_date = end_date = datetime.now().strftime("%Y-%m-%d")
 
         try:
             headers = self.config_service.get_headers()
@@ -34,18 +32,12 @@ class StockOrdersService:
                 print(f"Erro na requisição: {response.status_code} - {response.text}")
                 return None
 
-            if response.content:
-                try:
-                    response_data = response.json()
-                except ValueError as e:
-                    print(f"Erro ao decodificar a resposta JSON: {str(e)}")
-                    return None
-            else:
-                print("Resposta sem conteúdo.")
-                return None
+            data = response.get_json(force=True)
 
-            result = response_data.get("result", {})
-            csv_url = result.get("url")
+            if isinstance(data, list) and data:
+                data = data[0]
+
+            csv_url = data.get("result", {}).get("url")
 
             if not csv_url:
                 raise Exception("URL do CSV não encontrada na resposta.")
@@ -77,7 +69,7 @@ class StockOrdersService:
             return None
 
     def send_pending_orders_email(self, orders):
-        to_email = os.getenv("NOTIFY_EMAIL")  # Email do destinatário
+        to_email = os.getenv("NOTIFY_EMAIL")
         subject = "Ordens Pendentes de Aprovação"
         body = f"Foram encontradas as seguintes ordens pendentes:\n\n{orders}"
         self.email_service.send_email(to_email, subject, body)
