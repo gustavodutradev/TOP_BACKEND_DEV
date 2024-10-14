@@ -19,11 +19,9 @@ class StockOrdersController:
         @self.app.route("/api/v1/orders", methods=["POST"])
         def orders():
             try:
-                pending_orders = self.orders_service.get_stock_orders()
-                
-                
                 self.logger.log_and_respond("Pending Stock Orders - Request Received")
-
+                
+                pending_orders = self.orders_service.get_stock_orders()
 
                 if not pending_orders:
                     self.logger.logger.info("Nenhuma ordem pendente encontrada.")
