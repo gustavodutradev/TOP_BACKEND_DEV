@@ -59,9 +59,9 @@ class StockOrdersService:
                         for row in reader:
                             if row.get("ordStatus", "") == "":
                                 pending_order = {
-                                    "Número da conta": row.get("account"),
-                                    "Quantidade": row.get("ordQty"),
-                                    "Ativo": row.get("symbol"),
+                                    "account": row.get("account"),
+                                    "orderQty": row.get("ordQty"),
+                                    "symbol": row.get("symbol"),
                                 }
 
                                 pending_orders.append(pending_order)
