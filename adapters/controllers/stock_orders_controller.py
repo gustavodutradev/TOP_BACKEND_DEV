@@ -34,7 +34,9 @@ class StockOrdersController:
                 if response:
                     return (
                         jsonify(
-                            {"message": "Requisição aceita. Aguardando processamento via webhook."}
+                            {
+                                "message": "Requisição aceita. Aguardando processamento via webhook."
+                            }
                         ),
                         202,
                     )
