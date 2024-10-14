@@ -34,7 +34,7 @@ class StockOrdersService:
 
             if response.content:
                 try:
-                    response_data = response.json()
+                    response_data = response.get_json()
                 except ValueError as e:
                     print(f"Erro ao decodificar a resposta JSON: {str(e)}")
                     return None
