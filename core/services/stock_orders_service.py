@@ -31,12 +31,19 @@ class StockOrdersService:
                 print(f"Erro na requisição: {response.status_code} - {response.text}")
                 return None
 
-            data = response.json()
+            if response.content:
+                try:
+                    response_data = response.json()
+                    if isinstance(response_data, list) and response_data:
+                        response_data = response_data[0]
+                except ValueError as e:
+                    print(f"Erro ao decodificar a resposta JSON: {str(e)}")
+                    return None
+            else:
+                print("Resposta sem conteúdo.")
+                return None
 
-            if isinstance(data, list) and data:
-                data = data[0]
-
-            csv_url = data.get("result", {}).get("url")
+            csv_url = response_data.get("result", {}).get("url")
 
             if not csv_url:
                 raise Exception("URL do CSV não encontrada na resposta.")

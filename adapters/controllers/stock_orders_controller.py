@@ -1,9 +1,8 @@
-from flask import jsonify, request
+from flask import jsonify
 from core.services.stock_orders_service import StockOrdersService
 from core.services.token_service import TokenService
 from utils.logging_requests import Logger
 import traceback
-import time
 
 
 class StockOrdersController:
@@ -20,7 +19,7 @@ class StockOrdersController:
         def orders():
             try:
                 self.logger.log_and_respond("Pending Stock Orders - Request Received")
-                
+
                 pending_orders = self.orders_service.get_stock_orders()
 
                 if not pending_orders:
