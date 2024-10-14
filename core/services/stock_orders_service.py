@@ -78,13 +78,13 @@ class StockOrdersService:
         subject = "Ordens Pendentes de Aprovação"
 
         # Formata o corpo do e-mail com as ordens pendentes
-        body = "Foram encontradas as seguintes ordens pendentes:\n\n"
+        body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
         for order in orders:
             body += (
-                f"Conta: {order['account']} | "
+                f"<p>Conta: {order['account']} | "
                 f"Quantidade: {order['orderQty']} | "
-                f"Ativo: {order['symbol']}\n"
+                f"Ativo: {order['symbol']}</p>"
             )
 
         # Envia o e-mail
-        self.email_service.send_email(to_email, subject, body)
+        self.email_service.send_email(to_email, subject, body, is_html=True)
