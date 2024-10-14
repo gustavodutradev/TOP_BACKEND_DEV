@@ -37,14 +37,16 @@ class StockOrdersService:
         except requests.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
             return None
-        
+
     def process_csv_from_url(self, csv_url):
         """Realiza o download do CSV zipado, extrai e filtra ordens pendentes."""
         try:
             # Baixa o arquivo ZIP
             zip_response = requests.get(csv_url)
             if zip_response.status_code != 200:
-                raise Exception(f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}")
+                raise Exception(
+                    f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}"
+                )
 
             pending_orders = []
 
@@ -55,8 +57,14 @@ class StockOrdersService:
                         reader = csv.DictReader(io.TextIOWrapper(csv_file, "utf-8"))
                         # Filtra ordens pendentes (status vazio)
                         for row in reader:
-                            if row.get("status", "") == "":
-                                pending_orders.append(row)
+                            if row.get("ordStatus", "") == "":
+                                pending_order = {
+                                    "Número da conta": row.get("account"),
+                                    "Quantidade": row.get("ordQty"),
+                                    "Ativo": row.get("symbol"),
+                                }
+
+                                pending_orders.append(pending_order)
 
             return pending_orders
 
@@ -65,7 +73,18 @@ class StockOrdersService:
             return None
 
     def send_pending_orders_email(self, orders):
+        """Envia as ordens pendentes por e-mail."""
         to_email = os.getenv("NOTIFY_EMAIL")
         subject = "Ordens Pendentes de Aprovação"
-        body = f"Foram encontradas as seguintes ordens pendentes:\n\n{orders}"
+
+        # Formata o corpo do e-mail com as ordens pendentes
+        body = "Foram encontradas as seguintes ordens pendentes:\n\n"
+        for order in orders:
+            body += (
+                f"Conta: {order['account']} | "
+                f"Quantidade: {order['orderQty']} | "
+                f"Ativo: {order['symbol']}\n"
+            )
+
+        # Envia o e-mail
         self.email_service.send_email(to_email, subject, body)
