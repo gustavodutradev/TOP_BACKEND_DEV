@@ -1,5 +1,5 @@
 from core.services.token_service import TokenService
-from utils.logging import Logger
+from utils.logging_requests import Logger
 
 
 class WebhookService:
@@ -9,74 +9,6 @@ class WebhookService:
         self.token_service = TokenService()
         self.register_routes()
         self.Logger = Logger(app)
-        # self.setup_logging()
-
-    # def setup_logging(self):
-    #     logging.basicConfig(level=logging.DEBUG)
-    #     self.logger = logging.getLogger(__name__)
-
-    # def log_and_respond(self, event_name: str):
-    #     try:
-    #         # Captura o JSON da requisição e verifica se está no formato esperado
-    #         data = request.get_json(force=True, silent=True)
-
-    #         # Se o JSON não estiver presente ou for inválido, retorna um erro 400
-    #         if not data:
-    #             self.app.logger.error(
-    #                 f"Received Event {event_name} - No JSON payload found"
-    #             )
-    #             return (
-    #                 jsonify(
-    #                     {
-    #                         "status": "Invalid request",
-    #                         "message": "No JSON payload found",
-    #                     }
-    #                 ),
-    #                 400,
-    #             )
-
-    #         # Verifica se 'data' é uma lista e pega o primeiro item, se aplicável
-    #         if isinstance(data, list) and len(data) > 0:
-    #             data = data[0]
-
-    #         # Tenta obter a URL diretamente ou via campo 'response'
-    #         url = data.get("url") or data.get("response", {}).get("url")
-
-    #         if not url:
-    #             # Acessa com segurança a lista 'errors' e verifica se há pelo menos um erro
-    #             errors = data.get("errors", [{}])
-    #             error = errors[0] if isinstance(errors, list) and errors else {}
-
-    #             # Coleta a mensagem e código de erro, com valores padrão
-    #             message = error.get("message", "Unknown error")
-    #             code = error.get("code", "Unknown code")
-
-    #             # Log detalhado do evento e erro
-    #             self.app.logger.warning(
-    #                 f"Received Event {event_name} - URL not found in request data. "
-    #                 f"Error Code: {code}, Message: {message}, Full Payload: {data}"
-    #             )
-
-    #             # Responde com o código de erro apropriado
-    #             return jsonify({"status": code, "message": message}), 400
-
-    #         # Loga o sucesso com a URL recebida
-    #         self.logger.info(
-    #             f"Received Event {event_name} - URL: {url}, Full Payload: {data}"
-    #         )
-
-    #         # Retorna sucesso quando o evento é processado corretamente
-    #         return (
-    #             jsonify(
-    #                 {"status": "success", "message": "Event processed", "url": url}
-    #             ),
-    #             200,
-    #         )
-
-    #     except Exception as e:
-    #         # Loga a exceção ocorrida durante o processamento da requisição
-    #         self.app.logger.error(f"Exception on {event_name} - {str(e)}")
-    #         return jsonify({"status": "error", "message": "Internal server error"}), 500
 
     def register_routes(self):
 
@@ -155,11 +87,6 @@ class WebhookService:
         @self.app.route("/api/v1/reservas-ofertas-ativas", methods=["POST"])
         def reservas_ofertas_ativas():
             return self.Logger.log_and_respond("Reservas de Ofertas Ativas")
-
-        ## Ordens da Bolsa
-        # @self.app.route("/api/v1/orders", methods=["POST"])
-        # def orders():
-        #     return self.Logger.log_and_respond("Orders")
 
         ## Operações
         @self.app.route("/api/v1/operations", methods=["POST"])
