@@ -27,48 +27,12 @@ class StockOrdersService:
                 json={"startDate": start_date, "endDate": end_date},
             )
 
-            if response.status_code != 202:
-                print(f"Erro na requisição: {response.status_code} - {response.text}")
-                return None
+            if response.status_code == 202:
+                print("Requisição aceita. Aguarde o webhook para processamento.")
+                return True  # Confirma que a requisição foi aceita
 
-            if response.content:
-                try:
-                    response_data = response.json()
-                    if isinstance(response_data, list) and response_data:
-                        response_data = response_data[0]
-                except ValueError as e:
-                    print(f"Erro ao decodificar a resposta JSON: {str(e)}")
-                    return None
-            else:
-                print("Resposta sem conteúdo.")
-                return None
-
-            csv_url = response_data.get("result", {}).get("url")
-
-            if not csv_url:
-                raise Exception("URL do CSV não encontrada na resposta.")
-
-            zip_response = requests.get(csv_url)
-
-            if zip_response.status_code != 200:
-                print(
-                    f"Erro ao fazer download do arquivo ZIP: {zip_response.status_code}"
-                )
-                return None
-
-            with zipfile.ZipFile(io.BytesIO(zip_response.content)) as zip_file:
-                orders = []
-                for filename in zip_file.namelist():
-                    with zip_file.open(filename) as csv_file:
-                        reader = csv.DictReader(io.TextIOWrapper(csv_file, "utf-8"))
-                        for row in reader:
-                            if row["status"] == "":
-                                orders.append(row)
-
-            if orders:
-                self.send_pending_orders_email(orders)
-
-            return orders
+            print(f"Erro na requisição: {response.status_code} - {response.text}")
+            return None
 
         except requests.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
