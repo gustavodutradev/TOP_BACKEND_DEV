@@ -6,7 +6,6 @@ import os
 import csv
 import zipfile
 import requests
-import time
 
 
 class StockOrdersService:
@@ -32,7 +31,7 @@ class StockOrdersService:
                 print(f"Erro na requisição: {response.status_code} - {response.text}")
                 return None
 
-            data = response.get_json(force=True)
+            data = response.json()
 
             if isinstance(data, list) and data:
                 data = data[0]
