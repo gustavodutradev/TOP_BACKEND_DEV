@@ -9,7 +9,7 @@ class PendingOrdersScheduler:
         self.scheduler = BackgroundScheduler(
             timezone=pytz.timezone("America/Sao_Paulo")
         )
-        self.configure_jobs()
+        self._configure_jobs()
 
     def _configure_jobs(self):
         """Agenda o o fluxo de ordens pendentes"""
