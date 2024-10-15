@@ -8,6 +8,7 @@ from adapters.controllers.stock_orders_controller import StockOrdersController
 from adapters.controllers.recommended_equities_controller import (
     RecommendedEquitiesController,
 )
+from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 import os
 
 app = Flask(__name__)
@@ -21,6 +22,8 @@ account_base_controller = AccountBaseController()
 debentures_controller = DebenturesController()
 recommended_equities_controller = RecommendedEquitiesController()
 stock_order_controller = StockOrdersController(app)
+
+task_scheduler = PendingOrdersScheduler()
 
 
 @app.route("/healthz")
