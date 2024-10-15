@@ -58,10 +58,19 @@ class StockOrdersService:
                         # Filtra ordens pendentes (status vazio)
                         for row in reader:
                             if row.get("ordStatus", "") == "":
+
+                                side = "Compra" if row.get("side") == "1" else "Venda"
+                                order_price = (
+                                    "Mercado"
+                                    if row.get("price") == 0
+                                    else row.get("price")
+                                )
                                 pending_order = {
                                     "account": row.get("account"),
-                                    "orderQty": row.get("ordQty"),
                                     "symbol": row.get("symbol"),
+                                    "orderQty": row.get("orderQty"),
+                                    "orderPrice": order_price,
+                                    "side": side,
                                 }
 
                                 pending_orders.append(pending_order)
@@ -82,8 +91,10 @@ class StockOrdersService:
         for order in orders:
             body += (
                 f"<p>Conta: {order['account']} | "
+                f"Ativo: {order['symbol']} |"
                 f"Quantidade: {order['orderQty']} | "
-                f"Ativo: {order['symbol']}</p>"
+                f"Preço: {order['orderPrice']} | "
+                f"Lado: {order['side']}</p>"
             )
 
         # Envia o e-mail
