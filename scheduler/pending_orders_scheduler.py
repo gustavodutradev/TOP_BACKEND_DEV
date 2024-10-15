@@ -5,8 +5,7 @@ import requests
 
 
 class PendingOrdersScheduler:
-    def __init__(self, orders_service):
-        self.orders_service = orders_service
+    def __init__(self):
         self.scheduler = BackgroundScheduler(
             timezone=pytz.timezone("America/Sao_Paulo")
         )
@@ -14,11 +13,11 @@ class PendingOrdersScheduler:
 
     def _configure_jobs(self):
         """Agenda o o fluxo de ordens pendentes"""
-        self.scheduler.add_job(self._send_pendind_orders, "cron", hour=12, minute=0)
-        self.scheduler.add_job(self._send_pendind_orders, "cron", hour=16, minute=0)
+        self.scheduler.add_job(self._call_orders_controller, "cron", hour=12, minute=5)
+        self.scheduler.add_job(self._call_orders_controller, "cron", hour=16, minute=0)
         self.scheduler.start()
 
-    def _send_pending_orders(self):
+    def _call_orders_controller(self):
         """Chama o serviço para verificar e enviar ordens pendentes"""
         print(f"Tarefa disparada em: {datetime.now()}")
         try:
