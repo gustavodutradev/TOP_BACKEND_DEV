@@ -63,6 +63,7 @@ class StockOrdersController:
             pending_orders = self.orders_service.process_csv_from_url(csv_url)
             if not pending_orders:
                 self.logger.logger.info("Nenhuma ordem pendente encontrada.")
+                self.orders_service.send_empty_pending_orders_email()
                 return jsonify({"message": "Nenhuma ordem pendente encontrada."}), 204
             # Loga e retorna as ordens encontradas.
             self.logger.logger.info(f"Ordens pendentes encontradas: {pending_orders}")

@@ -88,3 +88,11 @@ class StockOrdersService:
 
         # Envia o e-mail
         self.email_service.send_email(to_email, subject, body, is_html=True)
+
+    def send_empty_pending_orders_email(self):
+        """Envia notificação por email alertando que não há ordens pendentes"""
+        to_email = os.getenv("NOTIFY_EMAIL")
+        subject = "Nenhuma Ordem Pendente de Aprovação"
+        body = "<p>Não foram encontradas ordens pendentes.</p>"
+
+        self.email_service.send_email(to_email, subject, body, is_html=True)
