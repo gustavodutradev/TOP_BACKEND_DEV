@@ -7,10 +7,12 @@ class EmailService:
     def __init__(self):
         self.sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
 
-    def send_email(self, to_email, subject, content, is_html=False):
+    def send_email(self, to_emails, subject, content, is_html=False):
+        if isinstance(to_emails, str):
+            to_emails = [email.strip() for email in to_emails.split(",")]
         email = Mail(
             from_email="gustavobdsdev@gmail.com",
-            to_emails=to_email,
+            to_emails=to_emails,
             subject=subject,
             html_content=content if is_html else None,
         )
