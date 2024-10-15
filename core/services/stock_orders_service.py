@@ -90,11 +90,11 @@ class StockOrdersService:
         body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
         for order in orders:
             body += (
-                f"<p>Conta: {order['account']} | "
-                f"Ativo: {order['symbol']} |"
-                f"Quantidade: {order['orderQty']} | "
-                f"Preço: {order['orderPrice']} | "
-                f"Lado: {order['side']}</p>"
+                f"<p><b>Conta:</b> {order['account']} | "
+                f"<b>Ativo:</b> {order['symbol']} | "
+                f"<b>Quantidade:</b> {order['orderQty']} | "
+                f"<b>Preço:</b> {order['orderPrice']} | "
+                f"<b>Lado:</b> {order['side']}</p>"
             )
 
         # Envia o e-mail
