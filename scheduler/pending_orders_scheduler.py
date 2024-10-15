@@ -13,7 +13,7 @@ class PendingOrdersScheduler:
 
     def _configure_jobs(self):
         """Agenda o o fluxo de ordens pendentes"""
-        self.scheduler.add_job(self._call_orders_controller, "cron", hour=12, minute=5)
+        self.scheduler.add_job(self._call_orders_controller, "cron", hour=12, minute=12)
         self.scheduler.add_job(self._call_orders_controller, "cron", hour=16, minute=0)
         self.scheduler.start()
 
