@@ -46,6 +46,11 @@ def get_registration_data(account_number):
     return registration_data_controller.get_registration_data(account_number)
 
 
+@app.route("/api/v1/get-holder-name/<account_number>", methods=["GET"])
+def get_holder_name(account_number):
+    return registration_data_controller.get_holder_name(account_number)
+
+
 @app.route("/api/v1/get-account-base", methods=["GET"])
 def get_account_base():
     return account_base_controller.get_account_base()

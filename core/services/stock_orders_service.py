@@ -1,5 +1,6 @@
 from core.services.config_service import ConfigService
 from core.services.email_service import EmailService
+from core.services.registration_data_service import RegistrationDataService
 from datetime import datetime
 import io
 import os
@@ -10,15 +11,17 @@ import requests
 
 class StockOrdersService:
     """Classe para requisitar ordens de compra e venda."""
+
     def __init__(self) -> None:
         self.config_service = ConfigService()
         self.email_service = EmailService()
+        self.registration_data_service = RegistrationDataService()
+        self.account_cache = {}  # Cache para armazenar informações de contas
 
     def get_stock_orders(self):
         """Requisita ordens de compra e venda da API IaaS Stock Order."""
         endpoint = f"/iaas-stock-order/api/v1/stock-order/orders"
         url = f"{self.config_service._base_url}{endpoint}"
-
         start_date = end_date = datetime.now().strftime("%Y-%m-%d")
 
         try:
@@ -31,7 +34,7 @@ class StockOrdersService:
 
             if response.status_code == 202:
                 print("Requisição aceita. Aguarde o webhook para processamento.")
-                return True  # Confirma que a requisição foi aceita
+                return True
 
             print(f"Erro na requisição: {response.status_code} - {response.text}")
             return None
@@ -41,9 +44,8 @@ class StockOrdersService:
             return None
 
     def process_csv_from_url(self, csv_url):
-        """Realiza o download do CSV zipado, extrai e filtra ordens pendentes."""
+        """Realiza o download do CSV zipado e extrai ordens pendentes."""
         try:
-            # Baixa o arquivo ZIP
             zip_response = requests.get(csv_url)
             if zip_response.status_code != 200:
                 raise Exception(
@@ -52,15 +54,12 @@ class StockOrdersService:
 
             pending_orders = []
 
-            # Extrai o conteúdo do ZIP e lê o CSV
             with zipfile.ZipFile(io.BytesIO(zip_response.content)) as zip_file:
                 for filename in zip_file.namelist():
                     with zip_file.open(filename) as csv_file:
                         reader = csv.DictReader(io.TextIOWrapper(csv_file, "utf-8"))
-                        # Filtra ordens pendentes (status vazio)
                         for row in reader:
                             if row.get("ordStatus", "") == "":
-
                                 side = "Compra" if row.get("side") == "1" else "Venda"
                                 order_price = (
                                     "Mercado"
@@ -74,7 +73,6 @@ class StockOrdersService:
                                     "orderPrice": order_price,
                                     "side": side,
                                 }
-
                                 pending_orders.append(pending_order)
 
             return pending_orders
@@ -83,27 +81,38 @@ class StockOrdersService:
             print(f"Erro ao processar o CSV: {str(e)}")
             return None
 
+    def get_account_holder_name(self, account_number: str) -> str:
+        """Busca o nome do titular da conta com cache."""
+        if account_number in self.account_cache:
+            return self.account_cache[account_number]
+
+        holder_name = self.registration_data_service.get_holder_name(account_number)
+        self.account_cache[account_number] = holder_name
+        return holder_name
+
     def send_pending_orders_email(self, orders):
-        """Envia as ordens pendentes por e-mail."""
+        """Envia as ordens pendentes por e-mail com nomes dos clientes."""
         to_email = os.getenv("NOTIFY_EMAIL")
         subject = "Ordens Pendentes de Aprovação"
 
-        # Formata o corpo do e-mail com as ordens pendentes
         body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
         for order in orders:
+            account_number = order["account"]
+            holder_name = self.get_account_holder_name(account_number)
+
             body += (
-                f"<p><b>Conta:</b> {order['account']} | "
+                f"<p><b>Cliente:</b> {holder_name} | "
+                f"<b>Conta:</b> {account_number} | "
                 f"<b>Ativo:</b> {order['symbol']} | "
                 f"<b>Quantidade:</b> {order['orderQty']} | "
                 f"<b>Preço:</b> {order['orderPrice']} | "
                 f"<b>Lado:</b> {order['side']}</p>"
             )
 
-        # Envia o e-mail
         self.email_service.send_email(to_email, subject, body, is_html=True)
 
     def send_empty_pending_orders_email(self):
-        """Envia notificação por email alertando que não há ordens pendentes"""
+        """Envia notificação por email alertando que não há ordens pendentes."""
         to_email = os.getenv("NOTIFY_EMAIL")
         subject = "Nenhuma Ordem Pendente de Aprovação"
         body = "<p>Não foram encontradas ordens pendentes.</p>"
