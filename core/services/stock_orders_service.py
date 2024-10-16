@@ -9,11 +9,13 @@ import requests
 
 
 class StockOrdersService:
+    """Classe para requisitar ordens de compra e venda."""
     def __init__(self) -> None:
         self.config_service = ConfigService()
         self.email_service = EmailService()
 
     def get_stock_orders(self):
+        """Requisita ordens de compra e venda da API IaaS Stock Order."""
         endpoint = f"/iaas-stock-order/api/v1/stock-order/orders"
         url = f"{self.config_service._base_url}{endpoint}"
 
@@ -62,7 +64,7 @@ class StockOrdersService:
                                 side = "Compra" if row.get("side") == "1" else "Venda"
                                 order_price = (
                                     "Mercado"
-                                    if row.get("price") == 0
+                                    if row.get("price") == "0.0"
                                     else row.get("price")
                                 )
                                 pending_order = {
