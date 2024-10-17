@@ -3,10 +3,7 @@ from core.services.email_service import EmailService
 from core.services.registration_data_service import RegistrationDataService
 from core.services.zip_service import ZipService
 from datetime import datetime
-import io
 import os
-import csv
-import zipfile
 import requests
 
 
