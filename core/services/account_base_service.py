@@ -25,7 +25,7 @@ class AccountBaseService:
             # Verifica se a resposta não é 200
             if response.status_code != 200:
                 print(
-                    f"Erro ao acessar suitability: {response.status_code} - {response.text}"
+                    f"Erro ao acessar Base de Contas: {response.status_code} - {response.text}"
                 )
                 return {"error": "Falha ao acessar o endpoint."}
 

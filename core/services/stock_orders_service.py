@@ -1,6 +1,7 @@
 from core.services.config_service import ConfigService
 from core.services.email_service import EmailService
 from core.services.registration_data_service import RegistrationDataService
+from core.services.zip_service import ZipService
 from datetime import datetime
 import io
 import os
@@ -52,28 +53,24 @@ class StockOrdersService:
                     f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}"
                 )
 
+            zip_service = ZipService()
             pending_orders = []
 
-            with zipfile.ZipFile(io.BytesIO(zip_response.content)) as zip_file:
-                for filename in zip_file.namelist():
-                    with zip_file.open(filename) as csv_file:
-                        reader = csv.DictReader(io.TextIOWrapper(csv_file, "utf-8"))
-                        for row in reader:
-                            if row.get("ordStatus", "") == "":
-                                side = "Compra" if row.get("side") == "1" else "Venda"
-                                order_price = (
-                                    "Mercado"
-                                    if row.get("price") == "0.0"
-                                    else row.get("price")
-                                )
-                                pending_order = {
-                                    "account": row.get("account"),
-                                    "symbol": row.get("symbol"),
-                                    "orderQty": row.get("orderQty"),
-                                    "orderPrice": order_price,
-                                    "side": side,
-                                }
-                                pending_orders.append(pending_order)
+            for reader in zip_service.unzip_csv_reader(zip_response):
+                for row in reader:
+                    if row.get("ordStatus", "") == "":
+                        side = "Compra" if row.get("side") == "1" else "Venda"
+                        order_price = (
+                            "Mercado" if row.get("price") == "0.0" else row.get("price")
+                        )
+                        pending_order = {
+                            "account": row.get("account"),
+                            "symbol": row.get("symbol"),
+                            "orderQty": row.get("orderQty"),
+                            "orderPrice": order_price,
+                            "side": side,
+                        }
+                        pending_orders.append(pending_order)
 
             return pending_orders
 
@@ -99,7 +96,9 @@ class StockOrdersService:
         enriched_orders = []
         for order in orders:
             account_number = order["account"]
-            holder_name = self.get_account_holder_name(account_number)  # Obtemos o nome do cliente.
+            holder_name = self.get_account_holder_name(
+                account_number
+            )  # Obtemos o nome do cliente.
 
             # Enriquecer a ordem com o nome do cliente.
             order_with_name = {**order, "holder_name": holder_name}
@@ -122,7 +121,6 @@ class StockOrdersService:
 
         # Enviar o e-mail.
         self.email_service.send_email(to_email, subject, body, is_html=True)
-
 
     def send_empty_pending_orders_email(self):
         """Envia notificação por email alertando que não há ordens pendentes."""
