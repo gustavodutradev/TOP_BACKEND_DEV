@@ -91,25 +91,38 @@ class StockOrdersService:
         return holder_name
 
     def send_pending_orders_email(self, orders):
-        """Envia as ordens pendentes por e-mail com nomes dos clientes."""
+        """Envia as ordens pendentes por e-mail, ordenadas alfabeticamente pelo nome dos clientes."""
         to_email = os.getenv("NOTIFY_EMAIL")
         subject = "Ordens Pendentes de Aprovação"
 
-        body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
+        # Adicionar nomes dos clientes às ordens para facilitar a ordenação.
+        enriched_orders = []
         for order in orders:
             account_number = order["account"]
-            holder_name = self.get_account_holder_name(account_number)
+            holder_name = self.get_account_holder_name(account_number)  # Obtemos o nome do cliente.
 
+            # Enriquecer a ordem com o nome do cliente.
+            order_with_name = {**order, "holder_name": holder_name}
+            enriched_orders.append(order_with_name)
+
+        # Ordenar as ordens alfabeticamente pelo nome do cliente (holder_name).
+        enriched_orders.sort(key=lambda x: x["holder_name"])
+
+        # Construir o corpo do e-mail com a lista ordenada.
+        body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
+        for order in enriched_orders:
             body += (
-                f"<p><b>Cliente:</b> {holder_name} | "
-                f"<b>Conta:</b> {account_number} | "
+                f"<p><b>Cliente:</b> {order['holder_name']} | "
+                f"<b>Conta:</b> {order['account']} | "
                 f"<b>Ativo:</b> {order['symbol']} | "
                 f"<b>Quantidade:</b> {order['orderQty']} | "
                 f"<b>Preço:</b> {order['orderPrice']} | "
                 f"<b>Lado:</b> {order['side']}</p>"
             )
 
+        # Enviar o e-mail.
         self.email_service.send_email(to_email, subject, body, is_html=True)
+
 
     def send_empty_pending_orders_email(self):
         """Envia notificação por email alertando que não há ordens pendentes."""
