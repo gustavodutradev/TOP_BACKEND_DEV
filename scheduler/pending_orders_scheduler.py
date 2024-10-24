@@ -2,14 +2,16 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import pytz
 import requests
+import os
 
 
 class PendingOrdersScheduler:
     def __init__(self):
-        self.scheduler = BackgroundScheduler(
-            timezone=pytz.timezone("America/Sao_Paulo")
-        )
-        self._configure_jobs()
+        if os.getenv("GUNICORN_WORKER_ID") is None:
+            self.scheduler = BackgroundScheduler(
+                timezone=pytz.timezone("America/Sao_Paulo")
+            )
+            self._configure_jobs()
 
     def _configure_jobs(self):
         """Agenda o fluxo de ordens pendentes"""
