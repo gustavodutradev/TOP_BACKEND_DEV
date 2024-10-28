@@ -20,7 +20,7 @@ class StockOrdersController:
             try:
                 # Detecta se é uma chamada inicial ou um webhook com base no payload recebido.
                 if request.is_json:
-                    data = request.get_json(force=True)
+                    data = request.get_json(silent=True)
 
                     # Se 'result' estiver presente, trata como um webhook.
                     if "result" in data:

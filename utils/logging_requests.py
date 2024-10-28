@@ -17,7 +17,7 @@ class Logger:
     def log_and_respond(self, event_name: str):
         try:
             # Captura o JSON da requisição
-            data = request.get_json(force=True)
+            data = request.get_json(silent=True)
 
             # Verifica se o JSON está presente
             if not data:
