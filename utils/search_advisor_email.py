@@ -2,23 +2,25 @@ import json
 
 
 class SearchAdvisorEmail:
-
     def __init__(self):
         pass
 
     def find_sgcge(self, account_number, account_data):
+        """Busca o código CGE do assessor a partir do número da conta."""
         for entry in account_data:
             if entry["account"] == account_number:
                 return entry["sgCGE"]
         return None
 
-    def find_email(self, sgcge, advisor_data):
+    def find_advisor_info(self, sgcge, advisor_data):
+        """Busca o e-mail e nome do assessor pelo código CGE."""
         for advisor in advisor_data:
             if advisor["advisorCgeCode"] == sgcge:
-                return advisor["email"]
-        return None
+                return advisor["email"], advisor["advisorName"]
+        return None, None
 
-    def get_advisor_email(self, account_number):
+    def get_advisor_info(self, account_number):
+        """Obtém as informações do assessor a partir do número da conta."""
         with open("resources/data/account_advisors_data.json", "r") as f:
             account_data = json.load(f)
 
@@ -27,14 +29,6 @@ class SearchAdvisorEmail:
 
         sgcge = self.find_sgcge(account_number, account_data)
         if sgcge is None:
-            return None
+            return None, None
 
-        email = self.find_email(sgcge, advisor_data)
-        return email
-
-
-# if __name__ == '__main__':
-#     search_advisor_email = SearchAdvisorEmail()
-#     account_number = '5870324'
-#     advisor_email = search_advisor_email.get_advisor_email(account_number)
-#     print(f'The advisor email for account {account_number} is {advisor_email}')
+        return self.find_advisor_info(sgcge, advisor_data)

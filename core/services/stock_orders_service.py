@@ -15,7 +15,7 @@ class StockOrdersService:
         self.config_service = ConfigService()
         self.email_service = EmailService()
         self.registration_data_service = RegistrationDataService()
-        self.search_advisor_email = SearchAdvisorEmail()
+        self.advisor_email_service = SearchAdvisorEmail()
         self.account_cache = {}  # Cache para armazenar informações de contas
 
     def get_stock_orders(self):
@@ -97,11 +97,19 @@ class StockOrdersService:
             self._send_advisor_email(advisor_email, advisor_orders)
 
     def _group_orders_by_advisor(self, orders):
-        """Agrupa as ordens pendentes por e-mail do assessor."""
+        """Agrupa as ordens por e-mail do assessor e nome do cliente."""
         orders_by_advisor = {}
         for order in orders:
-            advisor_email = self.search_advisor_email.get_advisor_email(order["account"])
-            orders_by_advisor.setdefault(advisor_email, []).append(order)
+            email, name = self.advisor_email_service.get_advisor_info(order["account"])
+            holder_name = self.get_account_holder_name(order["account"])
+
+            if not holder_name or holder_name == "Nome não encontrado":
+                holder_name = name if name else "Assessor não identificado"
+
+            orders_by_advisor.setdefault(email, []).append(
+                {**order, "holder_name": holder_name}
+            )
+
         return orders_by_advisor
 
     def _send_consolidated_email(self, orders):
@@ -151,6 +159,8 @@ class StockOrdersService:
                     f"<p>  - Conta: {order['account']} | Ativo: {order['symbol']} | "
                     f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
                 )
+
+        body += "<p>Este e-mail reforça a atenção com as ordens pendentes de seus clientes, para que não perca a atual janela de execução. Favor reforçar aos clientes a necessidade de aprová-las.</p>"
 
         # Enviar o e-mail para o assessor
         self.email_service.send_email(advisor_email, subject, body, is_html=True)
