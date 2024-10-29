@@ -125,7 +125,7 @@ class StockOrdersService:
         for client, client_orders in orders_by_client.items():
             account_number = client_orders[0]["account"]
 
-            body += f"<p><b>Cliente: {client} (Conta: {account_number})</b></p>"
+            body += f"<p><b>Cliente: {client.title()} (Conta: {account_number})</b></p>"
             for order in client_orders:
                 body += (
                     f"<p>  - Ativo: {order['symbol']} | "
@@ -158,7 +158,7 @@ class StockOrdersService:
         for client, client_orders in orders_by_client.items():
             account_number = client_orders[0]["account"]
 
-            body += f"<p><b>Cliente: {client} (Conta: {account_number})</b></p>"
+            body += f"<p><b>Cliente: {client.title()} (Conta: {account_number})</b></p>"
             for order in client_orders:
                 body += (
                     f"<p>   - Ativo: {order['symbol']} | "
