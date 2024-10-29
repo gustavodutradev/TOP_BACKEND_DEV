@@ -15,6 +15,7 @@ class StockOrdersService:
         self.config_service = ConfigService()
         self.email_service = EmailService()
         self.registration_data_service = RegistrationDataService()
+        self.search_advisor_email = SearchAdvisorEmail()
         self.account_cache = {}  # Cache para armazenar informações de contas
 
     def get_stock_orders(self):
@@ -99,7 +100,7 @@ class StockOrdersService:
         """Agrupa as ordens pendentes por e-mail do assessor."""
         orders_by_advisor = {}
         for order in orders:
-            advisor_email = SearchAdvisorEmail.get_advisor_email(order["account"])
+            advisor_email = self.search_advisor_email.get_advisor_email(order["account"])
             orders_by_advisor.setdefault(advisor_email, []).append(order)
         return orders_by_advisor
 
