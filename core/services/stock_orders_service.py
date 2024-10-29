@@ -3,12 +3,13 @@ from core.services.email_service import EmailService
 from core.services.registration_data_service import RegistrationDataService
 from core.services.zip_service import ZipService
 from datetime import datetime
+from utils.search_advisor_email import SearchAdvisorEmail
 import os
 import requests
 
 
 class StockOrdersService:
-    """Classe para requisitar ordens de compra e venda."""
+    """Classe para requisitar e processar ordens de compra e venda."""
 
     def __init__(self) -> None:
         self.config_service = ConfigService()
@@ -17,8 +18,8 @@ class StockOrdersService:
         self.account_cache = {}  # Cache para armazenar informações de contas
 
     def get_stock_orders(self):
-        """Requisita ordens de compra e venda da API IaaS Stock Order."""
-        endpoint = f"/iaas-stock-order/api/v1/stock-order/orders"
+        """Requisita ordens da API IaaS Stock Order."""
+        endpoint = "/iaas-stock-order/api/v1/stock-order/orders"
         url = f"{self.config_service._base_url}{endpoint}"
         start_date = end_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -42,7 +43,7 @@ class StockOrdersService:
             return None
 
     def process_csv_from_url(self, csv_url):
-        """Realiza o download do CSV zipado e extrai ordens pendentes."""
+        """Baixa e processa o CSV zipado, retornando ordens pendentes."""
         try:
             zip_response = requests.get(csv_url)
             if zip_response.status_code != 200:
@@ -85,69 +86,76 @@ class StockOrdersService:
         return holder_name
 
     def send_pending_orders_email(self, orders):
-        """Envia as ordens pendentes por e-mail, agrupadas e ordenadas por cliente."""
+        """Envia ordens pendentes para a mesa variável e os assessores responsáveis."""
+        # Envio consolidado para a mesa variável
+        self._send_consolidated_email(orders)
+
+        # Agrupar ordens por assessor e enviar individualmente
+        orders_by_advisor = self._group_orders_by_advisor(orders)
+        for advisor_email, advisor_orders in orders_by_advisor.items():
+            self._send_advisor_email(advisor_email, advisor_orders)
+
+    def _group_orders_by_advisor(self, orders):
+        """Agrupa as ordens pendentes por e-mail do assessor."""
+        orders_by_advisor = {}
+        for order in orders:
+            advisor_email = SearchAdvisorEmail.get_advisor_email(order["account"])
+            orders_by_advisor.setdefault(advisor_email, []).append(order)
+        return orders_by_advisor
+
+    def _send_consolidated_email(self, orders):
+        """Envia e-mail consolidado para a mesa variável."""
         to_email = os.getenv("NOTIFY_EMAIL")
         subject = "Ordens Pendentes de Aprovação"
 
-        # Agrupar ordens por cliente em um dicionário
-        orders_by_client = {}
-        for order in orders:
-            holder_name = self.get_account_holder_name(order["account"])
-            orders_by_client.setdefault(holder_name, []).append(order)
+        # Agrupar ordens por cliente
+        orders_by_client = self._group_orders_by_client(orders)
 
-        # Ordenar os clientes alfabeticamente
-        sorted_clients = sorted(orders_by_client.keys())
-
-        # Construir o corpo do email com as ordens agrupadas e ordenadas
+        # Construir o corpo do e-mail
         body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
-        for client in sorted_clients:
+        for client, client_orders in orders_by_client.items():
             body += f"<p><b>Cliente: {client}</b></p>"
-            for order in orders_by_client[client]:
+            for order in client_orders:
                 body += (
                     f"<p>  - Conta: {order['account']} | Ativo: {order['symbol']} | "
                     f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
                 )
 
-        # Enviar o email
+        # Enviar o e-mail
         self.email_service.send_email(to_email, subject, body, is_html=True)
 
-    # def send_pending_orders_email(self, orders):
-    #     """Envia as ordens pendentes por e-mail, ordenadas alfabeticamente pelo nome dos clientes."""
-    #     to_email = os.getenv("NOTIFY_EMAIL")
-    #     subject = "Ordens Pendentes de Aprovação"
+    def _group_orders_by_client(self, orders):
+        """Agrupa as ordens pendentes por cliente."""
+        orders_by_client = {}
+        for order in orders:
+            holder_name = self.get_account_holder_name(order["account"])
+            orders_by_client.setdefault(holder_name, []).append(order)
+        return orders_by_client
 
-    #     # Adicionar nomes dos clientes às ordens para facilitar a ordenação.
-    #     enriched_orders = []
-    #     for order in orders:
-    #         account_number = order["account"]
-    #         holder_name = self.get_account_holder_name(
-    #             account_number
-    #         )  # Obtemos o nome do cliente.
+    def _send_advisor_email(self, advisor_email, orders):
+        """Envia e-mail para o assessor responsável com as ordens dos seus clientes."""
+        subject = "Ordens Pendentes de Aprovação - Seus Clientes"
 
-    #         # Enriquecer a ordem com o nome do cliente.
-    #         order_with_name = {**order, "holder_name": holder_name}
-    #         enriched_orders.append(order_with_name)
+        # Agrupar ordens por cliente
+        orders_by_client = self._group_orders_by_client(orders)
 
-    #     # Ordenar as ordens alfabeticamente pelo nome do cliente (holder_name).
-    #     enriched_orders.sort(key=lambda x: x["holder_name"])
+        # Construir o corpo do e-mail
+        body = (
+            "<p>Foram encontradas as seguintes ordens pendentes dos seus clientes:</p>"
+        )
+        for client, client_orders in orders_by_client.items():
+            body += f"<p><b>Cliente: {client}</b></p>"
+            for order in client_orders:
+                body += (
+                    f"<p>  - Conta: {order['account']} | Ativo: {order['symbol']} | "
+                    f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
+                )
 
-    #     # Construir o corpo do e-mail com a lista ordenada.
-    #     body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
-    #     for order in enriched_orders:
-    #         body += (
-    #             f"<p><b>Cliente:</b> {order['holder_name']} | "
-    #             f"<b>Conta:</b> {order['account']} | "
-    #             f"<b>Ativo:</b> {order['symbol']} | "
-    #             f"<b>Quantidade:</b> {order['orderQty']} | "
-    #             f"<b>Preço:</b> {order['orderPrice']} | "
-    #             f"<b>Lado:</b> {order['side']}</p>"
-    #         )
-
-    #     # Enviar o e-mail.
-    #     self.email_service.send_email(to_email, subject, body, is_html=True)
+        # Enviar o e-mail para o assessor
+        self.email_service.send_email(advisor_email, subject, body, is_html=True)
 
     def send_empty_pending_orders_email(self):
-        """Envia notificação por email alertando que não há ordens pendentes."""
+        """Envia notificação de que não há ordens pendentes."""
         to_email = os.getenv("NOTIFY_EMAIL")
         subject = "Nenhuma Ordem Pendente de Aprovação"
         body = "<p>Não foram encontradas ordens pendentes.</p>"
