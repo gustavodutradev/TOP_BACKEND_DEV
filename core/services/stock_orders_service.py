@@ -150,7 +150,8 @@ class StockOrdersService:
 
         # Construir o corpo do e-mail
         body = (
-            "<p>Foram encontradas as seguintes ordens pendentes dos seus clientes:</p>"
+            "<p>Prezado(a) Assessor(a),</p>"
+            "<p>Foram encontradas as seguintes ordens pendentes de aprovação dos seus clientes:</p>"
         )
         for client, client_orders in orders_by_client.items():
             body += f"<p><b>Cliente: {client}</b></p>"
@@ -160,7 +161,7 @@ class StockOrdersService:
                     f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
                 )
 
-        body += "<p>Este e-mail reforça a atenção com as ordens pendentes de seus clientes, para que não perca a atual janela de execução. Favor reforçar aos clientes a necessidade de aprová-las.</p>"
+        body += ("<p>É importante reforçar aos seus clientes a necessidade de aprovar as ordens para que não percam a janela de execução atual.</p>")
 
         # Enviar o e-mail para o assessor
         self.email_service.send_email(advisor_email, subject, body, is_html=True)
