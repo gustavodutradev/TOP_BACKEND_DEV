@@ -123,10 +123,12 @@ class StockOrdersService:
         # Construir o corpo do e-mail
         body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
         for client, client_orders in orders_by_client.items():
-            body += f"<p><b>Cliente: {client}</b></p>"
+            account_number = client_orders[0]["account"]
+
+            body += f"<p><b>Cliente: {client} (Conta: {account_number})</b></p>"
             for order in client_orders:
                 body += (
-                    f"<p>  - Conta: {order['account']} | Ativo: {order['symbol']} | "
+                    f"<p>  - Ativo: {order['symbol']} | "
                     f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
                 )
 
@@ -154,10 +156,12 @@ class StockOrdersService:
             "<p>Foram encontradas as seguintes ordens pendentes de aprovação dos seus clientes:</p>"
         )
         for client, client_orders in orders_by_client.items():
-            body += f"<p><b>Cliente: {client}</b></p>"
+            account_number = client_orders[0]["account"]
+
+            body += f"<p><b>Cliente: {client} (Conta: {account_number})</b></p>"
             for order in client_orders:
                 body += (
-                    f"<p>  - Conta: {order['account']} | Ativo: {order['symbol']} | "
+                    f"<p>   - Ativo: {order['symbol']} | "
                     f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
                 )
 
