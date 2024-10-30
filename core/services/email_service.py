@@ -11,7 +11,7 @@ class EmailService:
         if isinstance(to_emails, str):
             to_emails = [email.strip() for email in to_emails.split(",")]
         email = Mail(
-            from_email="gustavobdsdev@gmail.com",
+            from_email="compliance@topinvgroup.com",
             to_emails=to_emails,
             subject=subject,
             html_content=content if is_html else None,
