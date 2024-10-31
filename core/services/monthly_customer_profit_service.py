@@ -13,11 +13,11 @@ class MonthlyCustomerProfitService:
         """Requisita rentabilidade mensal do cliente."""
         endpoint = "/api-partner-report-hub/api/v1/report/customer-profitability"
         url = f"{self.config_service._base_url}{endpoint}"
-        # period = {"referenceMonth": "x", "referenceYear": "y"}
+        period = {"referenceMonth": "09", "referenceYear": "2024"}
 
         try:
             headers = self.config_service.get_headers()
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, json=period, headers=headers)
 
             if response.status_code == 202:
                 print("Requisição aceita. Aguarde o webhook para processamento.")
