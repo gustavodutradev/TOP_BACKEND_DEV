@@ -132,6 +132,8 @@ class StockOrdersService:
                     f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
                 )
 
+        body += ("<p><i>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</i></p>")
+
         # Enviar o e-mail
         self.email_service.send_email(to_email, subject, body, is_html=True)
 
@@ -166,6 +168,7 @@ class StockOrdersService:
                 )
 
         body += ("<p>É importante reforçar aos seus clientes a necessidade de aprovar as ordens para que não percam a janela de execução atual.</p>")
+        body += ("<p><i>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</i></p>")
 
         # Enviar o e-mail para o assessor
         self.email_service.send_email(advisor_email, subject, body, is_html=True)
