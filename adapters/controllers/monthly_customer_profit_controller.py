@@ -68,7 +68,7 @@ class MonthlyCustomerProfitController:
                 self.logger.logger.info("Nenhuma rentabilidade encontrada.")
                 return jsonify({"message": "Nenhuma rentabilidade encontrada."}), 204
             
-            self.logger.logger.info(f"Rentabilidade encontrada: {profitability}")
+            self.logger.logger.info(f"Rentabilidade encontrada")
 
             return jsonify(profitability), 200
         except Exception as e:

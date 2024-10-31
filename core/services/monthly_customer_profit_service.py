@@ -43,8 +43,11 @@ class MonthlyCustomerProfitService:
 
             unziped_file = zip_service.unzip_csv_reader(zip_response)
 
-            # for reader in unziped_file ........
-            return unziped_file
+            for reader in unziped_file:
+                for row in reader:
+                    wallets_list = row.get("cod_carteira")
+
+            return wallets_list
 
         except requests.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
