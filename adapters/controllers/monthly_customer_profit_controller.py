@@ -24,6 +24,7 @@ class MonthlyCustomerProfitController:
                     if "response" in data:
                         self.logger.log_and_respond("Webhook recebido.")
                         return self._process_webhook(data)
+
                 self.logger.log_and_respond(
                     "Iniciando requisição de rentabilidade mensal dos clientes."
                 )
@@ -61,22 +62,18 @@ class MonthlyCustomerProfitController:
             if not csv_url:
                 self.logger.logger.error("URL do CSV não encontrada no payload.")
                 return jsonify({"error": "CSV URL not found."}), 400
+            
+            profitability = self.monthly_customer_profit_service.process_csv_from_url(csv_url)
+            if not profitability:
+                self.logger.logger.info("Nenhuma rentabilidade encontrada.")
+                return jsonify({"message": "Nenhuma rentabilidade encontrada."}), 204
+            
+            self.logger.logger.info(f"Rentabilidade encontrada: {profitability}")
 
-            pending_orders = self.orders_service.process_csv_from_url(csv_url)
-            if not pending_orders:
-                self.logger.logger.info("Nenhuma ordem pendente encontrada.")
-                self.orders_service.send_empty_pending_orders_email()
-                return jsonify({"message": "Nenhuma ordem pendente encontrada."}), 204
-
-            self.logger.logger.info(f"Ordens pendentes encontradas: {pending_orders}")
-
-            self.orders_service.send_pending_orders_email(pending_orders)
-
-            return jsonify(pending_orders), 200
+            return jsonify(profitability), 200
         except Exception as e:
             self.logger.logger.error(
                 f"Erro ao processar o payload do webhook: {str(e)}"
             )
             self.logger.logger.error(traceback.format_exc())
             return jsonify({"error": "Internal server error"}), 500
-
