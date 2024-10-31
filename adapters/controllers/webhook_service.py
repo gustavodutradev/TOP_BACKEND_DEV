@@ -66,10 +66,6 @@ class WebhookService:
             return self.Logger.log_and_respond("Commissions")
 
         ## Rentabilidade Mensal
-        @self.app.route("/api/v1/monthly-customer-profit", methods=["POST"])
-        def monthly_customer_profit():
-            return self.Logger.log_and_respond("Monthly Customer Profit")
-
         @self.app.route("/api/v1/monthly-product-profit", methods=["POST"])
         def monthly_product_profit():
             return self.Logger.log_and_respond("Monthly Product Profit")
