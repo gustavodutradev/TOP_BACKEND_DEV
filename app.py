@@ -8,6 +8,7 @@ from adapters.controllers.stock_orders_controller import StockOrdersController
 from adapters.controllers.recommended_equities_controller import (
     RecommendedEquitiesController,
 )
+from adapters.controllers.monthly_customer_profit_controller import MonthlyCustomerProfitController
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 import os
 
@@ -22,6 +23,7 @@ account_base_controller = AccountBaseController()
 debentures_controller = DebenturesController()
 recommended_equities_controller = RecommendedEquitiesController()
 stock_order_controller = StockOrdersController(app)
+monthly_customer_profit_controller = MonthlyCustomerProfitController(app)
 
 task_scheduler = PendingOrdersScheduler()
 
