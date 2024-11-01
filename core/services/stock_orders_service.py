@@ -134,7 +134,7 @@ class StockOrdersService:
 
         body += (
             "<p style='margin-top: 80px;'></p>"
-            "<p style='font-size: 0.8rem'><i><u>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</u></i></p>"
+            "<p style='font-size: 0.8rem'><i><u>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados, além de sugestões e feedbacks, favor contatar o setor de TI da TOP.</u></i></p>"
         )
 
         # Enviar o e-mail
@@ -173,7 +173,7 @@ class StockOrdersService:
         body += (
             "<p>É importante reforçar aos seus clientes a necessidade de aprovar as ordens para que não percam a janela de execução atual.</p>"
             "<p style='margin-top: 80px;'></p>"
-            "<p style='font-size: 0.8rem'><i><u>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</u></i></p>"
+            "<p style='font-size: 0.8rem'><i><u>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados, além de sugestões e feedbacks, favor contatar o setor de TI da TOP.</u></i></p>"
         )
 
         # Enviar o e-mail para o assessor
@@ -186,7 +186,7 @@ class StockOrdersService:
         body = (
             "<p>Não foram encontradas ordens pendentes.</p>"
             "<p style='margin-top: 80px;'></p>"
-            "<p style='font-size: 0.8rem'><i><u>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</u></i></p>"
+            "<p style='font-size: 0.8rem'><i><u>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados, além de sugestões e feedbacks, favor contatar o setor de TI da TOP.</u></i></p>"
         )
 
         self.email_service.send_email(to_email, subject, body, is_html=True)
