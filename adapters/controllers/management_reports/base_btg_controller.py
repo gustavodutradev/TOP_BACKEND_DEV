@@ -14,7 +14,9 @@ class BaseBTGController:
         self.logger = Logger(app)
 
     def register_routes(self):
-        @self.app.route("/api/v1/rg-base-btg", methods=["POST"], endpoint="rg_base_btg_handler")
+        @self.app.route(
+            "/api/v1/rg-base-btg", methods=["POST"], endpoint="rg_base_btg_handler"
+        )
         def handler():
             """Lida com a solicitação inicial e também processa webhooks."""
             try:
@@ -66,16 +68,18 @@ class BaseBTGController:
             csv_data = self.base_btg_service.process_csv_from_url(csv_url)
             if not csv_data:
                 self.logger.logger.info(
-                    "Nenhuma foram encontrados dados para Base BTG."
+                    "Não foram encontrados dados para o relatório Base BTG."
                 )
                 return (
                     jsonify(
-                        {"message": "Nenhuma foram encontrados dados para Base BTG."}
+                        {
+                            "message": "Nenhuma foram encontrados dados para o relatório Base BTG."
+                        }
                     ),
                     204,
                 )
 
-            self.logger.logger.info(f"Rentabilidade encontrada")
+            self.logger.logger.info(f"Relatório Base BTG gerado com sucesso.")
 
             return jsonify(csv_data), 200
         except Exception as e:
