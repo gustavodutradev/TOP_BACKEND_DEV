@@ -11,6 +11,9 @@ from adapters.controllers.recommended_equities_controller import (
 from adapters.controllers.monthly_customer_profit_controller import (
     MonthlyCustomerProfitController,
 )
+from adapters.controllers.management_reports.base_btg_controller import (
+    BaseBTGController,
+)
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 import os
 
@@ -26,6 +29,7 @@ debentures_controller = DebenturesController()
 recommended_equities_controller = RecommendedEquitiesController()
 stock_order_controller = StockOrdersController(app)
 monthly_customer_profit_controller = MonthlyCustomerProfitController(app)
+base_btg_controller = BaseBTGController(app)
 
 task_scheduler = PendingOrdersScheduler()
 
