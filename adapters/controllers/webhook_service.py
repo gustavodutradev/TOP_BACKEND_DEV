@@ -21,10 +21,6 @@ class WebhookService:
         def positions():
             return self.Logger.log_and_respond("RG - POSICOES")
 
-        @self.app.route("/api/v1/rg-base-btg", methods=["POST"])
-        def base_btg():
-            return self.Logger.log_and_respond("RG - BASE BTG")
-
         @self.app.route("/api/v1/rg-nnm-gerencial", methods=["POST"])
         def nnm_gerencial():
             return self.Logger.log_and_respond("RG - NNM GERENCIAL")
