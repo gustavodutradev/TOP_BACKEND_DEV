@@ -13,13 +13,6 @@ class WebhookService:
     def register_routes(self):
 
         ## Relatórios Gerenciais
-        @self.app.route("/api/v1/rg-tir-mensal-parceiro", methods=["POST"])
-        def monthly_tir():
-            return self.Logger.log_and_respond("RG - TIR_MENSAL")
-
-        @self.app.route("/api/v1/rg-posicoes", methods=["POST"])
-        def positions():
-            return self.Logger.log_and_respond("RG - POSICOES")
 
         @self.app.route("/api/v1/rg-nnm-gerencial", methods=["POST"])
         def nnm_gerencial():
