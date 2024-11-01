@@ -121,7 +121,7 @@ class StockOrdersService:
         orders_by_client = self._group_orders_by_client(orders)
 
         # Construir o corpo do e-mail
-        body = "<p>Foram encontradas as seguintes ordens pendentes:</p>"
+        body = "<p style='margin-bottom: 50px;'>Foram encontradas as seguintes ordens pendentes:</p>"
         for client, client_orders in orders_by_client.items():
             account_number = client_orders[0]["account"]
 
@@ -158,7 +158,7 @@ class StockOrdersService:
         # Construir o corpo do e-mail
         body = (
             "<p>Prezado(a) Assessor(a),</p>"
-            "<p>Foram encontradas as seguintes ordens pendentes de aprovação dos seus clientes:</p>"
+            "<p style='margin-bottom: 50px;'>Foram encontradas as seguintes ordens pendentes de aprovação dos seus clientes:</p>"
         )
         for client, client_orders in orders_by_client.items():
             account_number = client_orders[0]["account"]
