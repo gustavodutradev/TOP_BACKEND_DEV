@@ -31,7 +31,7 @@ class BaseBTGReportService:
             return None
 
     def process_csv_from_url(self, csv_url):
-        """Realiza o download do CSV zipado e extrai as informações. Este webhook retorna o arquivo csv diretamente, e não zipado"""
+        """Realiza o download do CSV e extrai as informações"""
         try:
             csv_response = requests.get(csv_url)
             if csv_response.status_code != 200:
