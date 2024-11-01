@@ -1,19 +1,18 @@
 from flask import Flask
-from adapters.controllers.webhook_service import WebhookService
-from adapters.controllers.suitability_controller import SuitabilityController
-from adapters.controllers.registration_data_controller import RegistrationDataController
-from adapters.controllers.account_base_controller import AccountBaseController
-from adapters.controllers.debentures_controller import DebenturesController
-from adapters.controllers.stock_orders_controller import StockOrdersController
-from adapters.controllers.recommended_equities_controller import (
+from adapters.controllers import (
+    WebhookService,
+    SuitabilityController,
+    RegistrationDataController,
+    AccountBaseController,
+    DebenturesController,
+    StockOrdersController,
     RecommendedEquitiesController,
-)
-from adapters.controllers.monthly_customer_profit_controller import (
     MonthlyCustomerProfitController,
-)
-from adapters.controllers.management_reports.base_btg_controller import (
     BaseBTGController,
+    PositionReportController,
+    MonthlyTIRController
 )
+
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 import os
 
@@ -30,6 +29,8 @@ recommended_equities_controller = RecommendedEquitiesController()
 stock_order_controller = StockOrdersController(app)
 monthly_customer_profit_controller = MonthlyCustomerProfitController(app)
 base_btg_controller = BaseBTGController(app)
+posicoes_controller = PositionReportController(app)
+monthly_tir_controller = MonthlyTIRController(app)
 
 task_scheduler = PendingOrdersScheduler()
 
