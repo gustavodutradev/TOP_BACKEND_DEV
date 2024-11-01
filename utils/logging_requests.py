@@ -44,7 +44,9 @@ class Logger:
             )
 
             # Tenta obter a URL diretamente ou via campo 'result'
-            url = data.get("result", {}).get("url")
+            url = data.get("result", {}).get("url") or data.get("response", {}).get(
+                "url"
+            )
 
             if not url:
                 # Coleta mensagem e código de erro (valores padrões se ausentes)
