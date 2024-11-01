@@ -62,12 +62,14 @@ class MonthlyCustomerProfitController:
             if not csv_url:
                 self.logger.logger.error("URL do CSV não encontrada no payload.")
                 return jsonify({"error": "CSV URL not found."}), 400
-            
-            profitability = self.monthly_customer_profit_service.process_csv_from_url(csv_url)
+
+            profitability = self.monthly_customer_profit_service.process_csv_from_url(
+                csv_url
+            )
             if not profitability:
                 self.logger.logger.info("Nenhuma rentabilidade encontrada.")
                 return jsonify({"message": "Nenhuma rentabilidade encontrada."}), 204
-            
+
             self.logger.logger.info(f"Rentabilidade encontrada")
 
             return jsonify(profitability), 200

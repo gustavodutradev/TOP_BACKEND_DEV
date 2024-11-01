@@ -132,7 +132,10 @@ class StockOrdersService:
                     f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
                 )
 
-        body += ("<p><i>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</i></p>")
+        body += (
+            "<p><i>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</i></p>"
+            "<br/><br/><br/>"
+        )
 
         # Enviar o e-mail
         self.email_service.send_email(to_email, subject, body, is_html=True)
@@ -167,8 +170,11 @@ class StockOrdersService:
                     f"Quantidade: {order['orderQty']} | Preço: {order['orderPrice']} | Lado: {order['side']}</p>"
                 )
 
-        body += ("<p>É importante reforçar aos seus clientes a necessidade de aprovar as ordens para que não percam a janela de execução atual.</p>")
-        body += ("<p><i>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</i></p>")
+        body += (
+            "<p>É importante reforçar aos seus clientes a necessidade de aprovar as ordens para que não percam a janela de execução atual.</p>"
+            "<br/><br/><br/>"
+            "<p><i>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</i></p>"
+        )
 
         # Enviar o e-mail para o assessor
         self.email_service.send_email(advisor_email, subject, body, is_html=True)
@@ -177,6 +183,10 @@ class StockOrdersService:
         """Envia notificação de que não há ordens pendentes."""
         to_email = os.getenv("NOTIFY_EMAIL")
         subject = "Nenhuma Ordem Pendente de Aprovação"
-        body = "<p>Não foram encontradas ordens pendentes.</p>"
+        body = (
+            "<p>Não foram encontradas ordens pendentes.</p>"
+            "<br/><br/><br/>"
+            "<p><i>Este e-mail é uma mensagem automática e não deve ser respondida. Qualquer erro percebido ou inconsistência de dados favor contatar o setor de TI da TOP.</i></p>"
+        )
 
         self.email_service.send_email(to_email, subject, body, is_html=True)

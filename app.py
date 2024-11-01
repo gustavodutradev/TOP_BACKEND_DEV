@@ -8,7 +8,9 @@ from adapters.controllers.stock_orders_controller import StockOrdersController
 from adapters.controllers.recommended_equities_controller import (
     RecommendedEquitiesController,
 )
-from adapters.controllers.monthly_customer_profit_controller import MonthlyCustomerProfitController
+from adapters.controllers.monthly_customer_profit_controller import (
+    MonthlyCustomerProfitController,
+)
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 import os
 
