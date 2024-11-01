@@ -17,7 +17,7 @@ class MonthlyCustomerProfitService:
 
         try:
             headers = self.config_service.get_headers()
-            response = requests.get(url, json=period, headers=headers)
+            response = requests.post(url, json=period, headers=headers)
 
             if response.status_code == 202:
                 print("Requisição aceita. Aguarde o webhook para processamento.")
