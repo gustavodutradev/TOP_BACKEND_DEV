@@ -14,8 +14,8 @@ class StockOrdersController:
         self.logger = Logger(app)
 
     def register_routes(self):
-        @self.app.route("/api/v1/orders", methods=["POST"])
-        def orders_handler():
+        @self.app.route("/api/v1/orders", methods=["POST"], endpoint="stock_orders_handler")
+        def handler():
             """Lida com a solicitação inicial e também processa webhooks."""
             try:
                 # Detecta se é uma chamada inicial ou um webhook com base no payload recebido.

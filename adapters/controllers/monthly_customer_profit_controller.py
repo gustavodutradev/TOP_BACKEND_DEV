@@ -14,7 +14,7 @@ class MonthlyCustomerProfitController:
         self.logger = Logger(app)
 
     def register_routes(self):
-        @self.app.route("/api/v1/monthly-customer-profit", methods=["POST"])
+        @self.app.route("/api/v1/monthly-customer-profit", methods=["POST"], endpoint="monthly_customer_profit_handler")
         def handler():
             """Lida com a solicitação inicial e também processa webhooks."""
             try:

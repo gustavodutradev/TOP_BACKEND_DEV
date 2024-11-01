@@ -14,7 +14,7 @@ class BaseBTGController:
         self.logger = Logger(app)
 
     def register_routes(self):
-        @self.app.route("/api/v1/rg-base-btg", methods=["POST"])
+        @self.app.route("/api/v1/rg-base-btg", methods=["POST"], endpoint="rg_base_btg_handler")
         def handler():
             """Lida com a solicitação inicial e também processa webhooks."""
             try:
