@@ -10,7 +10,7 @@ from adapters.controllers import (
     MonthlyCustomerProfitController,
     BaseBTGController,
     PositionReportController,
-    MonthlyTIRController
+    MonthlyTIRController,
 )
 
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
