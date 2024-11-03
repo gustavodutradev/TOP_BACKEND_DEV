@@ -3,7 +3,7 @@ import logging
 from typing import Union, List
 from dataclasses import dataclass
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content, EmailContent
+from sendgrid.helpers.mail import Mail, Content
 
 @dataclass
 class EmailConfig:
@@ -51,19 +51,35 @@ class EmailService:
             return [email.strip() for email in emails.split(",") if email.strip()]
         return [email.strip() for email in emails if email.strip()]
 
-    def _create_email_content(self, content: str, is_html: bool) -> EmailContent:
+    def _create_mail_object(
+        self, 
+        to_emails: List[str], 
+        subject: str, 
+        content: str, 
+        is_html: bool
+    ) -> Mail:
         """
-        Create appropriate email content based on type
+        Create Mail object for SendGrid
         
         Args:
+            to_emails: List of recipient email addresses
+            subject: Email subject
             content: Email content
             is_html: Whether the content is HTML
             
         Returns:
-            EmailContent object
+            Mail object configured for sending
         """
+        message = Mail(
+            from_email=self.config.from_email,
+            to_emails=to_emails,
+            subject=subject
+        )
+
         content_type = 'text/html' if is_html else 'text/plain'
-        return Content(content_type, content)
+        message.content = [Content(content_type, content)]
+        
+        return message
 
     def send_email(
         self, 
@@ -82,7 +98,7 @@ class EmailService:
             is_html: Whether the content is HTML
             
         Returns:
-            bool: True if email was sent successfully, False otherwise
+            bool: True if email was sent successfully
             
         Raises:
             EmailServiceException: If there's an error sending the email
@@ -93,13 +109,11 @@ class EmailService:
             if not parsed_emails:
                 raise EmailServiceException("No valid email addresses provided")
 
-            email_content = self._create_email_content(content, is_html)
-            
-            message = Mail(
-                from_email=Email(self.config.from_email),
-                to_emails=[To(email) for email in parsed_emails],
+            message = self._create_mail_object(
+                to_emails=parsed_emails,
                 subject=subject,
-                content=email_content
+                content=content,
+                is_html=is_html
             )
 
             response = self.sg.send(message)
