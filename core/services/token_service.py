@@ -14,9 +14,11 @@ from dotenv import load_dotenv
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class TokenData:
     """Classe para armazenar dados do token."""
+
     access_token: str
     expires_at: float
 
@@ -26,23 +28,27 @@ class TokenData:
         return time.time() >= self.expires_at
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'TokenData':
+    def from_dict(cls, data: Dict[str, Any]) -> "TokenData":
         """Cria uma instância de TokenData a partir de um dicionário."""
         return cls(
-            access_token=data['access_token'],
-            expires_at=float(data['expires_at'])
+            access_token=data["access_token"], expires_at=float(data["expires_at"])
         )
+
 
 class TokenServiceError(Exception):
     """Exceção customizada para erros do TokenService."""
+
     pass
+
 
 class TokenService:
     """Serviço para gerenciamento de tokens de autenticação."""
-    
+
     _instance = None
     CACHE_FILENAME = "token_cache.json"
-    AUTH_URL = "https://api.btgpactual.com/iaas-auth/api/v1/authorization/oauth2/accesstoken"
+    AUTH_URL = (
+        "https://api.btgpactual.com/iaas-auth/api/v1/authorization/oauth2/accesstoken"
+    )
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -62,7 +68,7 @@ class TokenService:
 
         logger.info("Initializing TokenService...")
         load_dotenv()
-        
+
         auth_base64 = os.getenv("AUTH_BASE64")
         if not auth_base64:
             raise TokenServiceError("AUTH_BASE64 environment variable not set")
@@ -95,14 +101,11 @@ class TokenService:
         """Busca um novo token da API."""
         try:
             response = requests.post(
-                self.AUTH_URL,
-                headers=self._headers,
-                data=self._body,
-                timeout=30
+                self.AUTH_URL, headers=self._headers, data=self._body, timeout=30
             )
-            
+
             logger.info(f"Token request status: {response.status_code}")
-            
+
             if response.status_code != 200:
                 raise TokenServiceError(
                     f"Failed to fetch access token: {response.status_code} - {response.text}"
@@ -111,7 +114,7 @@ class TokenService:
             token_data = self._process_response(response)
             self._save_token_to_cache(token_data)
             self._token_data = token_data
-            
+
             return token_data.access_token
 
         except requests.RequestException as e:
@@ -128,13 +131,14 @@ class TokenService:
             raise TokenServiceError("Expiration time not found in response headers")
 
         try:
-            expires_at = datetime.strptime(
-                expires_header,
-                "%a, %d %b %Y %H:%M:%S %Z"
-            ).replace(tzinfo=timezone.utc).timestamp()
-            
+            expires_at = (
+                datetime.strptime(expires_header, "%a, %d %b %Y %H:%M:%S %Z")
+                .replace(tzinfo=timezone.utc)
+                .timestamp()
+            )
+
             return TokenData(access_token=access_token, expires_at=expires_at)
-        
+
         except ValueError as e:
             raise TokenServiceError(f"Invalid expiration date format: {str(e)}")
 
@@ -143,12 +147,12 @@ class TokenService:
         try:
             token_dict = {
                 "access_token": token_data.access_token,
-                "expires_at": token_data.expires_at
+                "expires_at": token_data.expires_at,
             }
-            
+
             self._cache_path.write_text(json.dumps(token_dict))
             logger.info("Token cached successfully")
-            
+
         except (IOError, json.JSONDecodeError) as e:
             logger.error(f"Failed to cache token: {str(e)}")
 
@@ -160,7 +164,7 @@ class TokenService:
 
             data = json.loads(self._cache_path.read_text())
             token_data = TokenData.from_dict(data)
-            
+
             if token_data.is_expired:
                 logger.info("Cached token is expired")
                 return None

@@ -9,19 +9,24 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class APIResponse:
     """Classe para padronizar respostas da API."""
+
     success: bool
     data: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
+
 
 class RegistrationDataService:
     """Serviço para acessar dados cadastrais de contas."""
 
     def __init__(self) -> None:
         self.config_service = ConfigService()
-        self._base_endpoint = "/iaas-account-management/api/v1/account-management/account"
+        self._base_endpoint = (
+            "/iaas-account-management/api/v1/account-management/account"
+        )
 
     def _build_url(self, account_number: str) -> str:
         """Constrói a URL para a requisição."""
@@ -32,9 +37,9 @@ class RegistrationDataService:
         try:
             headers = self.config_service.get_headers()
             response = requests.get(url, headers=headers, timeout=30)
-            
+
             logger.info(f"Request to {url} - Status Code: {response.status_code}")
-            
+
             if response.status_code != 200:
                 error_msg = f"API error: {response.status_code} - {response.text}"
                 logger.error(error_msg)
@@ -65,20 +70,20 @@ class RegistrationDataService:
         """Busca todos os dados cadastrais de uma conta."""
         url = self._build_url(account_number)
         response = self._make_request(url)
-        
+
         if not response.success:
             return {"error": response.error}
-        
+
         return response.data
 
     def get_holder_name(self, account_number: str) -> str:
         """Busca apenas o nome do titular de uma conta."""
         response = self.get_registration_data(account_number)
-        
+
         if "error" in response:
             logger.error(f"Error fetching holder name: {response['error']}")
             return "Nome não encontrado"
-        
+
         try:
             return response["holder"]["name"]
         except KeyError as e:

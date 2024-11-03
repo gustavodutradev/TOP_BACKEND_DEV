@@ -14,9 +14,11 @@ from utils.search_advisor_email import SearchAdvisorEmail
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class Order:
     """Modelo para representar uma ordem."""
+
     account: str
     symbol: str
     order_qty: str
@@ -24,15 +26,18 @@ class Order:
     side: str
     holder_name: Optional[str] = None
 
+
 @dataclass
 class AdvisorInfo:
     """Modelo para informações do assessor."""
+
     email: str
     name: str
 
+
 class EmailTemplateBuilder:
     """Classe para construção de templates de e-mail."""
-    
+
     @staticmethod
     def get_email_footer() -> str:
         return (
@@ -54,15 +59,16 @@ class EmailTemplateBuilder:
     @classmethod
     def build_consolidated_email(cls, orders_by_client: Dict[str, List[Order]]) -> str:
         body = "<p style='margin-bottom: 50px;'>Foram encontradas as seguintes ordens pendentes:</p>"
-        
+
         for client, client_orders in orders_by_client.items():
             account_number = client_orders[0].account
             body += f"<p><b>Cliente: {client.title()} (Conta: {account_number})</b></p>"
-            
+
             for order in client_orders:
                 body += cls.build_order_details(order)
-        
+
         return body + cls.get_email_footer()
+
 
 class StockOrdersService:
     """Serviço para requisitar e processar ordens de compra e venda."""
@@ -85,20 +91,22 @@ class StockOrdersService:
         try:
             current_date = datetime.now().strftime("%Y-%m-%d")
             url = self._build_url("/orders")
-            
+
             headers = self.config_service.get_headers()
             response = requests.post(
                 url,
                 headers=headers,
                 json={"startDate": current_date, "endDate": current_date},
-                timeout=30
+                timeout=30,
             )
 
             if response.status_code == 202:
                 logger.info("Requisição aceita. Aguardando webhook para processamento.")
                 return True
 
-            logger.error(f"Erro na requisição: {response.status_code} - {response.text}")
+            logger.error(
+                f"Erro na requisição: {response.status_code} - {response.text}"
+            )
             return False
 
         except requests.RequestException as e:
@@ -110,7 +118,9 @@ class StockOrdersService:
         try:
             zip_response = requests.get(csv_url, timeout=30)
             if zip_response.status_code != 200:
-                raise requests.RequestException(f"Erro ao baixar arquivo ZIP: {zip_response.status_code}")
+                raise requests.RequestException(
+                    f"Erro ao baixar arquivo ZIP: {zip_response.status_code}"
+                )
 
             pending_orders: List[Order] = []
             for reader in self.zip_service.unzip_csv_reader(zip_response):
@@ -129,20 +139,20 @@ class StockOrdersService:
         """Cria um objeto Order a partir de uma linha do CSV."""
         side = "Compra" if row.get("side") == "1" else "Venda"
         order_price = "Mercado" if row.get("price") == "0.0" else row.get("price")
-        
+
         return Order(
             account=row.get("account", ""),
             symbol=row.get("symbol", ""),
             order_qty=row.get("orderQty", ""),
             order_price=order_price,
-            side=side
+            side=side,
         )
 
     def get_account_holder_name(self, account_number: str) -> str:
         """Busca o nome do titular da conta com cache."""
         return self.account_cache.get(
             account_number,
-            self.registration_data_service.get_holder_name(account_number)
+            self.registration_data_service.get_holder_name(account_number),
         )
 
     def send_pending_orders_email(self, orders: List[Order]) -> None:
@@ -150,27 +160,31 @@ class StockOrdersService:
         try:
             self._send_consolidated_email(orders)
             orders_by_advisor = self._group_orders_by_advisor(orders)
-            
+
             for advisor_email, advisor_orders in orders_by_advisor.items():
                 self._send_advisor_email(advisor_email, advisor_orders)
-                
+
         except Exception as e:
             logger.error(f"Erro ao enviar e-mails: {str(e)}")
 
     def _group_orders_by_advisor(self, orders: List[Order]) -> Dict[str, List[Order]]:
         """Agrupa as ordens por e-mail do assessor."""
         orders_by_advisor: Dict[str, List[Order]] = {}
-        
+
         for order in orders:
             advisor_info = self._get_advisor_info(order.account)
             holder_name = self.get_account_holder_name(order.account)
-            
+
             if not holder_name or holder_name == "Nome não encontrado":
-                holder_name = advisor_info.name if advisor_info.name else "Assessor não identificado"
-            
+                holder_name = (
+                    advisor_info.name
+                    if advisor_info.name
+                    else "Assessor não identificado"
+                )
+
             order.holder_name = holder_name
             orders_by_advisor.setdefault(advisor_info.email, []).append(order)
-            
+
         return orders_by_advisor
 
     def _get_advisor_info(self, account: str) -> AdvisorInfo:
@@ -186,12 +200,9 @@ class StockOrdersService:
 
         orders_by_client = self._group_orders_by_client(orders)
         body = EmailTemplateBuilder.build_consolidated_email(orders_by_client)
-        
+
         self.email_service.send_email(
-            to_email,
-            "Ordens Pendentes de Aprovação",
-            body,
-            is_html=True
+            to_email, "Ordens Pendentes de Aprovação", body, is_html=True
         )
 
     def _group_orders_by_client(self, orders: List[Order]) -> Dict[str, List[Order]]:
@@ -209,13 +220,10 @@ class StockOrdersService:
             raise ValueError("E-mail de notificação não configurado")
 
         body = (
-            "<p>Não foram encontradas ordens pendentes.</p>" +
-            EmailTemplateBuilder.get_email_footer()
+            "<p>Não foram encontradas ordens pendentes.</p>"
+            + EmailTemplateBuilder.get_email_footer()
         )
 
         self.email_service.send_email(
-            to_email,
-            "Nenhuma Ordem Pendente de Aprovação",
-            body,
-            is_html=True
+            to_email, "Nenhuma Ordem Pendente de Aprovação", body, is_html=True
         )
