@@ -22,7 +22,7 @@ app = Flask(__name__)
 webhook_service = WebhookService(app)
 
 suitability_controller = SuitabilityController(app)
-registration_data_controller = RegistrationDataController()
+registration_data_controller = RegistrationDataController(app)
 account_base_controller = AccountBaseController()
 debentures_controller = DebenturesController()
 recommended_equities_controller = RecommendedEquitiesController()
@@ -45,14 +45,14 @@ def home():
     return "API is running!"
 
 
-@app.route("/api/v1/get-registration-data/<account_number>", methods=["GET"])
-def get_registration_data(account_number):
-    return registration_data_controller.get_registration_data(account_number)
+# @app.route("/api/v1/get-registration-data/<account_number>", methods=["GET"])
+# def get_registration_data(account_number):
+#     return registration_data_controller.get_registration_data(account_number)
 
 
-@app.route("/api/v1/get-holder-name/<account_number>", methods=["GET"])
-def get_holder_name(account_number):
-    return registration_data_controller.get_holder_name(account_number)
+# @app.route("/api/v1/get-holder-name/<account_number>", methods=["GET"])
+# def get_holder_name(account_number):
+#     return registration_data_controller.get_holder_name(account_number)
 
 
 @app.route("/api/v1/get-account-base", methods=["GET"])

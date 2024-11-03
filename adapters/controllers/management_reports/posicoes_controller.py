@@ -13,9 +13,9 @@ class PositionReportController:
         self.token_service = TokenService()
         self.app = app
         self.logger = Logger(app)
-        self.register_routes()
+        self.routes()
 
-    def register_routes(self) -> None:
+    def routes(self) -> None:
         """Register the API routes for the controller."""
         self.app.add_url_rule(
             "/api/v1/rg-posicoes", "rg_posicoes_handler", self.handler, methods=["POST"]
