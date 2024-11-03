@@ -16,16 +16,16 @@ class StockOrdersController:
         self.logger = Logger(app)
 
     def register_routes(self) -> None:
-        """Register the API routes for the controller."""
+        """Registra a rota da API para o controller."""
         self.app.add_url_rule(
             "/api/v1/orders", "stock_orders_handler", self.handler, methods=["POST"]
         )
 
     def handler(self) -> Tuple[Dict[str, Any], int]:
         """
-        Handle the initial request and process webhooks.
+        Lida com a requisição inicial e processa webhook.
         Returns:
-            Tuple containing response data and HTTP status code
+            Tupla contendo dados de resposta e status HTTP
         """
         try:
             if not request.is_json:
@@ -42,9 +42,9 @@ class StockOrdersController:
 
     def _handle_initial_request(self) -> Tuple[Dict[str, Any], int]:
         """
-        Handle the initial Positions report request.
+        Lida com a requisição inicial de Ordens da Bolsa.
         Returns:
-            Tuple containing response data and HTTP status code
+            Tupla contendo dados de resposta e status HTTP
         """
         self.logger.log_and_respond("Iniciando requisição de ordens.")
 
@@ -59,11 +59,11 @@ class StockOrdersController:
 
     def _process_webhook(self, data: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
         """
-        Process the webhook payload from the API.
+        Processa o payload do webhook que vem da API.
         Args:
-            data: The webhook payload data
+            data: Webhook payload
         Returns:
-            Tuple containing response data and HTTP status code
+            Tupla contento dados de resposta e status HTTP
         """
         self.logger.log_and_respond("Webhook recebido.")
 
@@ -80,29 +80,28 @@ class StockOrdersController:
                 "message": "Nenhuma ordem pendente encontrada."
             }, HTTPStatus.NO_CONTENT
 
-        self.logger.logger.info(f"Ordens pendentes encontradas: {pending_orders}")
+        self.logger.logger.info(f"Ordens pendentes encontradas")
 
         self.orders_service.send_pending_orders_email(pending_orders)
-
         return pending_orders, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
-        Extract CSV URL from webhook payload.
+        Extrai a URL do CSV do payload do webhook.
         Args:
-            data: The webhook payload data
+            data: webhook payload
         Returns:
-            The CSV URL if found, empty string otherwise
+           A URL do CSV caso encontrada, se não, uma string vazia
         """
         return data.get("result", {}).get("url", "")
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
-        Handle and log any exceptions that occur during processing.
+        Lida e loga qualquer exceção que ocorrer durante o processo.
         Args:
-            error: The exception that occurred
+            error: A exceção que ocorreu
         Returns:
-            Tuple containing error response and HTTP status code
+            Tupla contendo resposta e status do erro
         """
         self.logger.logger.error(f"Erro na requisição: {str(error)}")
         self.logger.logger.error(traceback.format_exc())

@@ -23,9 +23,9 @@ class PositionReportController:
 
     def handler(self) -> Tuple[Dict[str, Any], int]:
         """
-        Handle the initial request and process webhooks.
+        Lida com a requisição inicial e processa webhook.
         Returns:
-            Tuple containing response data and HTTP status code
+            Tupla contendo dados de resposta e status HTTP
         """
         try:
             if not request.is_json:
