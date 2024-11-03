@@ -13,7 +13,7 @@ class BaseBTGReportService:
     def get_base_btg_report(self):
         """Requisita relatório gerencial Base BTG"""
         endpoint = "/api-rm-reports/api/v1/rm-reports/account-base"
-        url = f"{self.config_service._base_url}{endpoint}"
+        url = f"{self.config_service.base_url}{endpoint}"
 
         try:
             headers = self.config_service.get_headers()

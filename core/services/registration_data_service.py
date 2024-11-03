@@ -30,7 +30,7 @@ class RegistrationDataService:
 
     def _build_url(self, account_number: str) -> str:
         """Constrói a URL para a requisição."""
-        return f"{self.config_service._base_url}{self._base_endpoint}/{account_number}/information"
+        return f"{self.config_service.base_url}{self._base_endpoint}/{account_number}/information"
 
     def _make_request(self, url: str) -> APIResponse:
         """Realiza a requisição HTTP e trata os erros."""

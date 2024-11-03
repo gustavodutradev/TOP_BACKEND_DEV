@@ -9,7 +9,7 @@ class SuitabilityService:
 
     def get_suitability(self, account_number: str):
         endpoint = f"/iaas-suitability/api/v1/suitability/account/{account_number}"
-        url = f"{self.config_service._base_url}{endpoint}"
+        url = f"{self.config_service.base_url}{endpoint}"
 
         print(f"URL da requisição: {url}")
 

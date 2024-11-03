@@ -13,7 +13,7 @@ class PositionReportService:
     def get_positions_report(self):
         """Requisita relatório gerencial de Posições"""
         endpoint = "/api-rm-reports/api/v1/rm-reports/position"
-        url = f"{self.config_service._base_url}{endpoint}"
+        url = f"{self.config_service.base_url}{endpoint}"
 
         try:
             headers = self.config_service.get_headers()

@@ -9,7 +9,7 @@ class AccountBaseService:
 
     def get_account_base(self):
         endpoint = "/api-account-base/api/v1/account-base/accounts"
-        url = f"{self.config_service._base_url}{endpoint}"
+        url = f"{self.config_service.base_url}{endpoint}"
 
         print(url)
 

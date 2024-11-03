@@ -9,7 +9,7 @@ class RecommendedEquitiesService:
 
     def get_recommended_equities(self):
         endpoint = "/iaas-recommended-equities-allocation/api/v1/recommended-equities-allocation"
-        url = f"{self.config_service._base_url}{endpoint}"
+        url = f"{self.config_service.base_url}{endpoint}"
 
         print(url)
 

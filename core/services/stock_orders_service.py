@@ -84,7 +84,7 @@ class StockOrdersService:
 
     def _build_url(self, endpoint: str) -> str:
         """Constrói a URL completa para a requisição."""
-        return f"{self.config_service._base_url}{self._base_endpoint}{endpoint}"
+        return f"{self.config_service.base_url}{self._base_endpoint}{endpoint}"
 
     def get_stock_orders(self) -> bool:
         """Requisita ordens da API IaaS Stock Order."""

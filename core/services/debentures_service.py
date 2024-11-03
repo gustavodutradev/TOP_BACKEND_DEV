@@ -9,7 +9,7 @@ class DebenturesService:
 
     def get_anbima_debentures(self, reference_date):
         endpoint = f"/iaas-debenture/api/v1/debenture"
-        url = f"{self.config_service._base_url}{endpoint}"
+        url = f"{self.config_service.base_url}{endpoint}"
 
         params = {"referenceDate": reference_date}
 
