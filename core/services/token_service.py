@@ -76,6 +76,7 @@ class TokenService:
         self._request_id = str(uuid.uuid4())
         self._headers = self._build_headers(auth_base64)
         self._body = {"grant_type": "client_credentials"}
+        self._token_data = self._load_cached_token()
         self._initialized = True
 
     def _build_headers(self, auth_base64: str) -> Dict[str, str]:
