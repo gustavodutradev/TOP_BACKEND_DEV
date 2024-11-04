@@ -1,6 +1,24 @@
 import logging
 import traceback
-from flask import request, jsonify
+from dataclasses import dataclass
+from typing import Optional, Dict, Any, Tuple
+from flask import Request, request, jsonify
+
+
+@dataclass
+class RequestContext:
+    """Classe para armazenar o contexto da requisição."""
+    clientip: str
+    method: str
+    url: str
+
+    @classmethod
+    def from_request(cls, request: Request) -> 'RequestContext':
+        return cls(
+            clientip=request.remote_addr,
+            method=request.method,
+            url=request.url
+        )
 
 
 class Logger:
@@ -8,91 +26,83 @@ class Logger:
         self.app = app
         self.setup_logging()
 
-    def setup_logging(self):
-        # Definindo um formato de log mais detalhado
+    def setup_logging(self) -> None:
+        """Configura o logger com formato detalhado."""
         log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         logging.basicConfig(level=logging.DEBUG, format=log_format)
         self.logger = logging.getLogger(__name__)
 
-    def log_and_respond(self, event_name: str):
-        try:
-            # Captura o JSON da requisição
-            data = request.get_json(silent=True)
+    def extract_url(self, data: Dict[str, Any]) -> Optional[str]:
+        """Extrai a URL do payload, procurando em diferentes locais possíveis."""
+        return (
+            data.get("result", {}).get("url") or 
+            data.get("response", {}).get("url")
+        )
 
-            # Verifica se o JSON está presente
+    def extract_error_info(self, data: Dict[str, Any]) -> Tuple[str, str]:
+        """Extrai informações de erro do payload."""
+        error = (data.get("errors") or [{}])[0]
+        return (
+            error.get("message", "Unknown error"),
+            error.get("code", "Unknown code")
+        )
+
+    def process_payload(self, data: Dict[str, Any], event_name: str) -> Tuple[Dict[str, Any], int]:
+        """Processa o payload e retorna a resposta apropriada."""
+        if isinstance(data, list) and data:
+            data = data[0]
+
+        self.app.logger.debug(
+            f"Payload Recebido: {data}",
+            extra=RequestContext.from_request(request).__dict__
+        )
+
+        url = self.extract_url(data)
+        if not url:
+            message, code = self.extract_error_info(data)
+            self.app.logger.warning(
+                f"Received Event {event_name} - URL not found. "
+                f"Error Code: {code}, Message: {message}, Full Payload: {data}",
+                extra=RequestContext.from_request(request).__dict__
+            )
+            return {"status": code, "message": message}, 400
+
+        self.logger.info(
+            f"Received Event {event_name} - URL: {url}, Full Payload: {data}",
+            extra=RequestContext.from_request(request).__dict__
+        )
+
+        return {
+            "status": "success",
+            "message": "Event processed",
+            "url": url
+        }, 200
+
+    def log_and_respond(self, event_name: str) -> Tuple[Dict[str, Any], int]:
+        """Processa a requisição, realiza o logging e retorna a resposta apropriada."""
+        try:
+            data = request.get_json(silent=True)
             if not data:
                 self.app.logger.error(
                     f"Received Event {event_name} - No JSON payload found",
-                    extra=self._get_request_context(),
+                    extra=RequestContext.from_request(request).__dict__
                 )
-                return (
-                    jsonify(
-                        {
-                            "status": "Invalid request",
-                            "message": "No JSON payload found",
-                        }
-                    ),
-                    400,
-                )
+                return {
+                    "status": "Invalid request",
+                    "message": "No JSON payload found"
+                }, 400
 
-            # Se 'data' for uma lista, usa o primeiro item, caso aplicável
-            if isinstance(data, list) and data:
-                data = data[0]
-
-            self.app.logger.debug(
-                f"Payload Recebido: {data}", extra=self._get_request_context()
-            )
-
-            # Tenta obter a URL diretamente ou via campo 'result'
-            url = data.get("result", {}).get("url") or data.get("response", {}).get(
-                "url"
-            )
-
-            if not url:
-                # Coleta mensagem e código de erro (valores padrões se ausentes)
-                error = (data.get("errors") or [{}])[0]
-                message = error.get("message", "Unknown error")
-                code = error.get("code", "Unknown code")
-
-                # Loga advertência com detalhes do erro
-                self.app.logger.warning(
-                    f"Received Event {event_name} - URL not found. "
-                    f"Error Code: {code}, Message: {message}, Full Payload: {data}",
-                    extra=self._get_request_context(),
-                )
-
-                # Retorna resposta de erro
-                return jsonify({"status": code, "message": message}), 400
-
-            # Loga sucesso com a URL encontrada
-            self.logger.info(
-                f"Received Event {event_name} - URL: {url}, Full Payload: {data}",
-                extra=self._get_request_context(),
-            )
-
-            # Responde com sucesso
-            return (
-                jsonify(
-                    {"status": "success", "message": "Event processed", "url": url}
-                ),
-                200,
-            )
+            response_data, status_code = self.process_payload(data, event_name)
+            return jsonify(response_data), status_code
 
         except Exception as e:
-            # Loga a exceção com detalhes do traceback
             self.app.logger.error(
                 f"Exception on {event_name} - {str(e)}",
-                extra=self._get_request_context(),
+                extra=RequestContext.from_request(request).__dict__
             )
             self.app.logger.error(traceback.format_exc())
-
-            # Retorna erro interno do servidor
-            return jsonify({"status": "error", "message": "Internal server error"}), 500
-
-    def _get_request_context(self):
-        """Obtém detalhes do contexto da requisição para enriquecer os logs."""
-        return {
-            "clientip": request.remote_addr,
-            "method": request.method,
-            "url": request.url,
-        }
+            
+            return jsonify({
+                "status": "error",
+                "message": "Internal server error"
+            }), 500
