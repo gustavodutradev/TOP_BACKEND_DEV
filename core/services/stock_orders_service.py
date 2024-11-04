@@ -76,10 +76,8 @@ class StockOrdersService:
     def __init__(self) -> None:
         self.config_service = ConfigService()
         self.email_service = EmailService()
-        self.registration_data_service = RegistrationDataService()
         self.advisor_email_service = SearchAdvisorEmail()
         self.zip_service = ZipService()
-        self.account_cache: Dict[str, str] = {}
         self._base_endpoint = "/iaas-stock-order/api/v1/stock-order"
 
     def _build_url(self, endpoint: str) -> str:
@@ -150,10 +148,7 @@ class StockOrdersService:
 
     def get_account_holder_name(self, account_number: str) -> str:
         """Busca o nome do titular da conta com cache."""
-        return self.account_cache.get(
-            account_number,
-            self.registration_data_service.get_holder_name(account_number),
-        )
+        return self.advisor_email_service.get_client_info(account_number)
 
     def send_pending_orders_email(self, orders: List[Order]) -> None:
         """Envia ordens pendentes para a mesa variável e os assessores responsáveis."""
