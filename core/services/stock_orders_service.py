@@ -167,6 +167,25 @@ class StockOrdersService:
         except Exception as e:
             logger.error(f"Erro ao enviar e-mails: {str(e)}")
 
+    def _send_advisor_email(self, advisor_email: str, orders: List[Order]) -> None:
+        """Envia e-mail para o assessor responsável com as ordens pendentes de seus respectivos clientes."""
+        if not advisor_email:
+            logger.warning("E-mail do assessor não encontrado para as ordens pendentes.")
+            return
+    
+        # Constrói o corpo do e-mail com as ordens pendentes para o assessor
+        orders_by_client = self._group_orders_by_client(orders)
+        email_body = EmailTemplateBuilder.build_consolidated_email(orders_by_client)
+    
+        subject = "Ordens Pendentes de Aprovação dos Seus Clientes"
+    
+        # Envia o e-mail
+        self.email_service.send_email(
+            advisor_email, subject, email_body, is_html=True
+        )
+        logger.info(f"E-mail enviado para o assessor {advisor_email} com {len(orders)} ordens pendentes.")
+
+
     def _group_orders_by_advisor(self, orders: List[Order]) -> Dict[str, List[Order]]:
         """Agrupa as ordens por e-mail do assessor."""
         orders_by_advisor: Dict[str, List[Order]] = {}
