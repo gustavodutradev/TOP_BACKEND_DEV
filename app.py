@@ -13,6 +13,8 @@ from adapters.controllers import (
     BaseBTGController,
     PositionReportController,
     MonthlyTIRController,
+    CraCriController,
+    FixedIncomeController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 
@@ -37,7 +39,9 @@ class FlaskApp:
             'monthly_profit': MonthlyCustomerProfitController(self.app),
             'base_btg': BaseBTGController(self.app),
             'positions': PositionReportController(self.app),
-            'monthly_tir': MonthlyTIRController(self.app)
+            'monthly_tir': MonthlyTIRController(self.app),
+            'cra_cri': CraCriController(self.app),
+            'fixed_income': FixedIncomeController(self.app),
         }
 
     def _init_scheduler(self) -> None:

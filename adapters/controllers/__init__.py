@@ -9,3 +9,5 @@ from .monthly_customer_profit_controller import MonthlyCustomerProfitController
 from .management_reports.base_btg_controller import BaseBTGController
 from .management_reports.posicoes_controller import PositionReportController
 from .management_reports.monthly_tir_controller import MonthlyTIRController
+from .fixed_income_reports.cra_cri_controller import CraCriController
+from .fixed_income_reports.fixed_income_controller import FixedIncomeController
