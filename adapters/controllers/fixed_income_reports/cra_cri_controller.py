@@ -32,7 +32,7 @@ class CraCriController:
                 return self._handle_initial_request()
 
             data = request.get_json(silent=True)
-            if data and "response" in data:
+            if data:
                 return self._process_webhook(data)
 
             return self._handle_initial_request()
@@ -71,7 +71,6 @@ class CraCriController:
 
         csv_url = self._extract_csv_url(data)
         if not csv_url:
-            self.logger.logger.error("URL do CSV não encontrada no payload.")
             return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
 
         csv_data = self.cra_cri_service.process_csv_from_url(csv_url)
@@ -94,7 +93,13 @@ class CraCriController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        return data.get("response", {}).get("url", "")
+        url = data.get("url", "")
+        
+        if not url:
+            self.logger.logger.error("URL do CSV não encontrada no payload.")
+            return ""
+        
+        return url
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
