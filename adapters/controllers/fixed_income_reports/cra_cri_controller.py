@@ -46,9 +46,7 @@ class CraCriController:
         Returns:
             Tuple containing response data and HTTP status code
         """
-        self.logger.log_and_respond(
-            "Iniciando requisição de relatório RF de CRA-CRI."
-        )
+        self.logger.log_and_respond("Iniciando requisição de relatório RF de CRA-CRI.")
 
         if not self.cra_cri_service.get_cra_cri_report():
             return {
@@ -94,11 +92,11 @@ class CraCriController:
             The CSV URL if found, empty string otherwise
         """
         url = data.get("url", "")
-        
+
         if not url:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
             return ""
-        
+
         return url
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:

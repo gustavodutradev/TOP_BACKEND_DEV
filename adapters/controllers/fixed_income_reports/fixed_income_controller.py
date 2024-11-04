@@ -18,7 +18,10 @@ class FixedIncomeController:
     def register_routes(self) -> None:
         """Register the API routes for the controller."""
         self.app.add_url_rule(
-            "/api/v1/rf-fixed-income", "fixed_income_handler", self.handler, methods=["POST"]
+            "/api/v1/rf-fixed-income",
+            "fixed_income_handler",
+            self.handler,
+            methods=["POST"],
         )
 
     def handler(self) -> Tuple[Dict[str, Any], int]:

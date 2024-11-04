@@ -10,6 +10,7 @@ def handle_exceptions(func):
     """
     Decorator para tratamento padronizado de exceções nas rotas.
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs) -> Tuple[Response, int]:
         try:
@@ -21,15 +22,16 @@ def handle_exceptions(func):
             logging.error(f"Error processing request: {str(e)}", exc_info=True)
             return (
                 jsonify({"error": "An unexpected error occurred"}),
-                HTTPStatus.INTERNAL_SERVER_ERROR
+                HTTPStatus.INTERNAL_SERVER_ERROR,
             )
+
     return wrapper
 
 
 class RegistrationDataController:
     """
     Controlador para gerenciar endpoints relacionados a dados cadastrais.
-    
+
     Attributes:
         app: Instância da aplicação Flask
         registration_data_service: Serviço para operações com dados cadastrais
@@ -47,14 +49,14 @@ class RegistrationDataController:
                 "rule": "/api/v1/get-registration-data/<account_number>",
                 "endpoint": "get_registration_data_handler",
                 "view_func": self.get_registration_data,
-                "methods": ["GET"]
+                "methods": ["GET"],
             },
             {
                 "rule": "/api/v1/get-holder-name/<account_number>",
                 "endpoint": "get_holder_name_handler",
                 "view_func": self.get_holder_name,
-                "methods": ["GET"]
-            }
+                "methods": ["GET"],
+            },
         ]
 
         for route in routes:

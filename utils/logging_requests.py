@@ -8,17 +8,14 @@ from flask import Request, request, jsonify
 @dataclass
 class RequestContext:
     """Classe para armazenar o contexto da requisição."""
+
     clientip: str
     method: str
     url: str
 
     @classmethod
-    def from_request(cls, request: Request) -> 'RequestContext':
-        return cls(
-            clientip=request.remote_addr,
-            method=request.method,
-            url=request.url
-        )
+    def from_request(cls, request: Request) -> "RequestContext":
+        return cls(clientip=request.remote_addr, method=request.method, url=request.url)
 
 
 class Logger:
@@ -34,27 +31,26 @@ class Logger:
 
     def extract_url(self, data: Dict[str, Any]) -> Optional[str]:
         """Extrai a URL do payload, procurando em diferentes locais possíveis."""
-        return (
-            data.get("result", {}).get("url") or 
-            data.get("response", {}).get("url")
-        )
+        return data.get("result", {}).get("url") or data.get("response", {}).get("url")
 
     def extract_error_info(self, data: Dict[str, Any]) -> Tuple[str, str]:
         """Extrai informações de erro do payload."""
         error = (data.get("errors") or [{}])[0]
         return (
             error.get("message", "Unknown error"),
-            error.get("code", "Unknown code")
+            error.get("code", "Unknown code"),
         )
 
-    def process_payload(self, data: Dict[str, Any], event_name: str) -> Tuple[Dict[str, Any], int]:
+    def process_payload(
+        self, data: Dict[str, Any], event_name: str
+    ) -> Tuple[Dict[str, Any], int]:
         """Processa o payload e retorna a resposta apropriada."""
         if isinstance(data, list) and data:
             data = data[0]
 
         self.app.logger.debug(
             f"Payload Recebido: {data}",
-            extra=RequestContext.from_request(request).__dict__
+            extra=RequestContext.from_request(request).__dict__,
         )
 
         url = self.extract_url(data)
@@ -63,20 +59,16 @@ class Logger:
             self.app.logger.warning(
                 f"Received Event {event_name} - URL not found. "
                 f"Error Code: {code}, Message: {message}, Full Payload: {data}",
-                extra=RequestContext.from_request(request).__dict__
+                extra=RequestContext.from_request(request).__dict__,
             )
             return {"status": code, "message": message}, 400
 
         self.logger.info(
             f"Received Event {event_name} - URL: {url}, Full Payload: {data}",
-            extra=RequestContext.from_request(request).__dict__
+            extra=RequestContext.from_request(request).__dict__,
         )
 
-        return {
-            "status": "success",
-            "message": "Event processed",
-            "url": url
-        }, 200
+        return {"status": "success", "message": "Event processed", "url": url}, 200
 
     def log_and_respond(self, event_name: str) -> Tuple[Dict[str, Any], int]:
         """Processa a requisição, realiza o logging e retorna a resposta apropriada."""
@@ -85,11 +77,11 @@ class Logger:
             if not data:
                 self.app.logger.error(
                     f"Received Event {event_name} - No JSON payload found",
-                    extra=RequestContext.from_request(request).__dict__
+                    extra=RequestContext.from_request(request).__dict__,
                 )
                 return {
                     "status": "Invalid request",
-                    "message": "No JSON payload found"
+                    "message": "No JSON payload found",
                 }, 400
 
             response_data, status_code = self.process_payload(data, event_name)
@@ -98,11 +90,8 @@ class Logger:
         except Exception as e:
             self.app.logger.error(
                 f"Exception on {event_name} - {str(e)}",
-                extra=RequestContext.from_request(request).__dict__
+                extra=RequestContext.from_request(request).__dict__,
             )
             self.app.logger.error(traceback.format_exc())
-            
-            return jsonify({
-                "status": "error",
-                "message": "Internal server error"
-            }), 500
+
+            return jsonify({"status": "error", "message": "Internal server error"}), 500

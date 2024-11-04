@@ -89,9 +89,12 @@ class TokenService:
         }
 
     def get_token(self) -> str:
-        """Retorna um token de acesso válido."""
+        """Retorna um token de acesso válido, utilizando cache se disponível."""
         if not self._initialized:
             self.initialize()
+
+        if not self._token_data:
+            self._token_data = self._load_cached_token()
 
         if self._token_data and not self._token_data.is_expired:
             return self._token_data.access_token

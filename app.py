@@ -30,18 +30,18 @@ class FlaskApp:
         """Initialize all controllers"""
         self.webhook_service = WebhookService(self.app)
         self.controllers = {
-            'suitability': SuitabilityController(self.app),
-            'registration': RegistrationDataController(self.app),
-            'account': AccountBaseController(),
-            'debentures': DebenturesController(),
-            'recommended_equities': RecommendedEquitiesController(),
-            'stock_orders': StockOrdersController(self.app),
-            'monthly_profit': MonthlyCustomerProfitController(self.app),
-            'base_btg': BaseBTGController(self.app),
-            'positions': PositionReportController(self.app),
-            'monthly_tir': MonthlyTIRController(self.app),
-            'cra_cri': CraCriController(self.app),
-            'fixed_income': FixedIncomeController(self.app),
+            "suitability": SuitabilityController(self.app),
+            "registration": RegistrationDataController(self.app),
+            "account": AccountBaseController(),
+            "debentures": DebenturesController(),
+            "recommended_equities": RecommendedEquitiesController(),
+            "stock_orders": StockOrdersController(self.app),
+            "monthly_profit": MonthlyCustomerProfitController(self.app),
+            "base_btg": BaseBTGController(self.app),
+            "positions": PositionReportController(self.app),
+            "monthly_tir": MonthlyTIRController(self.app),
+            "cra_cri": CraCriController(self.app),
+            "fixed_income": FixedIncomeController(self.app),
         }
 
     def _init_scheduler(self) -> None:
@@ -51,27 +51,27 @@ class FlaskApp:
     def _init_routes(self) -> None:
         """Initialize all routes"""
         # Health check routes
-        self.app.add_url_rule('/healthz', 'health_check', self.health_check)
-        self.app.add_url_rule('/', 'home', self.home)
+        self.app.add_url_rule("/healthz", "health_check", self.health_check)
+        self.app.add_url_rule("/", "home", self.home)
 
         # API routes
         self.app.add_url_rule(
-            '/api/v1/get-account-base',
-            'get_account_base',
+            "/api/v1/get-account-base",
+            "get_account_base",
             self.get_account_base,
-            methods=['GET']
+            methods=["GET"],
         )
         self.app.add_url_rule(
-            '/api/v1/get-anbima-debentures/<date>',
-            'anbima_debentures',
+            "/api/v1/get-anbima-debentures/<date>",
+            "anbima_debentures",
             self.anbima_debentures,
-            methods=['GET']
+            methods=["GET"],
         )
         self.app.add_url_rule(
-            '/api/v1/get-recommended-equities/<date>',
-            'get_recommended_equities',
+            "/api/v1/get-recommended-equities/<date>",
+            "get_recommended_equities",
             self.get_recommended_equities,
-            methods=['GET']
+            methods=["GET"],
         )
 
     def health_check(self) -> Tuple[str, int]:
@@ -84,15 +84,15 @@ class FlaskApp:
 
     def get_account_base(self):
         """Get account base endpoint"""
-        return self.controllers['account'].get_account_base()
+        return self.controllers["account"].get_account_base()
 
     def anbima_debentures(self, date: str):
         """Get anbima debentures endpoint"""
-        return self.controllers['debentures'].get_anbima_debentures(date)
+        return self.controllers["debentures"].get_anbima_debentures(date)
 
     def get_recommended_equities(self, date: str):
         """Get recommended equities endpoint"""
-        return self.controllers['recommended_equities'].get_recommended_equities(date)
+        return self.controllers["recommended_equities"].get_recommended_equities(date)
 
     def run(self, host: str = "0.0.0.0", port: int = None) -> None:
         """Run the Flask application"""
@@ -103,5 +103,6 @@ class FlaskApp:
 
 if __name__ == "__main__":
     import os
+
     app = FlaskApp()
     app.run()
