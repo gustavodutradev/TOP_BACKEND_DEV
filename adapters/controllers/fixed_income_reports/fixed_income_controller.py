@@ -77,7 +77,12 @@ class FixedIncomeController:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
             return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
 
-        csv_data = self.fixed_income_service.process_csv_from_url(csv_url)
+        try:
+            csv_data = self.fixed_income_service.process_csv_from_url(csv_url)
+        except Exception as e:
+            self.logger.logger.error(f"Erro ao processar CSV: {str(e)}")
+            return {"error": "Erro ao processar CSV"}, HTTPStatus.INTERNAL_SERVER_ERROR
+
         if not csv_data:
             self.logger.logger.info(
                 "Não foram encontrados dados para o relatório RF por parceiro."
@@ -97,7 +102,8 @@ class FixedIncomeController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        url = data.get("url", "")
+        response = data.get("response", {})
+        url = response.get("url", "")
 
         if not url:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
