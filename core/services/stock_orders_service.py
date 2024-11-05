@@ -146,10 +146,6 @@ class StockOrdersService:
             side=side,
         )
 
-    def get_account_holder_name(self, account_number: str) -> str:
-        """Busca o nome do titular da conta com cache."""
-        return self.advisor_email_service.get_client_info(account_number)
-
     def send_pending_orders_email(self, orders: List[Order]) -> None:
         """Envia ordens pendentes para a mesa variável e os assessores responsáveis."""
         try:
@@ -188,24 +184,22 @@ class StockOrdersService:
 
         for order in orders:
             advisor_info = self._get_advisor_info(order.account)
-            holder_name = self.get_account_holder_name(order.account)
 
-            if not holder_name or holder_name == "Nome não encontrado":
-                holder_name = (
-                    advisor_info.name
-                    if advisor_info.name
-                    else "Assessor não identificado"
-                )
+            # Utilize o método atualizado de SearchAdvisorEmail
+            client_name, advisor_name, advisor_email, _ = self.advisor_email_service.get_client_and_advisor_info(order.account)
 
-            order.holder_name = holder_name
-            orders_by_advisor.setdefault(advisor_info.email, []).append(order)
+            if advisor_email:
+                orders_by_advisor.setdefault(advisor_email, []).append(order)
+
+            # Preenche o nome do titular da conta na ordem
+            order.holder_name = client_name if client_name else "Cliente não encontrado"
 
         return orders_by_advisor
 
     def _get_advisor_info(self, account: str) -> AdvisorInfo:
-        """Obtém informações do assessor para uma conta."""
-        email, name = self.advisor_email_service.get_advisor_info(account)
-        return AdvisorInfo(email=email, name=name)
+        """Obtém informações do assessor para uma conta usando SearchAdvisorEmail."""
+        _, advisor_name, advisor_email, _ = self.advisor_email_service.get_client_and_advisor_info(account)
+        return AdvisorInfo(email=advisor_email, name=advisor_name)
 
     def _send_consolidated_email(self, orders: List[Order]) -> None:
         """Envia e-mail consolidado para a mesa variável."""
@@ -224,7 +218,7 @@ class StockOrdersService:
         """Agrupa as ordens pendentes por cliente."""
         orders_by_client: Dict[str, List[Order]] = {}
         for order in orders:
-            holder_name = self.get_account_holder_name(order.account)
+            holder_name = order.holder_name or "Nome não encontrado"
             orders_by_client.setdefault(holder_name, []).append(order)
         return orders_by_client
 
