@@ -97,7 +97,7 @@ class FixedIncomeController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        url = data.get("url", "")
+        url = data.get("response", {}).get("url") or data.get("url", "")
 
         if not url:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
