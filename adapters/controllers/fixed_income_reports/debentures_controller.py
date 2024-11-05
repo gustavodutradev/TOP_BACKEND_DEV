@@ -7,7 +7,7 @@ import traceback
 from http import HTTPStatus
 
 
-class DebenturesController:
+class RFDebenturesController:
     def __init__(self, app):
         self.debentures_service = DebenturesService()
         self.token_service = TokenService()
