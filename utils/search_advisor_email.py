@@ -20,7 +20,7 @@ class SearchAdvisorEmail:
 
     def get_client_info(self, account_number):
         """Obtém as informações do cliente a partir do número da conta."""
-        with open("resources/data/account_advisords_data.json", "r") as f:
+        with open("resources/data/account_advisors_data.json", "r") as f:
             account_data = json.load(f)
 
         client_name = self.find_client_name(account_number, account_data)

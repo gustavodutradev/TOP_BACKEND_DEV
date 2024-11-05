@@ -19,7 +19,7 @@ class CommissionsController:
         """Register the API routes for the controller."""
         self.app.add_url_rule(
             "/api/v1/rg-commissions",
-            "rm_commissions_handler",
+            "rg_commissions_handler",
             self.handler,
             methods=["POST"],
         )
