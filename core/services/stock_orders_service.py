@@ -183,25 +183,25 @@ class StockOrdersService:
         orders_by_advisor: Dict[str, List[Order]] = {}
 
         for order in orders:
-            advisor_info = self._get_advisor_info(order.account)
-
-            # Utilize o método atualizado de SearchAdvisorEmail
-            client_name, advisor_name, advisor_email, _ = self.advisor_email_service.get_client_and_advisor_info(order.account)
+            client_name, _, advisor_email, _ = (
+                self.advisor_email_service.get_client_and_advisor_info(order.account)
+            )
 
             if advisor_email:
                 orders_by_advisor.setdefault(advisor_email, []).append(order)
 
-            # Preenche o nome do titular da conta na ordem
             order.holder_name = client_name if client_name else "Cliente não encontrado"
 
         return orders_by_advisor
 
     def _get_advisor_info(self, account: str) -> AdvisorInfo:
         """Obtém informações do assessor para uma conta usando SearchAdvisorEmail."""
-        _, advisor_name, advisor_email, _ = self.advisor_email_service.get_client_and_advisor_info(account)
+        _, advisor_name, advisor_email, _ = (
+            self.advisor_email_service.get_client_and_advisor_info(account)
+        )
 
-        if advisor_email == "tatianaguimaraes@topinvgroup.com":
-            advisor_email = "brunomaia@topinvgroup.com"
+        # if advisor_email == "tatianaguimaraes@topinvgroup.com":
+        #     advisor_email = "brunomaia@topinvgroup.com"
         return AdvisorInfo(email=advisor_email, name=advisor_name)
 
     def _send_consolidated_email(self, orders: List[Order]) -> None:

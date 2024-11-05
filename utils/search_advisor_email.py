@@ -46,6 +46,7 @@
 
 import json
 
+
 class SearchAdvisorEmail:
     def __init__(self):
         self.account_data = self.load_json("resources/data/account_advisors_data.json")
