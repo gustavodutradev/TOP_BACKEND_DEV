@@ -74,28 +74,39 @@ class Logger:
 
         return {"status": "success", "message": "Event processed", "url": url}, 200
 
-    def log_and_respond(self, event_name: str) -> Tuple[Dict[str, Any], int]:
-        """Processa a requisição, realiza o logging e retorna a resposta apropriada."""
-        try:
+def log_and_respond(self, event_name: str) -> Tuple[Dict[str, Any], int]:
+    """Processa a requisição, realiza o logging e retorna a resposta apropriada."""
+    try:
+        # Verifica se é uma chamada de webhook
+        is_webhook = request.headers.get('X-Webhook-Event') or 'response' in (request.get_json(silent=True) or {})
+        
+        if is_webhook:
             data = request.get_json(silent=True)
             if not data:
                 self.app.logger.error(
-                    f"Received Event {event_name} - No JSON payload found",
+                    f"Received Webhook {event_name} - Invalid or missing JSON payload",
                     extra=RequestContext.from_request(request).__dict__,
                 )
                 return {
                     "status": "Invalid request",
-                    "message": "No JSON payload found",
+                    "message": "Invalid or missing JSON payload for webhook",
                 }, 400
 
             response_data, status_code = self.process_payload(data, event_name)
             return jsonify(response_data), status_code
-
-        except Exception as e:
-            self.app.logger.error(
-                f"Exception on {event_name} - {str(e)}",
+        else:
+            # Para requisições iniciais, apenas loga o evento
+            self.app.logger.info(
+                f"Received Event {event_name}",
                 extra=RequestContext.from_request(request).__dict__,
             )
-            self.app.logger.error(traceback.format_exc())
+            return jsonify({"status": "success", "message": event_name}), 200
 
-            return jsonify({"status": "error", "message": "Internal server error"}), 500
+    except Exception as e:
+        self.app.logger.error(
+            f"Exception on {event_name} - {str(e)}",
+            extra=RequestContext.from_request(request).__dict__,
+        )
+        self.app.logger.error(traceback.format_exc())
+
+        return jsonify({"status": "error", "message": "Internal server error"}), 500
