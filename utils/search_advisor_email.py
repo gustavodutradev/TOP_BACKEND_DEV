@@ -5,29 +5,23 @@ class SearchAdvisorEmail:
     def __init__(self):
         pass
 
-    def find_sgcge(self, account_number, account_data):
-        """Busca o código CGE do assessor e o nome do cliente a partir do número da conta."""
+    def find_sgcge_and_client_name(self, account_number, account_data):
+        """Busca o código CGE do assessor a partir do número da conta do cliente."""
         for entry in account_data:
             if entry["account"] == account_number:
-                return entry["sgCGE"]
-            return None
-
-    def find_client_name(self, account_number, account_data):
-        for entry in account_data:
-            if entry["account"] == account_number:
-                return entry["clientName"]
-        return None
+                return entry["sgCGE"], entry["clientName"]
+        return None, None
 
     def get_client_info(self, account_number):
-        """Obtém as informações do cliente a partir do número da conta."""
+        """Obtém as informações do cliente e CGE do assessor, a partir do número da conta."""
         with open("resources/data/account_advisors_data.json", "r") as f:
             account_data = json.load(f)
 
-        client_name = self.find_client_name(account_number, account_data)
-        if client_name is None:
+        client_info = self.find_sgcge_and_client_name(account_number, account_data)
+        if client_info is None:
             return None, None
 
-        return client_name
+        return client_info
 
     def find_advisor_info(self, sgcge, advisor_data):
         """Busca o e-mail e nome do assessor pelo código CGE."""
@@ -44,7 +38,7 @@ class SearchAdvisorEmail:
         with open("resources/data/advisors_data.json", "r") as f:
             advisor_data = json.load(f)
 
-        sgcge = self.find_sgcge(account_number, account_data)
+        sgcge, _ = self.find_sgcge_and_client_name(account_number, account_data)
         if sgcge is None:
             return None, None
 
