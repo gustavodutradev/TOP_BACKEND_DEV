@@ -102,13 +102,6 @@ class FixedIncomeController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        if "errors" in data:
-            error_messages = ", ".join(
-                [f"{err['code']}: {err['message']}" for err in data["errors"]]
-            )
-            self.logger.logger.error(f"Erros encontrados no payload: {error_messages}")
-            return ""
-    
         url = data.get("url", "")
 
         if not url:

@@ -7,7 +7,6 @@ import traceback
 from http import HTTPStatus
 
 
-
 class GovBondController:
     def __init__(self, app):
         self.gov_bond_service = GovBondService()

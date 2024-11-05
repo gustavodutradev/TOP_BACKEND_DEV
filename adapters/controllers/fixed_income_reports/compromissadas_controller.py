@@ -1,5 +1,7 @@
 from flask import request
-from core.services.fixed_income_reports.compromissadas_service import CompromissadasService
+from core.services.fixed_income_reports.compromissadas_service import (
+    CompromissadasService,
+)
 from core.services.token_service import TokenService
 from utils.logging_requests import Logger
 from typing import Dict, Tuple, Any

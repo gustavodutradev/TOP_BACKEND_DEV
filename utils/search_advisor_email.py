@@ -11,7 +11,7 @@ class SearchAdvisorEmail:
             if entry["account"] == account_number:
                 return entry["sgCGE"]
             return None
-        
+
     def find_client_name(self, account_number, account_data):
         for entry in account_data:
             if entry["account"] == account_number:
