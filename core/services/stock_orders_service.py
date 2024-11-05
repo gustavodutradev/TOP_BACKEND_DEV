@@ -199,6 +199,9 @@ class StockOrdersService:
     def _get_advisor_info(self, account: str) -> AdvisorInfo:
         """Obtém informações do assessor para uma conta usando SearchAdvisorEmail."""
         _, advisor_name, advisor_email, _ = self.advisor_email_service.get_client_and_advisor_info(account)
+
+        if advisor_email == "tatianaguimaraes@topinvgroup.com":
+            advisor_email = "brunomaia@topinvgroup.com"
         return AdvisorInfo(email=advisor_email, name=advisor_name)
 
     def _send_consolidated_email(self, orders: List[Order]) -> None:
