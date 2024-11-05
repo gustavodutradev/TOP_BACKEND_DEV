@@ -18,6 +18,7 @@ from adapters.controllers import (
     RFDebenturesController,
     GovBondController,
     CompromissadasController,
+    CommissionsController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 
@@ -48,6 +49,7 @@ class FlaskApp:
             "rf_debentures": RFDebenturesController(self.app),
             "gov_bond": GovBondController(self.app),
             "compromissadas": CompromissadasController(self.app),
+            "commissions": CommissionsController(self.app),
         }
 
     def _init_scheduler(self) -> None:
