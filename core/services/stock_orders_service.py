@@ -137,13 +137,18 @@ class StockOrdersService:
         """Cria um objeto Order a partir de uma linha do CSV."""
         side = "Compra" if row.get("side") == "1" else "Venda"
         order_price = "Mercado" if row.get("price") == "0.0" else row.get("price")
+        account = row.get("account", "")
+        
+        # Buscar o nome do cliente aqui, antes de criar a ordem
+        client_name = self.advisor_email_service.find_client_name_by_account(account)
 
         return Order(
-            account=row.get("account", ""),
+            account=account,
             symbol=row.get("symbol", ""),
             order_qty=row.get("orderQty", ""),
             order_price=order_price,
             side=side,
+            holder_name=client_name  # Definir o nome do cliente já na criação da ordem
         )
 
     def send_pending_orders_email(self, orders: List[Order]) -> None:
@@ -183,14 +188,12 @@ class StockOrdersService:
         orders_by_advisor: Dict[str, List[Order]] = {}
 
         for order in orders:
-            client_name, _, advisor_email, _ = (
+            _, _, advisor_email, _ = (
                 self.advisor_email_service.get_client_and_advisor_info(order.account)
             )
 
             if advisor_email:
                 orders_by_advisor.setdefault(advisor_email, []).append(order)
-
-            order.holder_name = client_name if client_name else "Cliente não encontrado"
 
         return orders_by_advisor
 
@@ -221,7 +224,8 @@ class StockOrdersService:
         """Agrupa as ordens pendentes por cliente."""
         orders_by_client: Dict[str, List[Order]] = {}
         for order in orders:
-            holder_name = order.holder_name or "Nome não encontrado"
+            # Usar o holder_name já definido na ordem, com fallback para "Cliente não encontrado"
+            holder_name = order.holder_name if order.holder_name else "Cliente não encontrado"
             orders_by_client.setdefault(holder_name, []).append(order)
         return orders_by_client
 
