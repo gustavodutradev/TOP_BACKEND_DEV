@@ -31,7 +31,11 @@ class Logger:
 
     def extract_url(self, data: Dict[str, Any]) -> Optional[str]:
         """Extrai a URL do payload, procurando em diferentes locais possíveis."""
-        return data.get("result", {}).get("url") or data.get("response", {}).get("url")
+        return (
+            data.get("result", {}).get("url", "")
+            or data.get("response", {}).get("url", "")
+            or data.get("url", "")
+        )
 
     def extract_error_info(self, data: Dict[str, Any]) -> Tuple[str, str]:
         """Extrai informações de erro do payload."""
