@@ -15,6 +15,9 @@ from adapters.controllers import (
     MonthlyTIRController,
     CraCriController,
     FixedIncomeController,
+    RFDebenturesController,
+    GovBondController,
+    CompromissadasController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 
@@ -42,6 +45,9 @@ class FlaskApp:
             "monthly_tir": MonthlyTIRController(self.app),
             "cra_cri": CraCriController(self.app),
             "fixed_income": FixedIncomeController(self.app),
+            "rf_debentures": RFDebenturesController(self.app),
+            "gov_bond": GovBondController(self.app),
+            "compromissadas": CompromissadasController(self.app),
         }
 
     def _init_scheduler(self) -> None:
