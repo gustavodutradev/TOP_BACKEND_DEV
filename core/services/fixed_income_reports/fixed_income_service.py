@@ -5,13 +5,13 @@ import csv
 
 
 class FixedIncomeService:
-    """Classe para requisitar relatório RF de CRA-CRI."""
+    """Classe para requisitar relatório consolidado de Renda Fixa."""
 
     def __init__(self) -> None:
         self.config_service = ConfigService()
 
     def get_fixed_income_report(self):
-        """Requisita relatório RF por parceiro"""
+        """Requisita relatório consolidado de Renda Fixa."""
         endpoint = "/api-partner-report-extractor/api/v1/report/fixed-income"
         url = f"{self.config_service.base_url}{endpoint}"
 

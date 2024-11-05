@@ -42,7 +42,7 @@ class CraCriController:
 
     def _handle_initial_request(self) -> Tuple[Dict[str, Any], int]:
         """
-        Handle the initial TIR report request.
+        Handle the initial report request.
         Returns:
             Tuple containing response data and HTTP status code
         """

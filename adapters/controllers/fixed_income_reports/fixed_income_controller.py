@@ -45,7 +45,7 @@ class FixedIncomeController:
 
     def _handle_initial_request(self) -> Tuple[Dict[str, Any], int]:
         """
-        Handle the initial TIR report request.
+        Handle the initial report request.
         Returns:
             Tuple containing response data and HTTP status code
         """
@@ -97,7 +97,13 @@ class FixedIncomeController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        return data.get("response", {}).get("url", "")
+        url = data.get("url", "")
+
+        if not url:
+            self.logger.logger.error("URL do CSV não encontrada no payload.")
+            return ""
+
+        return url
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
