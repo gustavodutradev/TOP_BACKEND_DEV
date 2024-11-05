@@ -18,8 +18,8 @@ class CompromissadasController:
     def register_routes(self) -> None:
         """Register the API routes for the controller."""
         self.app.add_url_rule(
-            "/api/v1/rf-debentures",
-            "rf_debentures_handler",
+            "/api/v1/rf-compromissadas",
+            "compromissadas_handler",
             self.handler,
             methods=["POST"],
         )
