@@ -108,8 +108,9 @@ class FixedIncomeController:
             )
             self.logger.logger.error(f"Erros encontrados no payload: {error_messages}")
             return ""
-
-        url = data.get("url", "")
+    
+        response = data.get("response", {})
+        url = response.get("url", "")
 
         if not url:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
