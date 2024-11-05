@@ -11,3 +11,6 @@ from .management_reports.posicoes_controller import PositionReportController
 from .management_reports.monthly_tir_controller import MonthlyTIRController
 from .fixed_income_reports.cra_cri_controller import CraCriController
 from .fixed_income_reports.fixed_income_controller import FixedIncomeController
+from .fixed_income_reports.compromissadas_controller import CompromissadasController
+from .fixed_income_reports.debentures_controller import RFDebenturesController
+from .fixed_income_reports.government_bond_controller import GovBondController
