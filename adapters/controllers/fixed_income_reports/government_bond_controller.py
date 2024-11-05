@@ -8,7 +8,7 @@ from http import HTTPStatus
 
 
 
-class FixedIncomeController:
+class GovBondController:
     def __init__(self, app):
         self.gov_bond_service = GovBondService()
         self.token_service = TokenService()
