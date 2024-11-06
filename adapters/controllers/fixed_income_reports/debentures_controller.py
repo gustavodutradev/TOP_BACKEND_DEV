@@ -5,7 +5,6 @@ from utils.logging_requests import Logger
 from typing import Dict, Tuple, Any
 import traceback
 from http import HTTPStatus
-from jsonpath_rw import parse
 
 
 class RFDebenturesController:
@@ -72,34 +71,23 @@ class RFDebenturesController:
             Tuple containing response data and HTTP status code
         """
         self.logger.log_and_respond("Webhook recebido.")
-    
-        if isinstance(data, list) and data:
-            data = data[0]
-    
-        if isinstance(data, dict):
-            csv_url = self._extract_csv_url(data)
-            if not csv_url:
-                self.logger.logger.error("URL do CSV não encontrada no payload.")
-                return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
-    
-            csv_data = self.debentures_service.process_csv_from_url(csv_url)
-            if not csv_data:
-                self.logger.logger.info(
-                    "Não foram encontrados dados para o relatório RF de Debentures."
-                )
-                return {
-                    "message": "Não foram encontrados dados para o relatório RF de Debentures."
-                }, HTTPStatus.NO_CONTENT
-    
-            self.logger.logger.info("Relatório RF de Debentures gerado com sucesso.")
+
+        csv_url = self._extract_csv_url(data)
+        if not csv_url:
+            self.logger.logger.error("URL do CSV não encontrada no payload.")
+            return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
+
+        csv_data = self.position_report_service.process_csv_from_url(csv_url)
+        if not csv_data:
+            self.logger.logger.info(
+                "Não foram encontrados dados para o relatório de Posições."
+            )
             return {
-                "url": data["url"],
-                "fileSize": data["fileSize"],
-                "filters": data["filters"]
-            }, HTTPStatus.OK
-        else:
-            self.logger.logger.error("Payload inválido: não é um dicionário.")
-            return {"error": "Invalid payload"}, HTTPStatus.BAD_REQUEST
+                "message": "Não foram encontrados dados para o relatório de Posições."
+            }, HTTPStatus.NO_CONTENT
+
+        self.logger.logger.info("Relatório de Posições gerado com sucesso.")
+        return csv_data, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
@@ -110,12 +98,13 @@ class RFDebenturesController:
             The CSV URL if found, empty string otherwise
         """
 
-        jsonpath_expr = parse("url")
-        match = next(jsonpath_expr.find(data), None)
-        if match:
-            return match.value
-        self.logger.logger.error("URL do CSV não encontrada no payload.")
-        return ""
+        url = data.get("response", {}).get("url", "")
+
+        if not url:
+            self.logger.logger.error("URL do CSV não encontrada no payload.")
+            return ""
+        
+        return url
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
