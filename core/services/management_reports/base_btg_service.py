@@ -5,7 +5,7 @@ import csv
 
 
 class BaseBTGReportService:
-    """Classe para requisitar rentabilidade mensal do cliente."""
+    """Classe para requisitar relatório gerencial Base BTG."""
 
     def __init__(self) -> None:
         self.config_service = ConfigService()
