@@ -78,16 +78,16 @@ class RFDebenturesController:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
             return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
 
-        csv_data = self.position_report_service.process_csv_from_url(csv_url)
+        csv_data = self.debentures_service.process_csv_from_url(csv_url)
         if not csv_data:
             self.logger.logger.info(
-                "Não foram encontrados dados para o relatório de Posições."
+                "Não foram encontrados dados para o relatório RF de Debentures."
             )
             return {
-                "message": "Não foram encontrados dados para o relatório de Posições."
+                "message": "Não foram encontrados dados para o relatório RF de Debentures."
             }, HTTPStatus.NO_CONTENT
 
-        self.logger.logger.info("Relatório de Posições gerado com sucesso.")
+        self.logger.logger.info("Relatório RF de Debentures gerado com sucesso.")
         return csv_data, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
@@ -99,13 +99,8 @@ class RFDebenturesController:
             The CSV URL if found, empty string otherwise
         """
 
-        url = data.get("url", "")
+        return data.get("url", "")
 
-        if not url:
-            self.logger.logger.error("URL do CSV não encontrada no payload.")
-            return ""
-        
-        return url
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
