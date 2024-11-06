@@ -1,5 +1,5 @@
 from flask import request
-from core.services.fixed_income_reports.cra_cri_service import CraCriService
+from core.services.operations.operations_service import OperationsService
 from core.services.token_service import TokenService
 from utils.logging_requests import Logger
 from typing import Dict, Tuple, Any
@@ -7,9 +7,9 @@ import traceback
 from http import HTTPStatus
 
 
-class CraCriController:
+class OperationsController:
     def __init__(self, app):
-        self.cra_cri_service = CraCriService()
+        self.operations_service = OperationsService()
         self.token_service = TokenService()
         self.app = app
         self.logger = Logger(app)
@@ -18,7 +18,7 @@ class CraCriController:
     def register_routes(self) -> None:
         """Register the API routes for the controller."""
         self.app.add_url_rule(
-            "/api/v1/rf-cra-cri", "cra_cri_handler", self.handler, methods=["POST"]
+            "/api/v1/operations", "operations_handler", self.handler, methods=["POST"]
         )
 
     def handler(self) -> Tuple[Dict[str, Any], int]:
@@ -32,7 +32,7 @@ class CraCriController:
                 return self._handle_initial_request()
 
             data = request.get_json(silent=True)
-            if data:
+            if data and "response" in data:
                 return self._process_webhook(data)
 
             return self._handle_initial_request()
@@ -42,15 +42,15 @@ class CraCriController:
 
     def _handle_initial_request(self) -> Tuple[Dict[str, Any], int]:
         """
-        Handle the initial report request.
+        Handle the initial Operations report request.
         Returns:
             Tuple containing response data and HTTP status code
         """
-        self.logger.log_and_respond("Iniciando requisição de relatório RF de CRA-CRI.")
+        self.logger.log_and_respond("Iniciando requisição do relatório de Operações.")
 
-        if not self.cra_cri_service.get_cra_cri_report():
+        if not self.operations_service.get_operations_report():
             return {
-                "error": "Falha ao iniciar a requisição de relatório RF de CRA-CRI."
+                "error": "Falha ao iniciar a requisição do relatório de Operações."
             }, HTTPStatus.INTERNAL_SERVER_ERROR
 
         return {
@@ -72,16 +72,16 @@ class CraCriController:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
             return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
 
-        csv_data = self.cra_cri_service.process_csv_from_url(csv_url)
+        csv_data = self.operations_service.process_csv_from_url(csv_url)
         if not csv_data:
             self.logger.logger.info(
-                "Não foram encontrados dados para o relatório RF de CRA-CRI."
+                "Não foram encontrados dados para o relatório de Operações."
             )
             return {
-                "message": "Não foram encontrados dados para o relatório RF de CRA-CRI."
+                "message": "Não foram encontrados dados para o relatório de Operações."
             }, HTTPStatus.NO_CONTENT
 
-        self.logger.logger.info("Relatório de CRA-CRI gerado com sucesso.")
+        self.logger.logger.info("Relatório de Operações gerado com sucesso.")
         return csv_data, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
@@ -92,8 +92,7 @@ class CraCriController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-
-        return data.get("url", "")
+        return data.get("response", {}).get("url", "")
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """

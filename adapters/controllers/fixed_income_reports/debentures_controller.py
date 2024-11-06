@@ -74,11 +74,11 @@ class RFDebenturesController:
         self.logger.logger.info(data.values())
 
         if isinstance(data, list):
-        # Verifica se a lista contém apenas um item
+            # Verifica se a lista contém apenas um item
             if len(data) == 1:
                 data = data[0]
             else:
-            # Caso a lista tenha mais de um item, pegue o segundo item (supondo que o primeiro item seja o erro)
+                # Caso a lista tenha mais de um item, pegue o segundo item (supondo que o primeiro item seja o erro)
                 data = data[1]
 
         if not isinstance(data, dict):
@@ -112,7 +112,6 @@ class RFDebenturesController:
         """
 
         return data.get("url", "")
-
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """

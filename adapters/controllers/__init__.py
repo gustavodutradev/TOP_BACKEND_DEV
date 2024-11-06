@@ -17,3 +17,5 @@ from .fixed_income_reports.fixed_income_controller import FixedIncomeController
 from .fixed_income_reports.compromissadas_controller import CompromissadasController
 from .fixed_income_reports.debentures_controller import RFDebenturesController
 from .fixed_income_reports.government_bond_controller import GovBondController
+from .operations.operations_controller import OperationsController
+from .operations.pre_operations_controller import PreOperationsController

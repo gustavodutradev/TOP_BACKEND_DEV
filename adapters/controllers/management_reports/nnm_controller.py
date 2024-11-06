@@ -46,9 +46,7 @@ class NNMController:
         Returns:
             Tuple containing response data and HTTP status code
         """
-        self.logger.log_and_respond(
-            "Iniciando requisição de relatório gerencial NNM."
-        )
+        self.logger.log_and_respond("Iniciando requisição de relatório gerencial NNM.")
 
         if not self.nnm_service.get_nnm_report():
             return {
@@ -76,9 +74,7 @@ class NNMController:
 
         csv_data = self.nnm_service.process_csv_from_url(csv_url)
         if not csv_data:
-            self.logger.logger.info(
-                "Não foram encontrados dados para o relatório NNM"
-            )
+            self.logger.logger.info("Não foram encontrados dados para o relatório NNM")
             return {
                 "message": "Não foram encontrados dados para o relatório NNM"
             }, HTTPStatus.NO_CONTENT

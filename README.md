@@ -6,11 +6,11 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
 
 **API de Relação de Produtos RF por Parceiro**
 
-- [x] Relatórios de Títulos públicos
-- [x] RF
-- [x] Debêntures
-- [x] CRA/CRI
-- [x] Compromissadas
+- [-] Relatórios de Títulos públicos
+- [-] RF
+- [-] Debêntures
+- [-] CRA/CRI
+- [-] Compromissadas
 
 **API de Rentabilidade Diária**
 
@@ -19,19 +19,19 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
 
 **API Base de Contas**
 
-- [ ] Todas as contas por parceiro, e se é do tipo Fundos
+- [x] Todas as contas por parceiro, e se é do tipo Fundos
 
 **API de Relatórios Gerenciais**
 
 - [x] TIR Mensal por parceiro
     
-- [x] Dados cadastrais
-    
 - [x] Relatório de Posições
     
 - [x] Base BTG
     
-- [ ] NNM Gerencial
+- [x] NNM Gerencial
+
+- [x] Fundos
     
 
 **API Produtos Estruturados**
@@ -46,7 +46,7 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
 
 **API Relatórios Gerenciais de Comissões**
 
-- [ ] Relatório de Comissão dos últimos 4 dias
+- [-] Relatório de Comissão dos últimos 4 dias
     
 
 **API de Rentabilidade Mensal**
@@ -82,7 +82,7 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
     
 - [ ] Busca histórica de preço unitário por conta e período de Renda Fixa
     
-- [ ] Posições por parceirow
+- [ ] Posições por parceiro
     
 - [ ] Histórico completo de posições por parceiro
     
@@ -101,14 +101,14 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
 
 **API Suitability**
 
-- [ ] Perfil de risco atual do investidor
+- [x] Perfil de risco atual do investidor
     
-- [ ] Perfil e validade de risco atual do investidor
+- [x] Perfil e validade de risco atual do investidor
     
 
 **API Dados Cadastrais**
 
-- [ ] Busca informações de uma conta, como Nome, E-mail, Telefone, etc..
+- [x] Busca informações de uma conta, como Nome, E-mail, Telefone, etc..
     
 
 **API de Seguro de Vida**
@@ -118,9 +118,9 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
 
 **API Relacionamento de Conta e Parceiro**
 
-- [ ] Contas e seus assessores
+- [x] Contas e seus assessores
     
-- [ ] Contas por CGE
+- [x] Contas por CGE
     
 
 **API PUSH e Reservas de IPO**

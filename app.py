@@ -21,6 +21,8 @@ from adapters.controllers import (
     CommissionsController,
     NNMController,
     FundsController,
+    OperationsController,
+    PreOperationsController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 
@@ -54,6 +56,8 @@ class FlaskApp:
             "commissions": CommissionsController(self.app),
             "nnm": NNMController(self.app),
             "funds": FundsController(self.app),
+            "operations": OperationsController(self.app),
+            "pre_operations": PreOperationsController(self.app),
         }
 
     def _init_scheduler(self) -> None:
