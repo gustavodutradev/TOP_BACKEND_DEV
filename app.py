@@ -19,6 +19,8 @@ from adapters.controllers import (
     GovBondController,
     CompromissadasController,
     CommissionsController,
+    NNMController,
+    FundsController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 
