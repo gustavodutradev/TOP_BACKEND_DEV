@@ -5,6 +5,7 @@ from utils.logging_requests import Logger
 from typing import Dict, Tuple, Any
 import traceback
 from http import HTTPStatus
+from jsonpath_rw import parse
 
 
 class RFDebenturesController:
@@ -97,13 +98,16 @@ class RFDebenturesController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        url = data.get("url", "") or data.get("response", {}).get("url", "")
+        if isinstance(data, list) and data:
+            data = data[0]
 
-        if not url:
+        jsonpath_expr = parse("url")
+        match = next(jsonpath_expr.find(data), None)
+        if match:
+            return match.value
+        else:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
             return ""
-
-        return url
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """

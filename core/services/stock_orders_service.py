@@ -138,7 +138,7 @@ class StockOrdersService:
         side = "Compra" if row.get("side") == "1" else "Venda"
         order_price = "Mercado" if row.get("price") == "0.0" else row.get("price")
         account = row.get("account", "")
-        
+
         # Buscar o nome do cliente aqui, antes de criar a ordem
         client_name = self.advisor_email_service.find_client_name_by_account(account)
 
@@ -148,7 +148,7 @@ class StockOrdersService:
             order_qty=row.get("orderQty", ""),
             order_price=order_price,
             side=side,
-            holder_name=client_name  # Definir o nome do cliente já na criação da ordem
+            holder_name=client_name,  # Definir o nome do cliente já na criação da ordem
         )
 
     def send_pending_orders_email(self, orders: List[Order]) -> None:
@@ -225,7 +225,9 @@ class StockOrdersService:
         orders_by_client: Dict[str, List[Order]] = {}
         for order in orders:
             # Usar o holder_name já definido na ordem, com fallback para "Cliente não encontrado"
-            holder_name = order.holder_name if order.holder_name else "Cliente não encontrado"
+            holder_name = (
+                order.holder_name if order.holder_name else "Cliente não encontrado"
+            )
             orders_by_client.setdefault(holder_name, []).append(order)
         return orders_by_client
 

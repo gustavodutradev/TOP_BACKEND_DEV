@@ -4,6 +4,7 @@ import io
 import csv
 from urllib.parse import urlparse
 
+
 class MonthlyTIRReportService:
     """Classe para requisitar Relatório Gerencial de TIR mensal."""
 

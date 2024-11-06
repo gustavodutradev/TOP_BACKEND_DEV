@@ -69,44 +69,45 @@ class MonthlyTIRController:
         """
         # Log do payload completo para debug
         self.logger.logger.info("Webhook recebido com payload completo: %s", data)
-    
+
         try:
             # Primeiro, vamos verificar se é um webhook de erro
-            if 'error' in str(data).lower():
+            if "error" in str(data).lower():
                 self.logger.logger.error("Webhook de erro recebido: %s", data)
                 return {"error": "Webhook error received"}, HTTPStatus.BAD_REQUEST
-    
+
             # Extrai a URL do CSV com logging detalhado
             csv_url = self._extract_csv_url(data)
             self.logger.logger.info("URL extraída do webhook: %s", csv_url)
-    
+
             if not csv_url:
                 self.logger.logger.error(
                     "URL do CSV não encontrada no payload. Payload completo: %s", data
                 )
                 return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
-    
+
             # Valida a URL antes de processá-la
             if not self._validate_url(csv_url):
                 self.logger.logger.error(
                     "URL inválida recebida: %s. Payload completo: %s", csv_url, data
                 )
                 return {"error": "Invalid CSV URL format."}, HTTPStatus.BAD_REQUEST
-    
+
             csv_data = self.monthly_tir_service.process_csv_from_url(csv_url)
             if not csv_data:
                 self.logger.logger.info(
-                    "Não foram encontrados dados para o relatório de TIR mensal. URL: %s", csv_url
+                    "Não foram encontrados dados para o relatório de TIR mensal. URL: %s",
+                    csv_url,
                 )
                 return {
                     "message": "Não foram encontrados dados para o relatório de TIR mensal."
                 }, HTTPStatus.NO_CONTENT
-    
+
             self.logger.logger.info(
                 "Relatório de TIR mensal gerado com sucesso para URL: %s", csv_url
             )
             return csv_data, HTTPStatus.OK
-    
+
         except Exception as e:
             self.logger.logger.error(
                 "Erro ao processar webhook: %s. Payload: %s", str(e), data
@@ -126,28 +127,30 @@ class MonthlyTIRController:
 
         try:
             # Se o payload contiver um objeto response
-            if isinstance(data.get('response'), dict):
-                url = data['response'].get('url')
-                self.logger.logger.debug("URL encontrada em ['response']['url']: %s", url)
+            if isinstance(data.get("response"), dict):
+                url = data["response"].get("url")
+                self.logger.logger.debug(
+                    "URL encontrada em ['response']['url']: %s", url
+                )
                 if url:
                     return url
 
             # Se o payload contiver um objeto result
-            if isinstance(data.get('result'), dict):
-                url = data['result'].get('url')
+            if isinstance(data.get("result"), dict):
+                url = data["result"].get("url")
                 self.logger.logger.debug("URL encontrada em ['result']['url']: %s", url)
                 if url:
                     return url
 
             # Busca direta por url no payload
-            url = data.get('url')
+            url = data.get("url")
             self.logger.logger.debug("URL encontrada diretamente no payload: %s", url)
             if url:
                 return url
 
             # Busca em outros possíveis caminhos do payload
-            if isinstance(data.get('data'), dict):
-                url = data['data'].get('url')
+            if isinstance(data.get("data"), dict):
+                url = data["data"].get("url")
                 self.logger.logger.debug("URL encontrada em ['data']['url']: %s", url)
                 if url:
                     return url
@@ -180,7 +183,7 @@ class MonthlyTIRController:
                 return False
 
             parsed = urlparse(url)
-            is_valid = all([parsed.scheme in ['http', 'https'], parsed.netloc])
+            is_valid = all([parsed.scheme in ["http", "https"], parsed.netloc])
 
             if not is_valid:
                 self.logger.logger.error(

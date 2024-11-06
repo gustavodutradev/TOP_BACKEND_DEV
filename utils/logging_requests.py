@@ -78,8 +78,10 @@ class Logger:
         """Processa a requisição, realiza o logging e retorna a resposta apropriada."""
         try:
             # Verifica se é uma chamada de webhook
-            is_webhook = request.headers.get('X-Webhook-Event') or 'response' in (request.get_json(silent=True) or {})
-            
+            is_webhook = request.headers.get("X-Webhook-Event") or "response" in (
+                request.get_json(silent=True) or {}
+            )
+
             if is_webhook:
                 data = request.get_json(silent=True)
                 if not data:
@@ -91,7 +93,7 @@ class Logger:
                         "status": "Invalid request",
                         "message": "Invalid or missing JSON payload for webhook",
                     }, 400
-    
+
                 response_data, status_code = self.process_payload(data, event_name)
                 return jsonify(response_data), status_code
             else:
@@ -101,12 +103,12 @@ class Logger:
                     extra=RequestContext.from_request(request).__dict__,
                 )
                 return jsonify({"status": "success", "message": event_name}), 200
-    
+
         except Exception as e:
             self.app.logger.error(
                 f"Exception on {event_name} - {str(e)}",
                 extra=RequestContext.from_request(request).__dict__,
             )
             self.app.logger.error(traceback.format_exc())
-    
+
             return jsonify({"status": "error", "message": "Internal server error"}), 500
