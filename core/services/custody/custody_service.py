@@ -1,8 +1,14 @@
 from core.services.config_service import ConfigService
+from core.services.zip_service import ZipService
 import requests
 import io
 import csv
 from datetime import datetime
+import logging
+
+# Configuração do logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class CustodyService:
@@ -56,18 +62,38 @@ class CustodyService:
     def process_csv_from_url(self, csv_url):
         """Realiza o download do CSV e extrai as informações"""
         try:
-            csv_response = requests.get(csv_url)
-            if csv_response.status_code != 200:
-                raise Exception(
-                    f"Erro ao baixar o arquivo CSV: {csv_response.status_code}"
+            zip_response = requests.get(csv_url, timeout=30)
+            if zip_response.status_code != 200:
+                raise requests.RequestException(
+                    f"Erro ao baixar arquivo ZIP: {zip_response.status_code}"
                 )
 
-            csv_content = io.StringIO(csv_response.text.replace('\0', ''))
-            csv_reader = csv.DictReader(csv_content, delimiter=",")
+            csv_readers = self.zip_service.unzip_csv_reader(zip_response)
+            if csv_readers is None:
+                return []
 
-            data = [row for row in csv_reader]
+            data = []
+            for csv_reader in csv_readers:
+                data.extend([row for row in csv_reader])
 
             return data
+
+        except Exception as e:
+            logger.error(f"Erro ao processar o CSV: {str(e)}")
+            return []
+        # try:
+        #     csv_response = requests.get(csv_url)
+        #     if csv_response.status_code != 200:
+        #         raise Exception(
+        #             f"Erro ao baixar o arquivo CSV: {csv_response.status_code}"
+        #         )
+
+        #     csv_content = io.StringIO(csv_response.text.replace('\0', ''))
+        #     csv_reader = csv.DictReader(csv_content, delimiter=",")
+
+        #     data = [row for row in csv_reader]
+
+        #     return data
 
         except requests.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
