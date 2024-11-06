@@ -72,7 +72,10 @@ class RFDebenturesController:
             Tuple containing response data and HTTP status code
         """
         self.logger.log_and_respond("Webhook recebido.")
-
+    
+        if isinstance(data, list) and data:
+            data = data[0]
+    
         if isinstance(data, dict):
             csv_url = self._extract_csv_url(data)
             if not csv_url:
@@ -106,11 +109,11 @@ class RFDebenturesController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        if isinstance(data, dict):
-            jsonpath_expr = parse("url")
-            match = next(jsonpath_expr.find(data), None)
-            if match:
-                return match.value
+
+        jsonpath_expr = parse("url")
+        match = next(jsonpath_expr.find(data), None)
+        if match:
+            return match.value
         self.logger.logger.error("URL do CSV não encontrada no payload.")
         return ""
 
