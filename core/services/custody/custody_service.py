@@ -18,7 +18,7 @@ class CustodyService:
 
         try:
             headers = self.config_service.get_headers()
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, timeout=30)
 
             if response.status_code == 202:
                 print("Requisição aceita. Aguarde o webhook para processamento.")
@@ -62,7 +62,7 @@ class CustodyService:
                     f"Erro ao baixar o arquivo CSV: {csv_response.status_code}"
                 )
 
-            csv_content = io.StringIO(csv_response.text)
+            csv_content = io.StringIO(csv_response.text.replace('\0', ''))
             csv_reader = csv.DictReader(csv_content, delimiter=",")
 
             data = [row for row in csv_reader]
