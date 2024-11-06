@@ -12,20 +12,6 @@ class WebhookService:
 
     def register_routes(self):
 
-        ## Relatórios Gerenciais
-
-        @self.app.route("/api/v1/rg-nnm-gerencial", methods=["POST"])
-        def nnm_gerencial():
-            return self.Logger.log_and_respond("RG - NNM GERENCIAL")
-
-        @self.app.route("/api/v1/rg-fundos", methods=["POST"])
-        def fundos():
-            return self.Logger.log_and_respond("RG - FUNDOS")
-
-        @self.app.route("/api/v1/rg-cra-cri", methods=["POST"])
-        def cra_cri():
-            return self.Logger.log_and_respond("RG - CRA/CRI")
-
         ## Rentabilidade Diária
         @self.app.route("/api/v1/daily-profit", methods=["POST"])
         def daily_profit():
