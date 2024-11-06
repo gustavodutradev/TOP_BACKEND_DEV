@@ -6,11 +6,11 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
 
 **API de Relação de Produtos RF por Parceiro**
 
-- [ ] Relatórios de Títulos públicos
-- [ ] RF
-- [ ] Debêntures
-- [ ] CRA/CRI
-- [ ] Compromissadas
+- [x] Relatórios de Títulos públicos
+- [x] RF
+- [x] Debêntures
+- [x] CRA/CRI
+- [x] Compromissadas
 
 **API de Rentabilidade Diária**
 
@@ -23,13 +23,13 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
 
 **API de Relatórios Gerenciais**
 
-- [ ] TIR Mensal por parceiro
+- [x] TIR Mensal por parceiro
     
-- [ ] Dados cadastrais
+- [x] Dados cadastrais
     
-- [ ] Relatório de Posições
+- [x] Relatório de Posições
     
-- [ ] Base BTG
+- [x] Base BTG
     
 - [ ] NNM Gerencial
     
@@ -51,7 +51,7 @@ Esta lista refere-se às API’s que estão integradas, e marcadas as que estão
 
 **API de Rentabilidade Mensal**
 
-- [ ] Rentabilidade das carteiras por período
+- [x] Rentabilidade das carteiras por período
     
 - [ ] Rentabilidade dos produtos por período 
     
