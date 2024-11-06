@@ -73,6 +73,18 @@ class RFDebenturesController:
         self.logger.log_and_respond("Webhook recebido.")
         self.logger.logger.info(data.values())
 
+        if isinstance(data, list):
+        # Verifica se a lista contém apenas um item
+            if len(data) == 1:
+                data = data[0]
+            else:
+            # Caso a lista tenha mais de um item, pegue o segundo item (supondo que o primeiro item seja o erro)
+                data = data[1]
+
+        if not isinstance(data, dict):
+            self.logger.logger.error("Payload inválido: não é um dicionário.")
+            return {"error": "Invalid payload"}, HTTPStatus.BAD_REQUEST
+
         csv_url = self._extract_csv_url(data)
         if not csv_url:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
