@@ -1,4 +1,5 @@
 from core.services.config_service import ConfigService
+from core.services.zip_service import ZipService
 import requests
 import io
 import csv
@@ -9,6 +10,7 @@ class OperationsService:
 
     def __init__(self) -> None:
         self.config_service = ConfigService()
+        self.zip_service = ZipService()
 
     def get_operations_report(self):
         """Requisita relatório das últimas Operações do parceiro"""
@@ -33,13 +35,14 @@ class OperationsService:
     def process_csv_from_url(self, csv_url):
         """Realiza o download do CSV e extrai as informações"""
         try:
-            csv_response = requests.get(csv_url)
-            if csv_response.status_code != 200:
-                raise Exception(
-                    f"Erro ao baixar o arquivo CSV: {csv_response.status_code}"
+            zip_response = requests.get(csv_url, timeout=30)
+            if zip_response.status_code != 200:
+                raise requests.RequestException(
+                    f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}"
                 )
+            
+            csv_content = self.zip_service.unzip_csv_reader(zip_response)
 
-            csv_content = io.StringIO(csv_response.text)
             csv_reader = csv.DictReader(csv_content, delimiter=",")
 
             data = [row for row in csv_reader]
