@@ -67,134 +67,34 @@ class MonthlyTIRController:
         Returns:
             Tuple containing response data and HTTP status code
         """
-        # Log do payload completo para debug
-        self.logger.logger.info("Webhook recebido com payload completo: %s", data)
+        self.logger.log_and_respond("Webhook recebido.")
 
-        try:
-            # Primeiro, vamos verificar se é um webhook de erro
-            if "error" in str(data).lower():
-                self.logger.logger.error("Webhook de erro recebido: %s", data)
-                return {"error": "Webhook error received"}, HTTPStatus.BAD_REQUEST
+        csv_url = self._extract_csv_url(data)
+        if not csv_url:
+            self.logger.logger.error("URL do CSV não encontrada no payload.")
+            return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
 
-            # Extrai a URL do CSV com logging detalhado
-            csv_url = self._extract_csv_url(data)
-            self.logger.logger.info("URL extraída do webhook: %s", csv_url)
-
-            if not csv_url:
-                self.logger.logger.error(
-                    "URL do CSV não encontrada no payload. Payload completo: %s", data
-                )
-                return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
-
-            # Valida a URL antes de processá-la
-            if not self._validate_url(csv_url):
-                self.logger.logger.error(
-                    "URL inválida recebida: %s. Payload completo: %s", csv_url, data
-                )
-                return {"error": "Invalid CSV URL format."}, HTTPStatus.BAD_REQUEST
-
-            csv_data = self.monthly_tir_service.process_csv_from_url(csv_url)
-            if not csv_data:
-                self.logger.logger.info(
-                    "Não foram encontrados dados para o relatório de TIR mensal. URL: %s",
-                    csv_url,
-                )
-                return {
-                    "message": "Não foram encontrados dados para o relatório de TIR mensal."
-                }, HTTPStatus.NO_CONTENT
-
+        csv_data = self.monthly_tir_service.process_csv_from_url(csv_url)
+        if not csv_data:
             self.logger.logger.info(
-                "Relatório de TIR mensal gerado com sucesso para URL: %s", csv_url
+                "Não foram encontrados dados para o relatório TIR mensal"
             )
-            return csv_data, HTTPStatus.OK
+            return {
+                "message": "Não foram encontrados dados para o relatório TIR mensal"
+            }, HTTPStatus.NO_CONTENT
 
-        except Exception as e:
-            self.logger.logger.error(
-                "Erro ao processar webhook: %s. Payload: %s", str(e), data
-            )
-            self.logger.logger.error(traceback.format_exc())
-            return {"error": str(e)}, HTTPStatus.INTERNAL_SERVER_ERROR
+        self.logger.logger.info("Relatório de TIR mensal gerado com sucesso.")
+        return csv_data, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
-        Extract CSV URL from webhook payload with detailed logging.
+        Extract CSV URL from webhook payload.
         Args:
             data: The webhook payload data
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        self.logger.logger.debug("Iniciando extração de URL do payload: %s", data)
-
-        try:
-            # Se o payload contiver um objeto response
-            if isinstance(data.get("response"), dict):
-                url = data["response"].get("url")
-                self.logger.logger.debug(
-                    "URL encontrada em ['response']['url']: %s", url
-                )
-                if url:
-                    return url
-
-            # Se o payload contiver um objeto result
-            if isinstance(data.get("result"), dict):
-                url = data["result"].get("url")
-                self.logger.logger.debug("URL encontrada em ['result']['url']: %s", url)
-                if url:
-                    return url
-
-            # Busca direta por url no payload
-            url = data.get("url")
-            self.logger.logger.debug("URL encontrada diretamente no payload: %s", url)
-            if url:
-                return url
-
-            # Busca em outros possíveis caminhos do payload
-            if isinstance(data.get("data"), dict):
-                url = data["data"].get("url")
-                self.logger.logger.debug("URL encontrada em ['data']['url']: %s", url)
-                if url:
-                    return url
-
-            # Se chegou aqui, não encontrou URL
-            self.logger.logger.warning("Nenhuma URL encontrada no payload: %s", data)
-            return ""
-
-        except Exception as e:
-            self.logger.logger.error(
-                "Erro ao extrair URL do payload: %s. Payload: %s", str(e), data
-            )
-            return ""
-
-    def _validate_url(self, url: str) -> bool:
-        """
-        Validate if URL is well-formed and has a proper scheme.
-        Args:
-            url: URL to validate
-        Returns:
-            bool indicating if URL is valid
-        """
-        from urllib.parse import urlparse
-
-        try:
-            self.logger.logger.debug("Validando URL: %s", url)
-
-            if not url:
-                self.logger.logger.error("URL vazia")
-                return False
-
-            parsed = urlparse(url)
-            is_valid = all([parsed.scheme in ["http", "https"], parsed.netloc])
-
-            if not is_valid:
-                self.logger.logger.error(
-                    "URL inválida. Scheme: %s, NetLoc: %s", parsed.scheme, parsed.netloc
-                )
-
-            return is_valid
-
-        except Exception as e:
-            self.logger.logger.error("Erro ao validar URL %s: %s", url, str(e))
-            return False
+        return data.get("response", {}).get("url", "")
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
