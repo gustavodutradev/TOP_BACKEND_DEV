@@ -97,7 +97,7 @@ class RFDebenturesController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        url = data.get("url", "")
+        url = data.get("url", "") or data.get("response", {}).get("url", "")
 
         if not url:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
