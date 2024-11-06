@@ -23,6 +23,8 @@ from adapters.controllers import (
     FundsController,
     OperationsController,
     PreOperationsController,
+    CustodyByDateController,
+    CustodyController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 
@@ -58,6 +60,8 @@ class FlaskApp:
             "funds": FundsController(self.app),
             "operations": OperationsController(self.app),
             "pre_operations": PreOperationsController(self.app),
+            "custody_by_date": CustodyByDateController(self.app),
+            "custody": CustodyController(self.app),
         }
 
     def _init_scheduler(self) -> None:

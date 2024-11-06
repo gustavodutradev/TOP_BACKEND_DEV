@@ -40,7 +40,7 @@ class OperationsService:
                 raise requests.RequestException(
                     f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}"
                 )
-            
+
             csv_content = self.zip_service.unzip_csv_reader(zip_response)
 
             csv_reader = csv.DictReader(csv_content, delimiter=",")

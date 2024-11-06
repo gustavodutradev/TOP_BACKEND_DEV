@@ -93,4 +93,3 @@ class Logger:
             )
             self.app.logger.error(traceback.format_exc())
             return jsonify({"status": "error", "message": "Internal server error"}), 500
-    

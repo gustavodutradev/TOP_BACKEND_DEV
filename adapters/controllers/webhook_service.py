@@ -21,15 +21,6 @@ class WebhookService:
         def daily_profit_by_date():
             return self.Logger.log_and_respond("Daily Profit by Date")
 
-        ## Relatórios de Custódia
-        @self.app.route("/api/v1/custody", methods=["POST"])
-        def custody():
-            return self.Logger.log_and_respond("Custody")
-
-        @self.app.route("/api/v1/custody-by-date", methods=["POST"])
-        def custody_by_date():
-            return self.Logger.log_and_respond("Custody by Date")
-
         ## Relatório STVM New NET Money
         @self.app.route("/api/v1/stvm", methods=["POST"])
         def stvm():
