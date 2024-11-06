@@ -10,6 +10,8 @@ from .management_reports.base_btg_controller import BaseBTGController
 from .management_reports.posicoes_controller import PositionReportController
 from .management_reports.monthly_tir_controller import MonthlyTIRController
 from .management_reports.commissions_controller import CommissionsController
+from .management_reports.nnm_controller import NNMController
+from .management_reports.funds_controller import FundsController
 from .fixed_income_reports.cra_cri_controller import CraCriController
 from .fixed_income_reports.fixed_income_controller import FixedIncomeController
 from .fixed_income_reports.compromissadas_controller import CompromissadasController
