@@ -16,6 +16,7 @@ class CustodyService:
 
     def __init__(self) -> None:
         self.config_service = ConfigService()
+        self.zip_service = ZipService()
         self.endpoint = "/api-partner-report-extractor/api/v1/report"
 
     def get_custody(self):
@@ -81,20 +82,3 @@ class CustodyService:
         except Exception as e:
             logger.error(f"Erro ao processar o CSV: {str(e)}")
             return []
-        # try:
-        #     csv_response = requests.get(csv_url)
-        #     if csv_response.status_code != 200:
-        #         raise Exception(
-        #             f"Erro ao baixar o arquivo CSV: {csv_response.status_code}"
-        #         )
-
-        #     csv_content = io.StringIO(csv_response.text.replace('\0', ''))
-        #     csv_reader = csv.DictReader(csv_content, delimiter=",")
-
-        #     data = [row for row in csv_reader]
-
-        #     return data
-
-        except requests.RequestException as e:
-            print(f"Erro na requisição: {str(e)}")
-            return None
