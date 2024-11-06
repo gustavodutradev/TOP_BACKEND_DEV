@@ -73,22 +73,30 @@ class RFDebenturesController:
         """
         self.logger.log_and_respond("Webhook recebido.")
 
-        csv_url = self._extract_csv_url(data)
-        if not csv_url:
-            self.logger.logger.error("URL do CSV não encontrada no payload.")
-            return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
-
-        csv_data = self.debentures_service.process_csv_from_url(csv_url)
-        if not csv_data:
-            self.logger.logger.info(
-                "Não foram encontrados dados para o relatório RF de Debentures."
-            )
+        if isinstance(data, dict):
+            csv_url = self._extract_csv_url(data)
+            if not csv_url:
+                self.logger.logger.error("URL do CSV não encontrada no payload.")
+                return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
+    
+            csv_data = self.debentures_service.process_csv_from_url(csv_url)
+            if not csv_data:
+                self.logger.logger.info(
+                    "Não foram encontrados dados para o relatório RF de Debentures."
+                )
+                return {
+                    "message": "Não foram encontrados dados para o relatório RF de Debentures."
+                }, HTTPStatus.NO_CONTENT
+    
+            self.logger.logger.info("Relatório RF de Debentures gerado com sucesso.")
             return {
-                "message": "Não foram encontrados dados para o relatório RF de Debentures."
-            }, HTTPStatus.NO_CONTENT
-
-        self.logger.logger.info("Relatório RF de Debentures gerado com sucesso.")
-        return csv_data, HTTPStatus.OK
+                "url": data["url"],
+                "fileSize": data["fileSize"],
+                "filters": data["filters"]
+            }, HTTPStatus.OK
+        else:
+            self.logger.logger.error("Payload inválido: não é um dicionário.")
+            return {"error": "Invalid payload"}, HTTPStatus.BAD_REQUEST
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
@@ -98,16 +106,13 @@ class RFDebenturesController:
         Returns:
             The CSV URL if found, empty string otherwise
         """
-        if isinstance(data, list) and data:
-            data = data[0]
-
-        jsonpath_expr = parse("url")
-        match = next(jsonpath_expr.find(data), None)
-        if match:
-            return match.value
-        else:
-            self.logger.logger.error("URL do CSV não encontrada no payload.")
-            return ""
+        if isinstance(data, dict):
+            jsonpath_expr = parse("url")
+            match = next(jsonpath_expr.find(data), None)
+            if match:
+                return match.value
+        self.logger.logger.error("URL do CSV não encontrada no payload.")
+        return ""
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
