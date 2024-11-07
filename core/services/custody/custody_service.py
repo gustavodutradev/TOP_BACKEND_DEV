@@ -11,6 +11,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class CustodyService:
     """Classe para requisitar relatórios de Custódia e envio de notificações sobre vencimento de produtos estruturados."""
 
@@ -41,7 +42,9 @@ class CustodyService:
         try:
             zip_response = requests.get(csv_url, timeout=30)
             if zip_response.status_code != 200:
-                raise requests.RequestException(f"Erro ao baixar arquivo ZIP: {zip_response.status_code}")
+                raise requests.RequestException(
+                    f"Erro ao baixar arquivo ZIP: {zip_response.status_code}"
+                )
             csv_readers = self.zip_service.unzip_csv_reader(zip_response)
             if csv_readers is None:
                 return []
@@ -56,6 +59,7 @@ class CustodyService:
     def _filter_products_to_expire(self, data):
         """Filtra produtos com vencimento para a data de hoje"""
         today = datetime.now().strftime("%d-%m-%Y")
+
         return [row for row in data if row["fixingDate"] == today]
 
     def _consolidate_operations(self, products):
@@ -63,7 +67,12 @@ class CustodyService:
         consolidated_products = []
         seen_operations = set()
         for product in products:
-            key = (product["accountNumber"], product["referenceAsset"], product["nomeDoProduto"], product["qtdAtual"])
+            key = (
+                product["accountNumber"],
+                product["referenceAsset"],
+                product["nomeDoProduto"],
+                product["qtdAtual"],
+            )
             if key not in seen_operations:
                 seen_operations.add(key)
                 consolidated_products.append(product)
@@ -96,7 +105,11 @@ class CustodyService:
         """Agrupa produtos para vencimento por e-mail do assessor"""
         products_by_advisor = {}
         for product in expiring_products:
-            _, _, advisor_email, _ = self.search_advisor_email.get_client_and_advisor_info(product["accountNumber"])
+            _, _, advisor_email, _ = (
+                self.search_advisor_email.get_client_and_advisor_info(
+                    product["accountNumber"]
+                )
+            )
             if advisor_email:
                 products_by_advisor.setdefault(advisor_email, []).append(product)
         return products_by_advisor
@@ -119,6 +132,37 @@ class CustodyService:
         """Executa a verificação de produtos para vencimento e envia e-mails conforme necessário"""
         data = self.process_csv_from_url(csv_url)
         expiring_products = self._filter_products_to_expire(data)
+
+        if not expiring_products:
+            self.send_empty_products_to_expire_email()
+            return
+
         consolidated_products = self._consolidate_operations(expiring_products)
         self.send_email_to_variable_desk(consolidated_products)
         self.send_email_to_advisors(consolidated_products)
+
+    def get_email_footer() -> str:
+        return (
+            "<p style='margin-top: 80px;'></p>"
+            "<p style='font-size: 0.8rem'><i><u>Este e-mail é uma mensagem automática e "
+            "não deve ser respondida. Qualquer erro percebido ou inconsistência de dados, "
+            "além de sugestões e feedbacks, favor contatar o setor de TI da TOP.</u></i></p>"
+        )
+
+    def send_empty_products_to_expire_email(self) -> None:
+        """Envia notificação de que não há produtos estruturados para vencer no dia corrente."""
+        to_email = os.getenv("NOTIFY_EMAIL")
+        if not to_email:
+            raise ValueError("E-mail de notificação não configurado")
+
+        body = (
+            "<p>Não há produtos estruturados com vencimento para a data de hoje.</p>"
+            + self.get_email_footer()
+        )
+
+        self.email_service.send_email(
+            to_email,
+            f"Não há produtos Estruturados para Vencimento - {datetime.now().strftime('%d/%m/%Y')}",
+            body,
+            is_html=True,
+        )

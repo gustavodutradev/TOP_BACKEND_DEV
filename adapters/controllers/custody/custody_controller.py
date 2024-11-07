@@ -73,16 +73,26 @@ class CustodyController:
             return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
 
         # Processamento do CSV e envio de e-mails de produtos estruturados com vencimento
-        self.logger.log_and_respond("Processando relatório de Custódia e verificando vencimento de produtos estruturados.")
+        self.logger.log_and_respond(
+            "Processando relatório de Custódia e verificando vencimento de produtos estruturados."
+        )
         try:
             # Executa a verificação e envio de notificações sobre vencimentos
             self.custody_service.execute_daily_expiration_check(csv_url)
-            self.logger.logger.info("Relatório de Custódia processado e e-mails de notificação enviados com sucesso.")
-            return {"message": "Relatório processado e e-mails enviados."}, HTTPStatus.OK
+            self.logger.logger.info(
+                "Relatório de Custódia processado e e-mails de notificação enviados com sucesso."
+            )
+            return {
+                "message": "Relatório processado e e-mails enviados."
+            }, HTTPStatus.OK
         except Exception as e:
-            self.logger.logger.error(f"Erro ao processar o CSV ou enviar e-mails: {str(e)}")
+            self.logger.logger.error(
+                f"Erro ao processar o CSV ou enviar e-mails: {str(e)}"
+            )
             self.logger.logger.error(traceback.format_exc())
-            return {"error": "Erro ao processar o relatório de Custódia ou enviar e-mails."}, HTTPStatus.INTERNAL_SERVER_ERROR
+            return {
+                "error": "Erro ao processar o relatório de Custódia ou enviar e-mails."
+            }, HTTPStatus.INTERNAL_SERVER_ERROR
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
@@ -93,7 +103,9 @@ class CustodyController:
             The CSV URL if found, empty string otherwise
         """
         # Tenta obter URL da chave 'response' ou 'result'
-        return data.get("response", {}).get("url", "") or data.get("result", {}).get("url", "")
+        return data.get("response", {}).get("url", "") or data.get("result", {}).get(
+            "url", ""
+        )
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
