@@ -27,6 +27,7 @@ from adapters.controllers import (
     CustodyController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
+from scheduler.custody_scheduler import CustodyScheduler
 
 
 class FlaskApp:
@@ -67,6 +68,7 @@ class FlaskApp:
     def _init_scheduler(self) -> None:
         """Initialize the task scheduler"""
         self.task_scheduler = PendingOrdersScheduler()
+        self.custody_scheduler = CustodyScheduler()
 
     def _init_routes(self) -> None:
         """Initialize all routes"""

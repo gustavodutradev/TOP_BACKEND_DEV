@@ -4,7 +4,7 @@ import pytz
 import requests
 
 
-class PendingOrdersScheduler:
+class CustodyScheduler:
     def __init__(self):
         self.scheduler = BackgroundScheduler(
             timezone=pytz.timezone("America/Sao_Paulo")
