@@ -125,6 +125,7 @@ class CustodyService:
                 body += f"\nCliente: {client['accountName']} (Conta: {client['accountNumber']})\n"
                 for product in client_products:
                     body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
+            body += self.get_email_footer()
             self.email_service.send_email(advisor_email, subject, body)
             logger.info(f"E-mail enviado para o assessor {advisor_email}")
 
@@ -141,7 +142,7 @@ class CustodyService:
         self.send_email_to_variable_desk(consolidated_products)
         self.send_email_to_advisors(consolidated_products)
 
-    def get_email_footer() -> str:
+    def get_email_footer(self) -> str:
         return (
             "<p style='margin-top: 80px;'></p>"
             "<p style='font-size: 0.8rem'><i><u>Este e-mail é uma mensagem automática e "
