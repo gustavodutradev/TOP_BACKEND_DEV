@@ -6,7 +6,6 @@ import requests
 import logging
 from core.services.config_service import ConfigService
 from core.services.email_service import EmailService
-from core.services.registration_data_service import RegistrationDataService
 from core.services.zip_service import ZipService
 from utils.search_advisor_email import SearchAdvisorEmail
 
