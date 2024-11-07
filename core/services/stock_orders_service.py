@@ -120,13 +120,19 @@ class StockOrdersService:
                 )
 
             pending_orders: List[Order] = []
+            partially_executed_orders: List[Order] = []
+
             for reader in self.zip_service.unzip_csv_reader(zip_response):
                 for row in reader:
-                    if not row.get("ordStatus"):
+                    ord_status = row.get("ordStatus")
+                    if not ord_status:
                         order = self._create_order_from_row(row)
                         pending_orders.append(order)
+                    elif ord_status == "1":
+                        order = self._create_order_from_row(row)
+                        partially_executed_orders.append(order)
 
-            return pending_orders
+            return pending_orders, partially_executed_orders
 
         except Exception as e:
             logger.error(f"Erro ao processar o CSV: {str(e)}")
@@ -150,11 +156,11 @@ class StockOrdersService:
             holder_name=client_name,  # Definir o nome do cliente já na criação da ordem
         )
 
-    def send_pending_orders_email(self, orders: List[Order]) -> None:
+    def send_pending_orders_email(self, pending_orders: List[Order], partially_executed_orders: List[Order]) -> None:
         """Envia ordens pendentes para a mesa variável e os assessores responsáveis."""
         try:
-            self._send_consolidated_email(orders)
-            orders_by_advisor = self._group_orders_by_advisor(orders)
+            self._send_consolidated_email(pending_orders, partially_executed_orders)
+            orders_by_advisor = self._group_orders_by_advisor(pending_orders + partially_executed_orders)
 
             for advisor_email, advisor_orders in orders_by_advisor.items():
                 self._send_advisor_email(advisor_email, advisor_orders)
@@ -174,12 +180,12 @@ class StockOrdersService:
         orders_by_client = self._group_orders_by_client(orders)
         email_body = EmailTemplateBuilder.build_consolidated_email(orders_by_client)
 
-        subject = "Ordens Pendentes de Aprovação dos Seus Clientes"
+        subject = "Ordens Pendentes de Aprovação e Parcialmente Executadas dos Seus Clientes"
 
         # Envia o e-mail
         self.email_service.send_email(advisor_email, subject, email_body, is_html=True)
         logger.info(
-            f"E-mail enviado para o assessor {advisor_email} com {len(orders)} ordens pendentes."
+            f"E-mail enviado para o assessor {advisor_email} com {len(orders)} ordens pendentes ou parcialmente executadas."
         )
 
     def _group_orders_by_advisor(self, orders: List[Order]) -> Dict[str, List[Order]]:
@@ -206,17 +212,30 @@ class StockOrdersService:
         #     advisor_email = "brunomaia@topinvgroup.com"
         return AdvisorInfo(email=advisor_email, name=advisor_name)
 
-    def _send_consolidated_email(self, orders: List[Order]) -> None:
+    def _send_consolidated_email(self, pending_orders: List[Order], partially_executed_orders: List[Order]) -> None:
         """Envia e-mail consolidado para a mesa variável."""
         to_email = os.getenv("NOTIFY_EMAIL")
         if not to_email:
             raise ValueError("E-mail de notificação não configurado")
+        
+        body = ""
+        if pending_orders:
+            orders_by_client = self._group_orders_by_client(pending_orders)
+            body += EmailTemplateBuilder.build_consolidated_email(orders_by_client)
+        else:
+            body += "<p>Não foram encontradas ordens pendentes.</p>"
 
-        orders_by_client = self._group_orders_by_client(orders)
-        body = EmailTemplateBuilder.build_consolidated_email(orders_by_client)
+            if partially_executed_orders:
+                orders_by_client = self._group_orders_by_client(partially_executed_orders)
+                body += "<p>Ordens Parcialmente Executadas encontradas:</p>"
+                body += EmailTemplateBuilder.build_consolidated_email(orders_by_client)
+            else:
+                body += "<p>Não foram encontradas ordens parcialmente executadas.</p>"
+
+        body += EmailTemplateBuilder.get_email_footer()
 
         self.email_service.send_email(
-            to_email, "Ordens Pendentes de Aprovação", body, is_html=True
+            to_email, "Ordens Pendentes e Parcialmente Executadas", body, is_html=True
         )
 
     def _group_orders_by_client(self, orders: List[Order]) -> Dict[str, List[Order]]:
