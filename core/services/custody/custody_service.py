@@ -169,14 +169,14 @@ class CustodyService:
         for product in expiring_products:
             client_name, advisor_name, advisor_email, sgcge = (
                 self.search_advisor_email.get_client_and_advisor_info(
-                    product["account_number"]
+                    product["accountNumber"]
                 )
             )
 
             # Verificar se todos os valores necessários estão presentes
             if advisor_name is None or advisor_email is None:
                 self.logger.logger.error(
-                    f"Assessor ou e-mail não encontrado para a conta {product['account_number']}."
+                    f"Assessor ou e-mail não encontrado para a conta {product['accountNumber']}."
                 )
                 continue  # Pula este produto se não encontrar dados do assessor
 
