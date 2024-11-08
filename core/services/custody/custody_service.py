@@ -128,15 +128,19 @@ class CustodyService:
         """Envia e-mail para a Mesa de Renda Variável com todos os produtos para vencimento."""
         subject = f"Produtos Estruturados para Vencimento - {datetime.now().strftime('%d/%m/%Y')}"
         body = "Prezada Mesa Variável, foram encontrados produtos estruturados com vencimento para a data de hoje:\n\n"
-
+    
         grouped_by_client = self._group_by_client(expiring_products)
         for client, products in grouped_by_client.items():
-            # Verifica se 'accountName' está presente no cliente
-            account_name = client.get("accountName", "Nome não disponível")
+            if isinstance(client, dict):
+                # Verifica se 'accountName' está presente no cliente
+                account_name = client.get("accountName", "Nome não disponível")
+            else:
+                # Se o 'client' não for um dicionário, use o valor como nome do cliente
+                account_name = client
             body += f"\nCliente: {account_name} (Conta: {client['accountNumber']})\n"
             for product in products:
                 body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
-
+    
         to_email = os.getenv("NOTIFY_EMAIL")
         self.email_service.send_email(to_email, subject, body)
         logger.info("E-mail consolidado enviado para a mesa de renda variável")
