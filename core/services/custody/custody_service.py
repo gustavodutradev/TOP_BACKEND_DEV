@@ -57,10 +57,20 @@ class CustodyService:
             return []
 
     def _filter_products_to_expire(self, data):
-        """Filtra produtos com vencimento para a data de hoje"""
-        today = datetime.now().strftime("%d-%m-%Y")
+        """Filtra produtos com vencimento para a data de hoje."""
+        today = datetime.now().strftime("%d/%m/%Y")  # Obtém a data de hoje sem o tempo
 
-        return [row for row in data if row["fixingDate"] == today]
+        expiring_products = []
+        for row in data:
+            try:
+                # Converte a data de vencimento do produto, assumindo que ela esteja no formato ISO-8601 (AAAA-MM-DD)
+                fixing_date = datetime.strptime(row["fixingDate"], "%d/%m/%Y").strftime("%d/%m/%Y")
+                if fixing_date == today:
+                    expiring_products.append(row)
+            except ValueError as e:
+                logger.error(f"Erro ao converter a data de vencimento para o produto {row}: {e}")
+
+        return expiring_products
 
     def _consolidate_operations(self, products):
         """Consolida operações duplicadas de PUT e CALL para o mesmo cliente e ativo"""
@@ -91,7 +101,7 @@ class CustodyService:
     def send_email_to_variable_desk(self, expiring_products):
         """Envia e-mail para a Mesa de Renda Variável com todos os produtos para vencimento"""
         subject = f"Produtos Estruturados para Vencimento - {datetime.now().strftime('%d/%m/%Y')}"
-        body = "Prezada Mesa Variável, abaixo encontram-se todos os produtos estruturados com vencimento para a data de hoje:\n\n"
+        body = "Prezada Mesa Variável, foram encontrados produtos estruturados com vencimento para a data de hoje:\n\n"
         grouped_by_client = self._group_by_client(expiring_products)
         for client, products in grouped_by_client.items():
             body += f"\nCliente: {client['accountName']} (Conta: {client['accountNumber']})\n"
