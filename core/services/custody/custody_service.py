@@ -1,3 +1,4 @@
+from typing import Dict
 from core.services.config_service import ConfigService
 from core.services.zip_service import ZipService
 from core.services.email_service import EmailService
