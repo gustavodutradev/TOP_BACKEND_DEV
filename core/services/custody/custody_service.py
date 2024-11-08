@@ -6,7 +6,6 @@ import requests
 from datetime import datetime
 import logging
 import os
-import pandas as pd
 
 # Configuração do logger
 logging.basicConfig(level=logging.INFO)
