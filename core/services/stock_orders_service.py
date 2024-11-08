@@ -156,11 +156,15 @@ class StockOrdersService:
             holder_name=client_name,  # Definir o nome do cliente já na criação da ordem
         )
 
-    def send_pending_orders_email(self, pending_orders: List[Order], partially_executed_orders: List[Order]) -> None:
+    def send_pending_orders_email(
+        self, pending_orders: List[Order], partially_executed_orders: List[Order]
+    ) -> None:
         """Envia ordens pendentes para a mesa variável e os assessores responsáveis."""
         try:
             self._send_consolidated_email(pending_orders, partially_executed_orders)
-            orders_by_advisor = self._group_orders_by_advisor(pending_orders + partially_executed_orders)
+            orders_by_advisor = self._group_orders_by_advisor(
+                pending_orders + partially_executed_orders
+            )
 
             for advisor_email, advisor_orders in orders_by_advisor.items():
                 self._send_advisor_email(advisor_email, advisor_orders)
@@ -180,7 +184,9 @@ class StockOrdersService:
         orders_by_client = self._group_orders_by_client(orders)
         email_body = EmailTemplateBuilder.build_consolidated_email(orders_by_client)
 
-        subject = "Ordens Pendentes de Aprovação e Parcialmente Executadas dos Seus Clientes"
+        subject = (
+            "Ordens Pendentes de Aprovação e Parcialmente Executadas dos Seus Clientes"
+        )
 
         # Envia o e-mail
         self.email_service.send_email(advisor_email, subject, email_body, is_html=True)
@@ -212,12 +218,14 @@ class StockOrdersService:
         #     advisor_email = "brunomaia@topinvgroup.com"
         return AdvisorInfo(email=advisor_email, name=advisor_name)
 
-    def _send_consolidated_email(self, pending_orders: List[Order], partially_executed_orders: List[Order]) -> None:
+    def _send_consolidated_email(
+        self, pending_orders: List[Order], partially_executed_orders: List[Order]
+    ) -> None:
         """Envia e-mail consolidado para a mesa variável."""
         to_email = os.getenv("NOTIFY_EMAIL")
         if not to_email:
             raise ValueError("E-mail de notificação não configurado")
-        
+
         body = ""
         if pending_orders:
             orders_by_client = self._group_orders_by_client(pending_orders)
@@ -226,7 +234,9 @@ class StockOrdersService:
             body += "<p>Não foram encontradas ordens pendentes.</p>"
 
             if partially_executed_orders:
-                orders_by_client = self._group_orders_by_client(partially_executed_orders)
+                orders_by_client = self._group_orders_by_client(
+                    partially_executed_orders
+                )
                 body += "<p>Ordens Parcialmente Executadas encontradas:</p>"
                 body += EmailTemplateBuilder.build_consolidated_email(orders_by_client)
             else:
