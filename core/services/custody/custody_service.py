@@ -31,63 +31,67 @@ class CustodyService:
             if response.status_code == 202:
                 logger.info("Requisição aceita. Aguarde o webhook para processamento.")
                 return True
-            logger.error(f"Erro na requisição: {response.status_code} - {response.text}")
+            logger.error(
+                f"Erro na requisição: {response.status_code} - {response.text}"
+            )
             return None
         except requests.RequestException as e:
             logger.error(f"Erro na requisição: {str(e)}")
             return None
 
     def process_csv_from_url(self, csv_url):
-        """Realiza o download do CSV e extrai as informações"""
+        """Realiza o download do CSV, converte para DataFrame e extrai as informações"""
         try:
             zip_response = requests.get(csv_url, timeout=30)
             if zip_response.status_code != 200:
                 raise requests.RequestException(
                     f"Erro ao baixar arquivo ZIP: {zip_response.status_code}"
                 )
-            csv_readers = self.zip_service.unzip_csv_reader(zip_response)
-            if csv_readers is None:
+            
+            # Utiliza o novo método para descompactar o ZIP e obter o DataFrame
+            df = self.zip_service.unzip_and_convert_csv_to_df(zip_response)
+            if df is None:
                 return []
-            data = []
-            for csv_reader in csv_readers:
-                data.extend([row for row in csv_reader])
-
+            
             # Converte a coluna "fixingDate" para o formato dd/mm/aaaa
-            if "fixingDate" in data[0]:
-                for row in data:
-                    row["fixingDate"] = self.convert_excel_date(row["fixingDate"])
-
+            if "fixingDate" in df.columns:
+                df["fixingDate"] = df["fixingDate"].apply(
+                    lambda x: self.convert_excel_date(x) if isinstance(x, (int, float)) else str(x)
+                )
+    
+            # Converte o DataFrame em uma lista de dicionários
+            data = df.to_dict(orient="records")
             return data
+    
         except Exception as e:
             logger.error(f"Erro ao processar o CSV: {str(e)}")
             return []
 
+
     def convert_excel_date(self, serial):
         """Converte uma data serial do Excel para o formato dd/mm/aaaa."""
-        try:
-            base_date = datetime(1899, 12, 30)  # Data de base do Excel
-            converted_date = base_date + timedelta(days=float(serial))
-            return converted_date.strftime("%d/%m/%Y")
-        except ValueError:
-            try:
-                # Tente interpretar a data como uma string no formato 'dd/mm/aaaa'
-                return datetime.strptime(serial, "%d/%m/%Y").strftime("%d/%m/%Y")
-            except ValueError:
-                logger.error(f"Não foi possível converter a data: {serial}")
-                return "01/01/1900"  # Retorna uma data padrão em caso de falha
+        base_date = datetime(1899, 12, 30)  # Data de base do Excel
+        converted_date = base_date + timedelta(days=serial)
+        return converted_date.strftime("%d/%m/%Y")
 
     def _filter_products_to_expire(self, data):
         """Filtra produtos com vencimento para a data de hoje."""
-        today = datetime.now().strftime("%d/%m/%Y")  # Obtém a data de hoje no formato dd/mm/aaaa
+        today = datetime.now().strftime(
+            "%d/%m/%Y"
+        )  # Obtém a data de hoje no formato dd/mm/aaaa
         expiring_products = []
         for row in data:
             try:
                 # Converte a data de vencimento do produto, assumindo que ela esteja no formato dd/mm/aaaa
-                fixing_date = datetime.strptime(row["fixingDate"], "%d/%m/%Y").strftime("%d/%m/%Y")
+                fixing_date = datetime.strptime(row["fixingDate"], "%d/%m/%Y").strftime(
+                    "%d/%m/%Y"
+                )
                 if fixing_date == today:
                     expiring_products.append(row)
             except ValueError as e:
-                logger.error(f"Erro ao converter a data de vencimento para o produto {row}: {e}")
+                logger.error(
+                    f"Erro ao converter a data de vencimento para o produto {row}: {e}"
+                )
         return expiring_products
 
     def _consolidate_operations(self, products):
@@ -100,7 +104,9 @@ class CustodyService:
                 product.get("accountNumber"),
                 product.get("referenceAsset"),
                 product.get("nomeDoProduto"),
-                product.get("qtdAtual", 0),  # Valor padrão de 0 para qtdAtual caso não exista
+                product.get(
+                    "qtdAtual", 0
+                ),  # Valor padrão de 0 para qtdAtual caso não exista
             )
             if key not in seen_operations:
                 seen_operations.add(key)
@@ -128,20 +134,15 @@ class CustodyService:
         """Envia e-mail para a Mesa de Renda Variável com todos os produtos para vencimento."""
         subject = f"Produtos Estruturados para Vencimento - {datetime.now().strftime('%d/%m/%Y')}"
         body = "Prezada Mesa Variável, foram encontrados produtos estruturados com vencimento para a data de hoje:\n\n"
-    
+
         grouped_by_client = self._group_by_client(expiring_products)
         for client, products in grouped_by_client.items():
-            if isinstance(client, dict):
-                # Verifica se 'accountName' está presente no cliente
-                account_name = client.get("accountName", "Nome não disponível")
-            else:
-                # Se o 'client' não for um dicionário, use o valor como nome do cliente
-                account_name = str(client)
-            account_number = client.get("accountNumber", "Número não disponível")
-            body += f"\nCliente: {account_name} (Conta: {account_number})\n"
+            # Verifica se 'accountName' está presente no cliente
+            account_name = client.get("accountName", "Nome não disponível")
+            body += f"\nCliente: {account_name} (Conta: {client['accountNumber']})\n"
             for product in products:
                 body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
-    
+
         to_email = os.getenv("NOTIFY_EMAIL")
         self.email_service.send_email(to_email, subject, body)
         logger.info("E-mail consolidado enviado para a mesa de renda variável")
