@@ -153,6 +153,7 @@ class CustodyService:
                 body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
 
         to_email = os.getenv("NOTIFY_EMAIL")
+        body += self.get_email_footer()
         self.email_service.send_email(to_email, subject, body)
         logger.info("E-mail consolidado enviado para a mesa de renda variável")
 
@@ -175,7 +176,7 @@ class CustodyService:
 
             # Verificar se todos os valores necessários estão presentes
             if advisor_name is None or advisor_email is None:
-                self.logger.logger.error(
+                logger.error(
                     f"Assessor ou e-mail não encontrado para a conta {product['accountNumber']}."
                 )
                 continue  # Pula este produto se não encontrar dados do assessor
