@@ -2,7 +2,6 @@ from typing import Dict
 from core.services.config_service import ConfigService
 from core.services.zip_service import ZipService
 from core.services.email_service import EmailService
-# from utils.search_advisor_email import SearchAdvisorEmail
 from utils.map_client_advisor_info import MapAdvisorInfo
 import requests
 from datetime import datetime, timedelta
@@ -154,7 +153,6 @@ class CustodyService:
                 body += f"Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
 
         to_email = os.getenv("NOTIFY_EMAIL")
-        body += self.get_email_footer()
         self.email_service.send_email(to_email, subject, body)
         logger.info("E-mail consolidado enviado para a mesa de renda variável")
 
@@ -170,9 +168,7 @@ class CustodyService:
 
         for product in expiring_products:
             client_name, advisor_name, advisor_email, sgcge = (
-                self.map_service.map_accounts_to_advisors(
-                    product["accountNumber"]
-                )
+                self.map_service.map_accounts_to_advisors(product["accountNumber"])
             )
 
             # Verificar se todos os valores necessários estão presentes

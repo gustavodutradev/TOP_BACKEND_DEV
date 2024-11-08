@@ -1,10 +1,23 @@
 import json
+import logging
+
+# Configuração do logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 class MapAdvisorInfo:
     def __init__(self):
         # Carrega os dados de contas e assessores a partir de arquivos JSON
         self.account_data = self.load_json("resources/data/account_advisors_data.json")
         self.advisor_data = self.load_json("resources/data/advisors_data.json")
+
+        # Verifica se os dados foram carregados corretamente
+        if self.account_data and self.advisor_data:
+            logger.info("Dados de contas e assessores carregados com sucesso.")
+            logger.debug(f"Assessores: {self.advisor_data}")
+        else:
+            logger.error("Erro ao carregar os dados de contas e assessores.")
 
     @staticmethod
     def load_json(filepath):
@@ -21,21 +34,32 @@ class MapAdvisorInfo:
 
     def map_accounts_to_advisors(self, account_number):
         # Criar um dicionário de assessores com base no código CGE do assessor (para fácil busca)
-        advisor_dict = {advisor['advisorCgeCode']: advisor for advisor in self.advisor_data}
-    
+        advisor_dict = {
+            advisor["advisorCgeCode"]: advisor for advisor in self.advisor_data
+        }
+
         # Iterar sobre as contas para encontrar a conta correspondente ao número fornecido
         for account in self.account_data:
-            if account['account'] == account_number:
+            if account["account"] == account_number:
                 # Encontrou a conta, agora associamos o assessor
-                assessor_cge_code = account['sgCGE']
-                
+                assessor_cge_code = account["sgCGE"]
+
                 # Se encontrar o assessor correspondente, retornamos as informações
                 if assessor_cge_code in advisor_dict:
                     advisor = advisor_dict[assessor_cge_code]
-                    return account['clientName'], advisor['advisorName'], advisor['email'], advisor['phone']
+                    logger.info(f"Encontrado assessor: {advisor['advisorName']}")
+                    return (
+                        account["clientName"],
+                        advisor["advisorName"],
+                        advisor["email"],
+                        advisor["phone"],
+                    )
                 else:
-                    # Se não encontrar o assessor, retorna None para email e telefone
-                    return account['clientName'], account['nome_assessor'], None, None
-    
+                    logger.error(
+                        f"Assessor com código CGE {assessor_cge_code} não encontrado."
+                    )
+                    return account["clientName"], account["nome_assessor"], None, None
+
         # Caso o número da conta não seja encontrado, retorne valores padrão
+        logger.error(f"Conta {account_number} não encontrada.")
         return None, None, None, None
