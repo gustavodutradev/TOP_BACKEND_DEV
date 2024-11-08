@@ -2,7 +2,7 @@ from typing import Dict
 from core.services.config_service import ConfigService
 from core.services.zip_service import ZipService
 from core.services.email_service import EmailService
-from utils.map_client_advisor_info import MapAdvisorInfo
+from utils.map_client_advisor_info import AdvisorLookup
 import requests
 from datetime import datetime, timedelta
 import logging
@@ -20,7 +20,7 @@ class CustodyService:
         self.config_service = ConfigService()
         self.zip_service = ZipService()
         self.email_service = EmailService()
-        self.map_service = MapAdvisorInfo()
+        self.map_service = AdvisorLookup()
         self.endpoint = "/api-partner-report-extractor/api/v1/report"
 
     def get_custody(self):
@@ -169,9 +169,14 @@ class CustodyService:
         products_by_advisor = {}
 
         for product in expiring_products:
-            _, advisor_name, advisor_email, _ = (
-                self.map_service.map_accounts_to_advisors(product["accountNumber"])
-            )
+            advisor_info = self.map_service.get_advisor_info(product["accountNumber"])
+
+            if not advisor_info:
+                logger.error("Não foi possíel coletar as informações do assessor.")
+
+            advisor_name = advisor_info.get("advisorName")
+            advisor_email = advisor_info.get("email")
+
 
             # Verificar se todos os valores necessários estão presentes
             if advisor_name is None or advisor_email is None:
