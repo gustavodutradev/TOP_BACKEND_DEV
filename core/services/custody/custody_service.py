@@ -167,7 +167,7 @@ class CustodyService:
         products_by_advisor = {}
 
         for product in expiring_products:
-            client_name, advisor_name, advisor_email, sgcge = (
+            _, advisor_name, advisor_email, _ = (
                 self.map_service.map_accounts_to_advisors(product["accountNumber"])
             )
 

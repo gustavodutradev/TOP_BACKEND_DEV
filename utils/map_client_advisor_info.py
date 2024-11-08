@@ -48,12 +48,12 @@ class MapAdvisorInfo:
                 if assessor_cge_code in advisor_dict:
                     advisor = advisor_dict[assessor_cge_code]
                     logger.info(f"Encontrado assessor: {advisor['advisorName']}")
-                    return (
-                        key["clientName"],
-                        advisor["advisorName"],
-                        advisor["email"],
-                        advisor["phone"],
-                    )
+                    return {
+                        "client_name": key["clientName"],
+                        "advisor_name": advisor["advisorName"],
+                        "advisor_email": advisor["email"],
+                        "sgcge": assessor_cge_code,
+                    }
 
                 else:
                     logger.error(
