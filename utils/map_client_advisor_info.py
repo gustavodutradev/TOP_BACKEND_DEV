@@ -20,22 +20,22 @@ class MapAdvisorInfo:
             return []
 
     def map_accounts_to_advisors(self, account_number):
-        # Criar um dicionário de assessores com base no nome do assessor (para fácil busca)
-        advisor_dict = {advisor['advisorName']: advisor for advisor in self.advisor_data}
-
+        # Criar um dicionário de assessores com base no código CGE do assessor (para fácil busca)
+        advisor_dict = {advisor['advisorCgeCode']: advisor for advisor in self.advisor_data}
+    
         # Iterar sobre as contas para encontrar a conta correspondente ao número fornecido
         for account in self.account_data:
             if account['account'] == account_number:
                 # Encontrou a conta, agora associamos o assessor
-                assessor_name = account['nome_assessor']
+                assessor_cge_code = account['sgCGE']
                 
                 # Se encontrar o assessor correspondente, retornamos as informações
-                if assessor_name in advisor_dict:
-                    advisor = advisor_dict[assessor_name]
-                    return account['clientName'], assessor_name, advisor['email'], advisor['phone']
+                if assessor_cge_code in advisor_dict:
+                    advisor = advisor_dict[assessor_cge_code]
+                    return account['clientName'], advisor['advisorName'], advisor['email'], advisor['phone']
                 else:
                     # Se não encontrar o assessor, retorna None para email e telefone
-                    return account['clientName'], assessor_name, None, None
-
-        # Caso o número da conta não seja encontrado
+                    return account['clientName'], account['nome_assessor'], None, None
+    
+        # Caso o número da conta não seja encontrado, retorne valores padrão
         return None, None, None, None
