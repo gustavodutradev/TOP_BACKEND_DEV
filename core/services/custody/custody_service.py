@@ -59,54 +59,96 @@ class CustodyService:
     def _filter_products_to_expire(self, data):
         """Filtra produtos com vencimento para a data de hoje."""
         today = datetime.now().strftime("%d/%m/%Y")  # Obtém a data de hoje sem o tempo
-
         expiring_products = []
+
         for row in data:
             try:
-                # Converte a data de vencimento do produto, assumindo que ela esteja no formato ISO-8601 (AAAA-MM-DD)
-                fixing_date = datetime.strptime(row["fixingDate"], "%d/%m/%Y").strftime("%d/%m/%Y")
+                # Verifica se a chave 'fixingDate' existe no dicionário
+                if "fixingDate" not in row:
+                    continue
+
+                fixing_date = row["fixingDate"]
+                # Converte a data de vencimento para o formato dd/mm/aaaa
+                fixing_date = datetime.strptime(fixing_date, "%d/%m/%Y").strftime(
+                    "%d/%m/%Y"
+                )
+
                 if fixing_date == today:
                     expiring_products.append(row)
             except ValueError as e:
-                logger.error(f"Erro ao converter a data de vencimento para o produto {row}: {e}")
+                logger.error(
+                    f"Erro ao converter a data de vencimento para o produto {row}: {e}"
+                )
 
         return expiring_products
 
     def _consolidate_operations(self, products):
-        """Consolida operações duplicadas de PUT e CALL para o mesmo cliente e ativo"""
+        """Consolida operações duplicadas de PUT e CALL para o mesmo cliente e ativo."""
         consolidated_products = []
         seen_operations = set()
+
         for product in products:
+            # Verifica se todas as chaves necessárias existem no produto
+            if not all(
+                key in product
+                for key in [
+                    "accountNumber",
+                    "referenceAsset",
+                    "nomeDoProduto",
+                    "qtdAtual",
+                ]
+            ):
+                logger.warning(
+                    f"Produto sem informações suficientes para consolidação: {product}"
+                )
+                continue
+
+            # Cria a chave para identificar produtos duplicados
             key = (
                 product["accountNumber"],
                 product["referenceAsset"],
                 product["nomeDoProduto"],
                 product["qtdAtual"],
             )
+
+            # Se a chave não foi vista antes, adiciona o produto à lista consolidada
             if key not in seen_operations:
                 seen_operations.add(key)
                 consolidated_products.append(product)
+
         return consolidated_products
 
     def _group_by_client(self, data):
-        """Agrupa produtos por cliente"""
+        """Agrupa produtos por cliente."""
         grouped_data = {}
+
         for row in data:
-            account_number = row["accountNumber"]
+            # Verifica se a chave 'accountNumber' existe no produto
+            account_number = row.get("accountNumber")
+            if not account_number:
+                logger.warning(f"Produto sem 'accountNumber': {row}")
+                continue
+
             if account_number not in grouped_data:
                 grouped_data[account_number] = []
+
             grouped_data[account_number].append(row)
+
         return grouped_data
 
     def send_email_to_variable_desk(self, expiring_products):
-        """Envia e-mail para a Mesa de Renda Variável com todos os produtos para vencimento"""
+        """Envia e-mail para a Mesa de Renda Variável com todos os produtos para vencimento."""
         subject = f"Produtos Estruturados para Vencimento - {datetime.now().strftime('%d/%m/%Y')}"
         body = "Prezada Mesa Variável, foram encontrados produtos estruturados com vencimento para a data de hoje:\n\n"
+
         grouped_by_client = self._group_by_client(expiring_products)
         for client, products in grouped_by_client.items():
-            body += f"\nCliente: {client['accountName']} (Conta: {client['accountNumber']})\n"
+            # Verifica se 'accountName' está presente no cliente
+            account_name = client.get("accountName", "Nome não disponível")
+            body += f"\nCliente: {account_name} (Conta: {client['accountNumber']})\n"
             for product in products:
                 body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
+
         to_email = os.getenv("NOTIFY_EMAIL")
         self.email_service.send_email(to_email, subject, body)
         logger.info("E-mail consolidado enviado para a mesa de renda variável")
@@ -142,12 +184,18 @@ class CustodyService:
     def execute_daily_expiration_check(self, csv_url):
         """Executa a verificação de produtos para vencimento e envia e-mails conforme necessário"""
         data = self.process_csv_from_url(csv_url)
+
+        if not data:
+            logger.error("Nenhum dado foi extraído do arquivo CSV.")
+            return
+
         expiring_products = self._filter_products_to_expire(data)
 
         if not expiring_products:
             self.send_empty_products_to_expire_email()
             return
 
+        # Consolidando as operações antes de enviar os e-mails
         consolidated_products = self._consolidate_operations(expiring_products)
         self.send_email_to_variable_desk(consolidated_products)
         self.send_email_to_advisors(consolidated_products)
