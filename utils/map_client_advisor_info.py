@@ -39,26 +39,27 @@ class MapAdvisorInfo:
         }
 
         # Iterar sobre as contas para encontrar a conta correspondente ao número fornecido
-        for account in self.account_data:
-            if account["account"] == account_number:
+        for key in self.account_data:
+            if key["account"] == account_number:
                 # Encontrou a conta, agora associamos o assessor
-                assessor_cge_code = account["sgCGE"]
+                assessor_cge_code = key["sgCGE"]
 
                 # Se encontrar o assessor correspondente, retornamos as informações
                 if assessor_cge_code in advisor_dict:
                     advisor = advisor_dict[assessor_cge_code]
                     logger.info(f"Encontrado assessor: {advisor['advisorName']}")
                     return (
-                        account["clientName"],
+                        key["clientName"],
                         advisor["advisorName"],
                         advisor["email"],
                         advisor["phone"],
                     )
+
                 else:
                     logger.error(
                         f"Assessor com código CGE {assessor_cge_code} não encontrado."
                     )
-                    return account["clientName"], account["nome_assessor"], None, None
+                    return key["clientName"], key["nome_assessor"], None, None
 
         # Caso o número da conta não seja encontrado, retorne valores padrão
         logger.error(f"Conta {account_number} não encontrada.")
