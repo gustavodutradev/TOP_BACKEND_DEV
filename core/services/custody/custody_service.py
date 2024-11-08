@@ -146,14 +146,12 @@ class CustodyService:
         grouped_by_client = self._group_by_client(expiring_products)
         for client, client_data in grouped_by_client.items():
             account_name = client_data.get("accountName", "Nome não disponível")
-            body += (
-                f"<p><b>Cliente: {account_name.title()} (Conta: {client_data['accountNumber']})</b></p>"
-            )
+            body += f"<p><b>Cliente: {account_name.title()} (Conta: {client_data['accountNumber']})</b></p>"
             for product in client_data["products"]:
                 body += (
                     f"<p>Ativo: {product['referenceAsset']} | "
                     f"Produto: {product['nomeDoProduto']}</p>"
-                    )
+                )
 
         to_email = os.getenv("NOTIFY_EMAIL")
         body += self.get_email_footer()
@@ -201,8 +199,8 @@ class CustodyService:
                 body += f"<p><b>Cliente: {client_data['accountName'].title()} (Conta: {client_data['accountNumber']})</b></p>"
                 for product in client_data["products"]:
                     body += (
-                    f"<p>Ativo: {product['referenceAsset']} | "
-                    f"Produto: {product['nomeDoProduto']}</p>"
+                        f"<p>Ativo: {product['referenceAsset']} | "
+                        f"Produto: {product['nomeDoProduto']}</p>"
                     )
             body += self.get_email_footer()
             self.email_service.send_email(advisor_email, subject, body, is_html=True)

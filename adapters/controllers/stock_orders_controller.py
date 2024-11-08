@@ -72,12 +72,10 @@ class StockOrdersController:
             self.logger.logger.error("URL do CSV não encontrada no payload.")
             return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
 
-        pending_orders, partially_executed_orders = (
-            self.orders_service.process_csv_from_url(csv_url)
-        )
-        if not pending_orders and not partially_executed_orders:
+        pending_orders = self.orders_service.process_csv_from_url(csv_url)
+        if not pending_orders:
             self.logger.logger.info(
-                "Nenhuma ordem pendente ou parcialmente executada encontrada."
+                "Nenhuma ordem pendente encontrada."
             )
             self.orders_service.send_empty_pending_orders_email()
             return {
@@ -86,9 +84,7 @@ class StockOrdersController:
 
         self.logger.logger.info(f"Ordens pendentes encontradas")
 
-        self.orders_service.send_pending_orders_email(
-            pending_orders, partially_executed_orders
-        )
+        self.orders_service.send_pending_orders_email(pending_orders)
         return pending_orders, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
@@ -99,7 +95,7 @@ class StockOrdersController:
         Returns:
            A URL do CSV caso encontrada, se não, uma string vazia
         """
-        return data.get("result", {}).get("url", "")
+        return data.get("response", {}).get("url", "")
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
