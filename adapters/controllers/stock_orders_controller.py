@@ -95,7 +95,7 @@ class StockOrdersController:
         Returns:
            A URL do CSV caso encontrada, se não, uma string vazia
         """
-        return data.get("response", {}).get("url", "")
+        return data.get("result", {}).get("url", "")
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
