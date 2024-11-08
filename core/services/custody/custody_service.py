@@ -29,12 +29,12 @@ class CustodyService:
             headers = self.config_service.get_headers()
             response = requests.get(url, headers=headers, timeout=30)
             if response.status_code == 202:
-                print("Requisição aceita. Aguarde o webhook para processamento.")
+                logger.info("Requisição aceita. Aguarde o webhook para processamento.")
                 return True
-            print(f"Erro na requisição: {response.status_code} - {response.text}")
+            logger.error(f"Erro na requisição: {response.status_code} - {response.text}")
             return None
         except requests.RequestException as e:
-            print(f"Erro na requisição: {str(e)}")
+            logger.error(f"Erro na requisição: {str(e)}")
             return None
 
     def process_csv_from_url(self, csv_url):
@@ -65,6 +65,7 @@ class CustodyService:
             try:
                 # Verifica se a chave 'fixingDate' existe no dicionário
                 if "fixingDate" not in row:
+                    logger.warning(f"Produto sem 'fixingDate': {row}")
                     continue
 
                 fixing_date = row["fixingDate"]
@@ -89,27 +90,20 @@ class CustodyService:
 
         for product in products:
             # Verifica se todas as chaves necessárias existem no produto
-            if not all(
-                key in product
-                for key in [
-                    "accountNumber",
-                    "referenceAsset",
-                    "nomeDoProduto",
-                    "qtdAtual",
-                ]
-            ):
+            required_keys = [
+                "accountNumber",
+                "referenceAsset",
+                "nomeDoProduto",
+                "qtdAtual",
+            ]
+            if not all(key in product for key in required_keys):
                 logger.warning(
                     f"Produto sem informações suficientes para consolidação: {product}"
                 )
                 continue
 
             # Cria a chave para identificar produtos duplicados
-            key = (
-                product["accountNumber"],
-                product["referenceAsset"],
-                product["nomeDoProduto"],
-                product["qtdAtual"],
-            )
+            key = tuple(product[key] for key in required_keys)
 
             # Se a chave não foi vista antes, adiciona o produto à lista consolidada
             if key not in seen_operations:
