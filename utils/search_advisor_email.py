@@ -47,12 +47,12 @@ class SearchAdvisorEmail:
 
         if sgcge is None:
             print(f"Código CGE não encontrado para a conta {account_number}.")
-            return client_name, None, None
+            return client_name, None, None, None
 
         email, advisor_name = self.find_advisor_email_and_name(sgcge)
 
         if email is None or advisor_name is None:
             print(f"Assessor com CGE {sgcge} não encontrado.")
-            return client_name, None, None
+            return client_name, None, None, None
 
         return client_name, advisor_name, email, sgcge
