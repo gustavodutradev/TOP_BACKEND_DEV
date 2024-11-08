@@ -2,7 +2,8 @@ from typing import Dict
 from core.services.config_service import ConfigService
 from core.services.zip_service import ZipService
 from core.services.email_service import EmailService
-from utils.search_advisor_email import SearchAdvisorEmail
+# from utils.search_advisor_email import SearchAdvisorEmail
+from utils.map_client_advisor_info import MapAdvisorInfo
 import requests
 from datetime import datetime, timedelta
 import logging
@@ -20,7 +21,7 @@ class CustodyService:
         self.config_service = ConfigService()
         self.zip_service = ZipService()
         self.email_service = EmailService()
-        self.search_advisor_email = SearchAdvisorEmail()
+        self.map_service = MapAdvisorInfo()
         self.endpoint = "/api-partner-report-extractor/api/v1/report"
 
     def get_custody(self):
@@ -150,7 +151,7 @@ class CustodyService:
                 f"\nCliente: {account_name} (Conta: {client_data['accountNumber']})\n"
             )
             for product in client_data["products"]:
-                body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
+                body += f"Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
 
         to_email = os.getenv("NOTIFY_EMAIL")
         body += self.get_email_footer()
@@ -169,7 +170,7 @@ class CustodyService:
 
         for product in expiring_products:
             client_name, advisor_name, advisor_email, sgcge = (
-                self.search_advisor_email.get_client_and_advisor_info(
+                self.map_service.map_accounts_to_advisors(
                     product["accountNumber"]
                 )
             )
