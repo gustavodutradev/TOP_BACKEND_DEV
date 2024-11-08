@@ -3,9 +3,10 @@ from core.services.zip_service import ZipService
 from core.services.email_service import EmailService
 from utils.search_advisor_email import SearchAdvisorEmail
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 import os
+import pandas as pd
 
 # Configuração do logger
 logging.basicConfig(level=logging.INFO)
@@ -52,15 +53,10 @@ class CustodyService:
             for csv_reader in csv_readers:
                 data.extend([row for row in csv_reader])
 
-            if data and "fixingDate" in data[0]:
+            # Converte a coluna "fixingDate" para o formato dd/mm/aaaa
+            if "fixingDate" in data[0]:
                 for row in data:
-                    fixing_date_value = row.get("fixingDate")
-                    if fixing_date_value:
-                        try:
-                            row["fixingDate"] = self.convert_excel_date(fixing_date_value)
-                        except Exception as e:
-                            logger.error(f"Erro ao converter a data de vencimento para o produto {row}: {e}")
-                            row["fixingDate"] = None
+                    row["fixingDate"] = self.convert_excel_date(row["fixingDate"])
 
             return data
         except Exception as e:
@@ -69,21 +65,17 @@ class CustodyService:
 
     def convert_excel_date(self, serial):
         """Converte uma data serial do Excel para o formato dd/mm/aaaa."""
-        try:
-           serial = float(serial)
-           base_date = datetime(1899, 12, 30)
-           converted_date = base_date + timedelta(days=serial)
-           return converted_date.strftime("%d/%m/%Y")
-        except ValueError as e:
-           logger.error(f"Erro ao tentar converter a data serial {serial}: {e}")
-           raise ValueError(f"Valor inválido para conversão de data: {serial}")
+        base_date = datetime(1899, 12, 30)  # Data de base do Excel
+        converted_date = base_date + timedelta(days=serial)
+        return converted_date.strftime("%d/%m/%Y")
 
     def _filter_products_to_expire(self, data):
         """Filtra produtos com vencimento para a data de hoje."""
-        today = datetime.now().strftime("%d/%m/%Y")
+        today = datetime.now().strftime("%d/%m/%Y")  # Obtém a data de hoje no formato dd/mm/aaaa
         expiring_products = []
         for row in data:
             try:
+                # Converte a data de vencimento do produto, assumindo que ela esteja no formato dd/mm/aaaa
                 fixing_date = datetime.strptime(row["fixingDate"], "%d/%m/%Y").strftime("%d/%m/%Y")
                 if fixing_date == today:
                     expiring_products.append(row)
@@ -96,12 +88,12 @@ class CustodyService:
         consolidated_products = []
         seen_operations = set()
         for product in products:
-
+            # Usa get com valor padrão caso a chave não exista
             key = (
                 product.get("accountNumber"),
                 product.get("referenceAsset"),
                 product.get("nomeDoProduto"),
-                product.get("qtdAtual", 0),
+                product.get("qtdAtual", 0),  # Valor padrão de 0 para qtdAtual caso não exista
             )
             if key not in seen_operations:
                 seen_operations.add(key)
@@ -112,7 +104,7 @@ class CustodyService:
         """Agrupa produtos por cliente."""
         grouped_data = {}
         for row in data:
-
+            # Verifica se a chave 'accountNumber' existe no produto
             account_number = row.get("accountNumber")
             if not account_number:
                 logger.warning(f"Produto sem 'accountNumber': {row}")
@@ -132,7 +124,7 @@ class CustodyService:
 
         grouped_by_client = self._group_by_client(expiring_products)
         for client, products in grouped_by_client.items():
-
+            # Verifica se 'accountName' está presente no cliente
             account_name = client.get("accountName", "Nome não disponível")
             body += f"\nCliente: {account_name} (Conta: {client['accountNumber']})\n"
             for product in products:
