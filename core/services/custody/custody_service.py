@@ -136,8 +136,9 @@ class CustodyService:
                 account_name = client.get("accountName", "Nome não disponível")
             else:
                 # Se o 'client' não for um dicionário, use o valor como nome do cliente
-                account_name = client
-            body += f"\nCliente: {account_name} (Conta: {client['accountNumber']})\n"
+                account_name = str(client)
+            account_number = client.get("accountNumber", "Número não disponível")
+            body += f"\nCliente: {account_name} (Conta: {account_number})\n"
             for product in products:
                 body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
     
