@@ -155,18 +155,35 @@ class CustodyService:
         self.email_service.send_email(to_email, subject, body)
         logger.info("E-mail consolidado enviado para a mesa de renda variável")
 
-    def _group_products_by_advisor(self, expiring_products):
-        """Agrupa produtos para vencimento por e-mail do assessor"""
+    def _group_products_by_advisor(self, expiring_products: list) -> Dict[str, list]:
+        """
+        Group the expiring products by advisor email.
+        Args:
+            expiring_products: List of products with expiration details
+        Returns:
+            A dictionary with advisor emails as keys and lists of products as values
+        """
         products_by_advisor = {}
+
         for product in expiring_products:
-            # Recupera as informações do cliente e do assessor
-            _, _, advisor_email, _ = (
-                self.search_advisor_email.get_client_and_advisor_info(
-                    product["accountNumber"]
+            client_name, advisor_name, advisor_email, sgcge = (
+                self.search_advisor.get_client_and_advisor_info(
+                    product["account_number"]
                 )
             )
-            if advisor_email:
-                products_by_advisor.setdefault(advisor_email, []).append(product)
+
+            # Verificar se todos os valores necessários estão presentes
+            if advisor_name is None or advisor_email is None:
+                self.logger.logger.error(
+                    f"Assessor ou e-mail não encontrado para a conta {product['account_number']}."
+                )
+                continue  # Pula este produto se não encontrar dados do assessor
+
+            # Adicionar o produto ao grupo de assessores
+            if advisor_email not in products_by_advisor:
+                products_by_advisor[advisor_email] = []
+            products_by_advisor[advisor_email].append(product)
+
         return products_by_advisor
 
     def send_email_to_advisors(self, expiring_products):
