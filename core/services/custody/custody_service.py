@@ -168,7 +168,7 @@ class CustodyService:
 
         for product in expiring_products:
             client_name, advisor_name, advisor_email, sgcge = (
-                self.search_advisor.get_client_and_advisor_info(
+                self.search_advisor_email.get_client_and_advisor_info(
                     product["account_number"]
                 )
             )
