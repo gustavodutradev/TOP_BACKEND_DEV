@@ -242,8 +242,6 @@ class StockOrdersService:
             else:
                 body += "<p>Não foram encontradas ordens parcialmente executadas.</p>"
 
-        body += EmailTemplateBuilder.get_email_footer()
-
         self.email_service.send_email(
             to_email, "Ordens Pendentes e Parcialmente Executadas", body, is_html=True
         )
