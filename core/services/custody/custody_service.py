@@ -3,7 +3,7 @@ from core.services.zip_service import ZipService
 from core.services.email_service import EmailService
 from utils.search_advisor_email import SearchAdvisorEmail
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import os
 
@@ -51,71 +51,57 @@ class CustodyService:
             data = []
             for csv_reader in csv_readers:
                 data.extend([row for row in csv_reader])
+
+            # Converte a coluna "fixingDate" para o formato dd/mm/aaaa
+            if "fixingDate" in data[0]:
+                for row in data:
+                    row["fixingDate"] = self.convert_excel_date(row["fixingDate"])
+
             return data
         except Exception as e:
             logger.error(f"Erro ao processar o CSV: {str(e)}")
             return []
 
+    def convert_excel_date(self, serial):
+        """Converte uma data serial do Excel para o formato dd/mm/aaaa."""
+        base_date = datetime(1899, 12, 30)  # Data de base do Excel
+        converted_date = base_date + timedelta(days=serial)
+        return converted_date.strftime("%d/%m/%Y")
+
     def _filter_products_to_expire(self, data):
         """Filtra produtos com vencimento para a data de hoje."""
-        today = datetime.now().strftime("%d/%m/%Y")  # Obtém a data de hoje sem o tempo
+        today = datetime.now().strftime("%d/%m/%Y")  # Obtém a data de hoje no formato dd/mm/aaaa
         expiring_products = []
-
         for row in data:
             try:
-                # Verifica se a chave 'fixingDate' existe no dicionário
-                if "fixingDate" not in row:
-                    logger.warning(f"Produto sem 'fixingDate': {row}")
-                    continue
-
-                fixing_date = row["fixingDate"]
-                # Converte a data de vencimento para o formato dd/mm/aaaa
-                fixing_date = datetime.strptime(fixing_date, "%d/%m/%Y").strftime(
-                    "%d/%m/%Y"
-                )
-
+                # Converte a data de vencimento do produto, assumindo que ela esteja no formato dd/mm/aaaa
+                fixing_date = datetime.strptime(row["fixingDate"], "%d/%m/%Y").strftime("%d/%m/%Y")
                 if fixing_date == today:
                     expiring_products.append(row)
             except ValueError as e:
-                logger.error(
-                    f"Erro ao converter a data de vencimento para o produto {row}: {e}"
-                )
-
+                logger.error(f"Erro ao converter a data de vencimento para o produto {row}: {e}")
         return expiring_products
 
     def _consolidate_operations(self, products):
         """Consolida operações duplicadas de PUT e CALL para o mesmo cliente e ativo."""
         consolidated_products = []
         seen_operations = set()
-
         for product in products:
-            # Verifica se todas as chaves necessárias existem no produto
-            required_keys = [
-                "accountNumber",
-                "referenceAsset",
-                "nomeDoProduto",
-                "qtdAtual",
-            ]
-            if not all(key in product for key in required_keys):
-                logger.warning(
-                    f"Produto sem informações suficientes para consolidação: {product}"
-                )
-                continue
-
-            # Cria a chave para identificar produtos duplicados
-            key = tuple(product[key] for key in required_keys)
-
-            # Se a chave não foi vista antes, adiciona o produto à lista consolidada
+            # Usa get com valor padrão caso a chave não exista
+            key = (
+                product.get("accountNumber"),
+                product.get("referenceAsset"),
+                product.get("nomeDoProduto"),
+                product.get("qtdAtual", 0),  # Valor padrão de 0 para qtdAtual caso não exista
+            )
             if key not in seen_operations:
                 seen_operations.add(key)
                 consolidated_products.append(product)
-
         return consolidated_products
 
     def _group_by_client(self, data):
         """Agrupa produtos por cliente."""
         grouped_data = {}
-
         for row in data:
             # Verifica se a chave 'accountNumber' existe no produto
             account_number = row.get("accountNumber")
