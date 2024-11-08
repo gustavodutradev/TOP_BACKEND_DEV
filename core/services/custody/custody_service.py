@@ -47,26 +47,29 @@ class CustodyService:
                 raise requests.RequestException(
                     f"Erro ao baixar arquivo ZIP: {zip_response.status_code}"
                 )
-            
+
             # Utiliza o novo método para descompactar o ZIP e obter o DataFrame
             df = self.zip_service.unzip_and_convert_csv_to_df(zip_response)
             if df is None:
                 return []
-            
+
             # Converte a coluna "fixingDate" para o formato dd/mm/aaaa
             if "fixingDate" in df.columns:
                 df["fixingDate"] = df["fixingDate"].apply(
-                    lambda x: self.convert_excel_date(x) if isinstance(x, (int, float)) else str(x)
+                    lambda x: (
+                        self.convert_excel_date(x)
+                        if isinstance(x, (int, float))
+                        else str(x)
+                    )
                 )
-    
+
             # Converte o DataFrame em uma lista de dicionários
             data = df.to_dict(orient="records")
             return data
-    
+
         except Exception as e:
             logger.error(f"Erro ao processar o CSV: {str(e)}")
             return []
-
 
     def convert_excel_date(self, serial):
         """Converte uma data serial do Excel para o formato dd/mm/aaaa."""
@@ -114,19 +117,23 @@ class CustodyService:
         return consolidated_products
 
     def _group_by_client(self, data):
-        """Agrupa produtos por cliente."""
+        """Agrupa produtos por cliente, considerando accountNumber como chave e dados do cliente como valor."""
         grouped_data = {}
         for row in data:
-            # Verifica se a chave 'accountNumber' existe no produto
             account_number = row.get("accountNumber")
             if not account_number:
                 logger.warning(f"Produto sem 'accountNumber': {row}")
                 continue
 
+            # Agrupa os produtos pelo número da conta e garante que as informações do cliente estejam no formato esperado
             if account_number not in grouped_data:
-                grouped_data[account_number] = []
+                grouped_data[account_number] = {
+                    "accountName": row.get("accountName", "Nome não disponível"),
+                    "accountNumber": account_number,
+                    "products": [],
+                }
 
-            grouped_data[account_number].append(row)
+            grouped_data[account_number]["products"].append(row)
 
         return grouped_data
 
@@ -136,11 +143,12 @@ class CustodyService:
         body = "Prezada Mesa Variável, foram encontrados produtos estruturados com vencimento para a data de hoje:\n\n"
 
         grouped_by_client = self._group_by_client(expiring_products)
-        for client, products in grouped_by_client.items():
-            # Verifica se 'accountName' está presente no cliente
-            account_name = client.get("accountName", "Nome não disponível")
-            body += f"\nCliente: {account_name} (Conta: {client['accountNumber']})\n"
-            for product in products:
+        for client, client_data in grouped_by_client.items():
+            account_name = client_data.get("accountName", "Nome não disponível")
+            body += (
+                f"\nCliente: {account_name} (Conta: {client_data['accountNumber']})\n"
+            )
+            for product in client_data["products"]:
                 body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
 
         to_email = os.getenv("NOTIFY_EMAIL")
@@ -151,6 +159,7 @@ class CustodyService:
         """Agrupa produtos para vencimento por e-mail do assessor"""
         products_by_advisor = {}
         for product in expiring_products:
+            # Recupera as informações do cliente e do assessor
             _, _, advisor_email, _ = (
                 self.search_advisor_email.get_client_and_advisor_info(
                     product["accountNumber"]
@@ -166,10 +175,11 @@ class CustodyService:
         for advisor_email, products in products_by_advisor.items():
             subject = f"Produtos Estruturados para Vencimento - {datetime.now().strftime('%d/%m/%Y')}"
             body = "Prezado(a) Assessor(a), abaixo encontram-se produtos estruturados de seus clientes com vencimento para data de hoje:\n\n"
+
             grouped_by_client = self._group_by_client(products)
-            for client, client_products in grouped_by_client.items():
-                body += f"\nCliente: {client['accountName']} (Conta: {client['accountNumber']})\n"
-                for product in client_products:
+            for client, client_data in grouped_by_client.items():
+                body += f"\nCliente: {client_data['accountName']} (Conta: {client_data['accountNumber']})\n"
+                for product in client_data["products"]:
                     body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
             body += self.get_email_footer()
             self.email_service.send_email(advisor_email, subject, body)
