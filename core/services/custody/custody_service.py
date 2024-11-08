@@ -147,13 +147,17 @@ class CustodyService:
         for client, client_data in grouped_by_client.items():
             account_name = client_data.get("accountName", "Nome não disponível")
             body += (
-                f"\nCliente: {account_name} (Conta: {client_data['accountNumber']})\n"
+                f"<p><b>Cliente: {account_name.title()} (Conta: {client_data['accountNumber']})</b></p>"
             )
             for product in client_data["products"]:
-                body += f"Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
+                body += (
+                    f"<p>Ativo: {product['referenceAsset']} | "
+                    f"Produto: {product['nomeDoProduto']}</p>"
+                    )
 
         to_email = os.getenv("NOTIFY_EMAIL")
-        self.email_service.send_email(to_email, subject, body)
+        body += self.get_email_footer()
+        self.email_service.send_email(to_email, subject, body, is_html=True)
         logger.info("E-mail consolidado enviado para a mesa de renda variável")
 
     def _group_products_by_advisor(self, expiring_products: list) -> Dict[str, list]:
@@ -194,11 +198,14 @@ class CustodyService:
 
             grouped_by_client = self._group_by_client(products)
             for client, client_data in grouped_by_client.items():
-                body += f"\nCliente: {client_data['accountName']} (Conta: {client_data['accountNumber']})\n"
+                body += f"<p><b>Cliente: {client_data['accountName'].title()} (Conta: {client_data['accountNumber']})</b></p>"
                 for product in client_data["products"]:
-                    body += f"* Ativo: {product['referenceAsset']} | Produto: {product['nomeDoProduto']}\n"
+                    body += (
+                    f"<p>Ativo: {product['referenceAsset']} | "
+                    f"Produto: {product['nomeDoProduto']}</p>"
+                    )
             body += self.get_email_footer()
-            self.email_service.send_email(advisor_email, subject, body)
+            self.email_service.send_email(advisor_email, subject, body, is_html=True)
             logger.info(f"E-mail enviado para o assessor {advisor_email}")
 
     def execute_daily_expiration_check(self, csv_url):
