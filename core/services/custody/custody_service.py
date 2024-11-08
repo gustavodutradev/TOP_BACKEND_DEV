@@ -64,9 +64,17 @@ class CustodyService:
 
     def convert_excel_date(self, serial):
         """Converte uma data serial do Excel para o formato dd/mm/aaaa."""
-        base_date = datetime(1899, 12, 30)  # Data de base do Excel
-        converted_date = base_date + timedelta(days=serial)
-        return converted_date.strftime("%d/%m/%Y")
+        try:
+            base_date = datetime(1899, 12, 30)  # Data de base do Excel
+            converted_date = base_date + timedelta(days=float(serial))
+            return converted_date.strftime("%d/%m/%Y")
+        except ValueError:
+            try:
+                # Tente interpretar a data como uma string no formato 'dd/mm/aaaa'
+                return datetime.strptime(serial, "%d/%m/%Y").strftime("%d/%m/%Y")
+            except ValueError:
+                logger.error(f"Não foi possível converter a data: {serial}")
+                return "01/01/1900"  # Retorna uma data padrão em caso de falha
 
     def _filter_products_to_expire(self, data):
         """Filtra produtos com vencimento para a data de hoje."""
