@@ -26,6 +26,6 @@ class SuitabilityController:
             return jsonify(suitability)
         except Exception as e:
             logging.error(
-                f"Error getting suitability for account {account_number}: {str(e)}"
+                f"Error getting suitability data for account {account_number}: {str(e)}"
             )
             return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR

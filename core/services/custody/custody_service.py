@@ -172,11 +172,10 @@ class CustodyService:
             advisor_info = self.map_service.get_advisor_info(product["accountNumber"])
 
             if not advisor_info:
-                logger.error("Não foi possíel coletar as informações do assessor.")
+                logger.error("Não foi possível coletar as informações do assessor.")
 
             advisor_name = advisor_info.get("advisorName")
             advisor_email = advisor_info.get("email")
-
 
             # Verificar se todos os valores necessários estão presentes
             if advisor_name is None or advisor_email is None:
@@ -187,17 +186,23 @@ class CustodyService:
 
             # Adicionar o produto ao grupo de assessores
             if advisor_email not in products_by_advisor:
-                products_by_advisor[advisor_email] = []
-            products_by_advisor[advisor_email].append(product)
+                products_by_advisor[advisor_email] = {
+                    "avisor_name": advisor_name,
+                    "products": [],
+                }
+            products_by_advisor[advisor_email]["products"].append(product)
 
         return products_by_advisor
 
     def send_email_to_advisors(self, expiring_products):
         """Envia e-mails para os assessores com produtos de seus clientes que estão para vencer"""
         products_by_advisor = self._group_products_by_advisor(expiring_products)
-        for advisor_email, products in products_by_advisor.items():
+        for advisor_email, advisor_data in products_by_advisor.items():
+            advisor_name = advisor_data["avisor_name"]
+            products = advisor_data["products"]
+
             subject = f"Produtos Estruturados para Vencimento - {datetime.now().strftime('%d/%m/%Y')}"
-            body = "Prezado(a) Assessor(a), abaixo encontram-se produtos estruturados de seus clientes com vencimento para data de hoje:\n\n"
+            body = f"Prezado(a) {advisor_name}, abaixo encontram-se produtos estruturados de seus clientes com vencimento para data de hoje:\n\n"
 
             grouped_by_client = self._group_by_client(products)
             for client, client_data in grouped_by_client.items():

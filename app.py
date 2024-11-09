@@ -25,6 +25,7 @@ from adapters.controllers import (
     PreOperationsController,
     CustodyByDateController,
     CustodyController,
+    LifeInsuranceController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 from scheduler.custody_scheduler import CustodyScheduler
@@ -63,6 +64,7 @@ class FlaskApp:
             "pre_operations": PreOperationsController(self.app),
             "custody_by_date": CustodyByDateController(self.app),
             "custody": CustodyController(self.app),
+            "life_insurance": LifeInsuranceController(self.app),
         }
 
     def _init_scheduler(self) -> None:
