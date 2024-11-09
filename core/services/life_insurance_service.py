@@ -27,10 +27,11 @@ class LifeInsuranceService:
 
             # Verifica se a resposta não é 200
             if response.status_code != 200:
-                print(
+                if response.status_code == 404:
+                    print(
                     f"Erro ao acessar a API de Seguro de Vida: {response.status_code} - {response.text}"
                 )
-                return {"error": "Falha ao acessar o endpoint."}
+                return {"error": f"Não há dados de Seguro de Vida para a conta {accountNumber}"}
 
             # Tentando decodificar a resposta JSON
             response_data = response.json()
