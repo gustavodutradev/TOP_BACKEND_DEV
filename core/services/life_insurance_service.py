@@ -1,7 +1,10 @@
 import json
 import requests
 from core.services.config_service import ConfigService
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class LifeInsuranceService:
     def __init__(self):
@@ -11,12 +14,12 @@ class LifeInsuranceService:
         endpoint = f"/iaas-life-insurance/api/v1/life-insurance/{accountNumber}"
         url = f"{self.config_service.base_url}{endpoint}"
 
-        print(url)
-
         try:
             headers = self.config_service.get_headers()
 
             response = requests.get(url, headers=headers)
+
+            logger.info(response)
 
             # Logando status code e response text
             print(f"Status Code: {response.status_code}")
