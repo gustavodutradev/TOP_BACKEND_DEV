@@ -103,7 +103,8 @@ class EmailService:
                         FileType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
                         Disposition("attachment"),
                     )
-                message.attachment.append(attachment)
+                list_attachments = attachments.append(attachment)
+                message.attachment = list_attachments
 
         return message
 
