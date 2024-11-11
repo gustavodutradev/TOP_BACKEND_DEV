@@ -92,10 +92,10 @@ class EmailService:
                 with open(attachment_path, "rb") as f:
                     encoded_file = b64encode(f.read()).decode()
                     attachment = Attachment(
-                        FileContent=encoded_file,
-                        FileName=os.path.basename(attachment_path),
-                        FileType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        Disposition="attachment",
+                        file_content=encoded_file,
+                        file_name=os.path.basename(attachment_path),
+                        file_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        disposition="attachment",
                     )
                     message.attachment.append(attachment)
 
