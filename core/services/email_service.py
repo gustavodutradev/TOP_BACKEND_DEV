@@ -90,9 +90,8 @@ class EmailService:
         if attachments:
             self.logger.info(f"Attaching {len(attachments)} attachments")
 
-            # Inicializa `message.attachment` como lista vazia se ainda não estiver definida
-            if not getattr(message, "attachment", None):
-                message.attachment = []
+            # Inicializa `message.attachment` como lista vazia
+            message.attachment = []
 
             for attachment_path in attachments:
                 with open(attachment_path, "rb") as f:
@@ -103,8 +102,7 @@ class EmailService:
                         FileType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
                         Disposition("attachment"),
                     )
-                list_attachments = attachments.append(attachment)
-                message.attachment = list_attachments
+                    message.attachment.append(attachment)  # Adiciona diretamente o anexo
 
         return message
 
