@@ -1,9 +1,10 @@
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Content, Attachment
 import os
 import logging
 from typing import Union, List
 from dataclasses import dataclass
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Content
+from base64 import b64encode
 
 
 @dataclass
@@ -59,7 +60,12 @@ class EmailService:
         return [email.strip() for email in emails if email.strip()]
 
     def _create_mail_object(
-        self, to_emails: List[str], subject: str, content: str, is_html: bool
+        self,
+        to_emails: List[str],
+        subject: str,
+        content: str,
+        is_html: bool,
+        attachments: List[str] = None,
     ) -> Mail:
         """
         Create Mail object for SendGrid
@@ -69,6 +75,7 @@ class EmailService:
             subject: Email subject
             content: Email content
             is_html: Whether the content is HTML
+            attachments: List of file paths to attach
 
         Returns:
             Mail object configured for sending
@@ -80,6 +87,18 @@ class EmailService:
         content_type = "text/html" if is_html else "text/plain"
         message.content = [Content(content_type, content)]
 
+        if attachments:
+            for attachment_path in attachments:
+                with open(attachment_path, "rb") as f:
+                    encoded_file = b64encode(f.read()).decode()
+                    attachment = Attachment(
+                        FileContent=encoded_file,
+                        FileName=os.path.basename(attachment_path),
+                        FileType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        Disposition="attachment",
+                    )
+                    message.attachment.append(attachment)
+
         return message
 
     def send_email(
@@ -88,6 +107,7 @@ class EmailService:
         subject: str,
         content: str,
         is_html: bool = False,
+        attachments: List[str] = None,
     ) -> bool:
         """
         Send email using SendGrid
@@ -97,6 +117,7 @@ class EmailService:
             subject: Email subject
             content: Email content
             is_html: Whether the content is HTML
+            attachments: List of file paths to attach
 
         Returns:
             bool: True if email was sent successfully
@@ -115,6 +136,7 @@ class EmailService:
                 subject=subject,
                 content=content,
                 is_html=is_html,
+                attachments=attachments,
             )
 
             response = self.sg.send(message)

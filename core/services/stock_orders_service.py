@@ -243,7 +243,7 @@ class StockOrdersService:
                 body += "<p>Não foram encontradas ordens parcialmente executadas.</p>"
 
         self.email_service.send_email(
-            to_email, "Ordens Pendentes e Parcialmente Executadas", body, is_html=True
+            to_email, "Ordens Pendentes de Aprovação", body, is_html=True
         )
 
     def _group_orders_by_client(self, orders: List[Order]) -> Dict[str, List[Order]]:

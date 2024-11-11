@@ -6,6 +6,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class LifeInsuranceService:
     def __init__(self):
         self.config_service = ConfigService()
@@ -29,9 +30,11 @@ class LifeInsuranceService:
             if response.status_code != 200:
                 if response.status_code == 404:
                     print(
-                    f"Erro ao acessar a API de Seguro de Vida: {response.status_code} - {response.text}"
-                )
-                return {"error": f"Não há dados de Seguro de Vida para a conta {accountNumber}"}
+                        f"Erro ao acessar a API de Seguro de Vida: {response.status_code} - {response.text}"
+                    )
+                return {
+                    "error": f"Não há dados de Seguro de Vida para a conta {accountNumber}"
+                }
 
             # Tentando decodificar a resposta JSON
             response_data = response.json()
