@@ -167,62 +167,62 @@ class CommissionsService:
             raise
 
 
-def send_commissions_report(self):
-    try:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_dir = f"relatorios_comissoes/relatorio_{timestamp}"
-        Path(report_dir).mkdir(parents=True, exist_ok=True)
-
-        attachments = []
-
-        # Gera os arquivos Excel e adiciona à lista de anexos
-        for advisor_key, data in self.processed_data.items():
-            if not data:
-                continue
-
-            df = pd.DataFrame(data)
-            df = df.sort_values(["nr_conta", "dt_referencia"])
-            excel_file = f"{report_dir}/{advisor_key}.xlsx"
-            df.to_excel(excel_file, index=False, engine="openpyxl")
-            attachments.append(excel_file)
-
-        # Gera o arquivo de contas não processadas
-        if self.unprocessed_accounts:
-            unprocessed_df = pd.DataFrame(
-                list(self.unprocessed_accounts), columns=["Conta"]
+    def send_commissions_report(self):
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            report_dir = f"relatorios_comissoes/relatorio_{timestamp}"
+            Path(report_dir).mkdir(parents=True, exist_ok=True)
+    
+            attachments = []
+    
+            # Gera os arquivos Excel e adiciona à lista de anexos
+            for advisor_key, data in self.processed_data.items():
+                if not data:
+                    continue
+                
+                df = pd.DataFrame(data)
+                df = df.sort_values(["nr_conta", "dt_referencia"])
+                excel_file = f"{report_dir}/{advisor_key}.xlsx"
+                df.to_excel(excel_file, index=False, engine="openpyxl")
+                attachments.append(excel_file)
+    
+            # Gera o arquivo de contas não processadas
+            if self.unprocessed_accounts:
+                unprocessed_df = pd.DataFrame(
+                    list(self.unprocessed_accounts), columns=["Conta"]
+                )
+                unprocessed_file = f"{report_dir}/contas_nao_processadas.xlsx"
+                unprocessed_df.to_excel(unprocessed_file, index=False, engine="openpyxl")
+                attachments.append(unprocessed_file)
+    
+            # Cria o corpo do email em formato HTML
+            html_content = f"""
+            <html>
+            <body>
+                <h2>Relatório de Comissões</h2>
+                <p>Anexamos os relatórios de comissões referentes ao período.</p>
+                <h3>Contas Não Processadas:</h3>
+                <p>As seguintes contas não puderam ser processadas:</p>
+                <ul>
+                    {''.join(f'<li>{conta}</li>' for conta in self.unprocessed_accounts)}
+                </ul>
+            </body>
+            </html>
+            """
+            # to_emails = os.getenv("NOTIFY_EMAIL")
+    
+            # Envia o email com os arquivos anexados
+            self.email_service.send_email(
+                to_emails="gustavodutra@topinvgroup.com",
+                subject="Relatório de Comissões",
+                content=html_content,
+                is_html=True,
+                attachments=attachments,
             )
-            unprocessed_file = f"{report_dir}/contas_nao_processadas.xlsx"
-            unprocessed_df.to_excel(unprocessed_file, index=False, engine="openpyxl")
-            attachments.append(unprocessed_file)
-
-        # Cria o corpo do email em formato HTML
-        html_content = f"""
-        <html>
-        <body>
-            <h2>Relatório de Comissões</h2>
-            <p>Anexamos os relatórios de comissões referentes ao período.</p>
-            <h3>Contas Não Processadas:</h3>
-            <p>As seguintes contas não puderam ser processadas:</p>
-            <ul>
-                {''.join(f'<li>{conta}</li>' for conta in self.unprocessed_accounts)}
-            </ul>
-        </body>
-        </html>
-        """
-        # to_emails = os.getenv("NOTIFY_EMAIL")
-
-        # Envia o email com os arquivos anexados
-        self.email_service.send_email(
-            to_emails="gustavodutra@topinvgroup.com",
-            subject="Relatório de Comissões",
-            content=html_content,
-            is_html=True,
-            attachments=attachments,
-        )
-
-        logger.info(f"Processamento concluído. Relatório enviado por e-mail.")
-        return report_dir
-
-    except Exception as e:
-        logger.error(f"Erro ao enviar relatórios por e-mail: {e}")
-        raise
+    
+            logger.info(f"Processamento concluído. Relatório enviado por e-mail.")
+            return report_dir
+    
+        except Exception as e:
+            logger.error(f"Erro ao enviar relatórios por e-mail: {e}")
+            raise
