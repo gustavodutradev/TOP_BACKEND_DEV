@@ -69,25 +69,31 @@ class EmailService:
     ) -> Mail:
         """
         Create Mail object for SendGrid
-    
+
         Args:
             to_emails: List of recipient email addresses
             subject: Email subject
             content: Email content
             is_html: Whether the content is HTML
             attachments: List of file paths to attach
-    
+
         Returns:
             Mail object configured for sending
         """
         message = Mail(
             from_email=self.config.from_email, to_emails=to_emails, subject=subject
         )
-    
+
         content_type = "text/html" if is_html else "text/plain"
         message.content = [Content(content_type, content)]
-    
+
         if attachments:
+            self.logger.info(f"Attaching {len(attachments)} attachments")
+
+            # Inicializa `message.attachment` como lista vazia se ainda não estiver definida
+            if not hasattr(message, "attachment") or message.attachment is None:
+                message.attachment = []
+
             for attachment_path in attachments:
                 with open(attachment_path, "rb") as f:
                     encoded_file = b64encode(f.read()).decode()
@@ -97,10 +103,8 @@ class EmailService:
                         file_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         disposition="attachment",
                     )
-                if not hasattr(message, 'attachment'):
-                    message.attachment = []
                 message.attachment.append(attachment)
-    
+
         return message
 
     def send_email(
