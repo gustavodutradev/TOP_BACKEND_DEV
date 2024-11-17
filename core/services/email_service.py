@@ -1,5 +1,13 @@
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Content, Attachment, FileContent, FileName, FileType, Disposition
+from sendgrid.helpers.mail import (
+    Mail,
+    Content,
+    Attachment,
+    FileContent,
+    FileName,
+    FileType,
+    Disposition,
+)
 import os
 import logging
 from typing import Union, List
@@ -99,10 +107,14 @@ class EmailService:
                     attachment = Attachment(
                         FileContent(encoded_file),
                         FileName(os.path.basename(attachment_path)),
-                        FileType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                        FileType(
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        ),
                         Disposition("attachment"),
                     )
-                    message.attachment.append(attachment)  # Adiciona diretamente o anexo
+                    message.attachment.append(
+                        attachment
+                    )  # Adiciona diretamente o anexo
 
         return message
 
