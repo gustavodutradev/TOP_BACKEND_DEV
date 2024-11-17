@@ -93,7 +93,7 @@ class CraCriController:
             The CSV URL if found, empty string otherwise
         """
 
-        return data.get("url", "")
+        return data.get("response", {}).get("url", "")
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
