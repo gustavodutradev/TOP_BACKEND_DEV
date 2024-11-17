@@ -26,6 +26,7 @@ from adapters.controllers import (
     CustodyByDateController,
     CustodyController,
     LifeInsuranceController,
+    PositionsByAccountController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 from scheduler.custody_scheduler import CustodyScheduler
@@ -65,6 +66,9 @@ class FlaskApp:
             "custody_by_date": CustodyByDateController(self.app),
             "custody": CustodyController(self.app),
             "life_insurance": LifeInsuranceController(self.app),
+            "positions_by_account": PositionsByAccountController(
+                self.app
+            ),  # New controller added
         }
 
     def _init_scheduler(self) -> None:

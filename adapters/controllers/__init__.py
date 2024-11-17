@@ -22,3 +22,4 @@ from .operations.operations_controller import OperationsController
 from .operations.pre_operations_controller import PreOperationsController
 from .custody.custody_by_date_controller import CustodyByDateController
 from .custody.custody_controller import CustodyController
+from .position.positions_by_account_controller import PositionsByAccountController
