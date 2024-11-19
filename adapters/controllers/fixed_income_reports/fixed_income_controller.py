@@ -96,19 +96,24 @@ class FixedIncomeController:
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
-        Extract CSV URL from webhook payload.
-        Args:
-            data: The webhook payload data
-        Returns:
-            The CSV URL if found, empty string otherwise
+        Extract CSV URL from webhook payload with enhanced logging.
         """
-        url = data.get("url", "")
+        # Tentar extrair URL do formato padrão
+        url = data.get("url")
+        if url:
+            self.logger.logger.info("URL encontrada no formato padrão")
+            return url
 
-        if not url:
-            self.logger.logger.error("URL do CSV não encontrada no payload.")
-            return ""
+        # Tentar extrair URL do objeto response
+        response_data = data.get("response", {})
+        url = response_data.get("url")
+        if url:
+            self.logger.logger.info("URL encontrada no objeto response")
+            return url
 
-        return url
+        # Log detalhado quando URL não é encontrada
+        self.logger.logger.error(f"Estrutura do payload recebido: {data}")
+        return ""
 
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
