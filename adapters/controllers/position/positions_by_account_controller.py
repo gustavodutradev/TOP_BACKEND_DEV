@@ -30,6 +30,6 @@ class PositionsByAccountController:
             return jsonify(positions_data)
         except Exception as e:
             logging.error(
-                f"Error getting Positions Insurance data for account {account_number}: {str(e)}"
+                f"Error getting Positions data for account {account_number}: {str(e)}"
             )
             return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR

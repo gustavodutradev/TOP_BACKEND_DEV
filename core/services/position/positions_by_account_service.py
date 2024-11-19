@@ -43,16 +43,7 @@ class PositionsByAccountService:
                 print("Resposta JSON é nula ou inválida.")
                 return {"error": "Nenhum dado retornado."}
 
-
-            df = pd.DataFrame(response_data)
-
-            for column in df.columns:
-                if isinstance(df[column].iloc[0], (dict, list)):
-                    df[column] = df[column].apply(lambda x: json.dumps(x, ensure_ascii=False))
-
-            csv_data = df.to_csv(index=False)
-            # Retorna a resposta correta
-            return csv_data
+            return response_data
 
         except requests.exceptions.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
