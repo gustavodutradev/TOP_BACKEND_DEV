@@ -44,7 +44,11 @@ class PositionsByAccountService:
                 return {"error": "Nenhum dado retornado."}
 
 
-            df = pd.json_normalize(response_data)
+            df = pd.DataFrame(response_data)
+
+            for column in df.columns:
+                if isinstance(df[column].iloc[0], (dict, list)):
+                    df[column] = df[column].apply(lambda x: json.dumps(x, ensure_ascii=False))
 
             csv_data = df.to_csv(index=False)
             # Retorna a resposta correta
