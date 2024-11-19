@@ -27,6 +27,7 @@ from adapters.controllers import (
     CustodyController,
     LifeInsuranceController,
     PositionsByAccountController,
+    ExchangeController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 from scheduler.custody_scheduler import CustodyScheduler
@@ -61,6 +62,7 @@ class FlaskApp:
             "commissions": CommissionsController(self.app),
             "nnm": NNMController(self.app),
             "funds": FundsController(self.app),
+            "exchange": ExchangeController(self.app),
             "operations": OperationsController(self.app),
             "pre_operations": PreOperationsController(self.app),
             "custody_by_date": CustodyByDateController(self.app),
@@ -68,7 +70,7 @@ class FlaskApp:
             "life_insurance": LifeInsuranceController(self.app),
             "positions_by_account": PositionsByAccountController(
                 self.app
-            ),  # New controller added
+            ),
         }
 
     def _init_scheduler(self) -> None:
