@@ -46,7 +46,7 @@ class PositionsByAccountService:
 
             df = pd.json_normalize(response_data)
 
-            csv_data = df.to_csv(index=False)
+            csv_data = df.to_excel(index=False)
             # Retorna a resposta correta
             return csv_data
 
