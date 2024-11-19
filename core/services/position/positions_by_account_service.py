@@ -2,6 +2,7 @@ import json
 import requests
 from core.services.config_service import ConfigService
 import logging
+import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,8 +43,12 @@ class PositionsByAccountService:
                 print("Resposta JSON é nula ou inválida.")
                 return {"error": "Nenhum dado retornado."}
 
+
+            df = pd.json_normalize(response_data)
+
+            csv_data = df.to_csv(index=False)
             # Retorna a resposta correta
-            return response_data
+            return csv_data
 
         except requests.exceptions.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
