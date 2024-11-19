@@ -3,10 +3,10 @@ import requests
 from core.services.config_service import ConfigService
 import logging
 import pandas as pd
-import io  # Adicione esta importação para usar BytesIO
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class PositionsByAccountService:
     def __init__(self):
@@ -43,18 +43,12 @@ class PositionsByAccountService:
                 print("Resposta JSON é nula ou inválida.")
                 return {"error": "Nenhum dado retornado."}
 
-            # Convertendo os dados JSON para um DataFrame do pandas
+
             df = pd.json_normalize(response_data)
 
-            # Usando um buffer de memória para salvar o Excel
-            excel_buffer = io.BytesIO()
-            df.to_excel(excel_buffer, index=False, engine='openpyxl')  # Especifica o engine para criar o Excel
-
-            # Movendo o cursor do buffer para o início
-            excel_buffer.seek(0)
-
-            # Retornando o conteúdo do Excel em bytes
-            return excel_buffer.getvalue()
+            csv_data = df.to_csv(index=False)
+            # Retorna a resposta correta
+            return csv_data
 
         except requests.exceptions.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
