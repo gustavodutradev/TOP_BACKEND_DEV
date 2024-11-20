@@ -42,14 +42,15 @@ class RelationshipService:
             zip_service = ZipService()
 
             unziped_file = zip_service.unzip_csv_reader(zip_response)
-
+            accounts = []
             for reader in unziped_file:
                 for row in reader:
                     account_number = row.get("account")
                     if account_number:
+                        accounts.append(account_number)
                         print(f"Conta: {account_number}")
 
-            return True
+            return accounts
 
         except requests.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
