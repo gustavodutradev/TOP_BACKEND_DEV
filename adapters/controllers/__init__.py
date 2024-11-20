@@ -7,6 +7,7 @@ from .debentures_controller import DebenturesController
 from .stock_orders_controller import StockOrdersController
 from .recommended_equities_controller import RecommendedEquitiesController
 from .monthly_customer_profit_controller import MonthlyCustomerProfitController
+from .relationship.account_advisors_controller import RelationshipController
 from .management_reports.base_btg_controller import BaseBTGController
 from .management_reports.posicoes_controller import PositionReportController
 from .management_reports.monthly_tir_controller import MonthlyTIRController
