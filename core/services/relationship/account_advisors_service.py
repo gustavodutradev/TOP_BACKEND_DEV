@@ -20,7 +20,7 @@ class RelationshipService:
 
         try:
             headers = self.config_service.get_headers()
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, timeout=30)
 
             logger.info(response)
 
@@ -48,8 +48,9 @@ class RelationshipService:
 
             if df is None:
                 logger.error("Não foi possível obter o DataFrame")
+                return None
 
-            logger.info("Dataframe: {df}".format(df))
+            logger.info(f"Dataframe: {df}".format(df))
 
             return df
 
