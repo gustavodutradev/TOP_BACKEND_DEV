@@ -1,17 +1,14 @@
 from core.services.config_service import ConfigService
 from core.services.zip_service import ZipService
 import requests
-import logging
+import csv
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 class RelationshipService:
     """Classe para requisitar relatório das últimas Operações do parceiro"""
 
     def __init__(self) -> None:
         self.config_service = ConfigService()
-        self.zip_service = ZipService()
 
     def get_account_advisors_link(self):
         """Requisita relatório de Contas e Assessores responsáveis"""
@@ -21,8 +18,6 @@ class RelationshipService:
         try:
             headers = self.config_service.get_headers()
             response = requests.get(url, headers=headers, timeout=30)
-
-            logger.info(response)
 
             if response.status_code == 202:
                 print("Requisição aceita. Aguarde o webhook para processamento.")
@@ -44,15 +39,17 @@ class RelationshipService:
                     f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}"
                 )
 
-            df = self.zip_service.unzip_and_convert_csv_to_df(zip_response)
+            zip_service = ZipService()
 
-            if df is None:
-                logger.error("Não foi possível obter o DataFrame")
-                return None
+            unziped_file = zip_service.unzip_csv_reader(zip_response)
 
-            logger.info(f"Dataframe: {df}".format(df))
+            for reader in unziped_file:
+                for row in reader:
+                    account_number = row.get("account")
+                    if account_number:
+                        print(f"Conta: {account_number}")
 
-            return df
+            return True
 
         except requests.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
