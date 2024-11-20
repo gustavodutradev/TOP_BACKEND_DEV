@@ -43,9 +43,13 @@ class MonthlyCustomerProfitService:
 
             unziped_file = zip_service.unzip_csv_reader(zip_response)
 
+            wallets_list = []
+
             for reader in unziped_file:
                 for row in reader:
-                    wallets_list = row.get("cod_carteira")
+                    wallet = row.get("cod_carteira")
+                    if wallet:
+                        wallets_list.append(wallet)
 
             return wallets_list
 
