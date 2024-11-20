@@ -15,7 +15,7 @@ class RelationshipController:
 
     def register_routes(self):
         @self.app.route(
-            "/api/v1/relationship-accounts",
+            "/api/v1/relationship-accounts-advisors",
             methods=["POST"],
             endpoint="relationship_accounts_handler",
         )
