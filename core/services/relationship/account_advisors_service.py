@@ -1,23 +1,22 @@
 from core.services.config_service import ConfigService
-from core.services.zip_service import ZipService
 import requests
-import csv
+from core.services.zip_service import ZipService
 
 
 class RelationshipService:
-    """Classe para requisitar relatório das últimas Operações do parceiro"""
+    """Classe para requisitar contas vinculadas do cliente."""
 
     def __init__(self) -> None:
         self.config_service = ConfigService()
 
-    def get_account_advisors_link(self):
-        """Requisita relatório de Contas e Assessores responsáveis"""
+    def get_account_advisors_relationship(self):
+        """Requisita contas vinculadas do cliente."""
         endpoint = "/iaas-account-advisor/api/v1/advisor/link/account"
         url = f"{self.config_service.base_url}{endpoint}"
 
         try:
             headers = self.config_service.get_headers()
-            response = requests.get(url, headers=headers, timeout=30)
+            response = requests.post(url, headers=headers)
 
             if response.status_code == 202:
                 print("Requisição aceita. Aguarde o webhook para processamento.")
@@ -31,26 +30,30 @@ class RelationshipService:
             return None
 
     def process_csv_from_url(self, csv_url):
-        """Realiza o download do CSV e extrai as informações"""
+        """Realiza o download do CSV zipado e extrai as informações"""
         try:
-            zip_response = requests.get(csv_url, timeout=30)
+            zip_response = requests.get(csv_url)
             if zip_response.status_code != 200:
-                raise requests.RequestException(
+                raise Exception(
                     f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}"
                 )
 
             zip_service = ZipService()
 
             unziped_file = zip_service.unzip_csv_reader(zip_response)
-            accounts = []
+
+            relationship_list = []
+
             for reader in unziped_file:
                 for row in reader:
-                    account_number = row.get("account")
-                    if account_number:
-                        accounts.append(account_number)
-                        print(f"Conta: {account_number}")
+                    account_info = {
+                        'customer_account': row.get('account'),
+                        'advisor_cge': row.get('sgCGE'),
+                    }
+                    relationship_list.append(account_info)
 
-            return accounts
+            return relationship_list
 
         except requests.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
+            return None
