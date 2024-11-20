@@ -16,7 +16,7 @@ class RelationshipService:
 
         try:
             headers = self.config_service.get_headers()
-            response = requests.post(url, headers=headers)
+            response = requests.get(url, headers=headers)
 
             if response.status_code == 202:
                 print("Requisição aceita. Aguarde o webhook para processamento.")
