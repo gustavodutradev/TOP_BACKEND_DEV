@@ -2,6 +2,7 @@ import json
 import requests
 from core.services.config_service import ConfigService
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from database.models import Conta
 
 class AccountBaseService:
@@ -51,9 +52,17 @@ class AccountBaseService:
             print("Erro ao decodificar JSON da resposta.")
             return {"error": "Erro ao decodificar a resposta da API."}
 
-    def save_accounts(self, db: Session, accounts: list):
-        # Salva as contas no banco de dados
-        for account in accounts:
-            conta = Conta(account_number=account["accountNumber"], type_fund=account["typeFund"])
-            db.add(conta)  # Adiciona a conta na sessão
-        db.commit()  # Confirma as alterações no banco de dados
+    def save_accounts(session, account_data_list):
+        for account_data in account_data_list:
+            # Verifica se o número da conta já existe
+            existing_account = session.query(Conta).filter_by(account_number=account_data['account_number']).first()
+            if not existing_account:
+                # Cria uma nova instância da conta
+                new_account = Conta(**account_data)
+                session.add(new_account)
+        
+        try:
+            session.commit()
+        except IntegrityError:
+            session.rollback()
+            print("Erro de integridade: houve tentativa de inserir uma conta duplicada.")
