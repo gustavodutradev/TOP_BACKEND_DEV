@@ -1,13 +1,14 @@
 import json
 import requests
 from core.services.config_service import ConfigService
-
+from sqlalchemy.orm import Session
+from database.models import Conta
 
 class AccountBaseService:
     def __init__(self):
         self.config_service = ConfigService()
 
-    def get_account_base(self):
+    def get_account_base(self, db: Session):
         endpoint = "/api-account-base/api/v1/account-base/accounts"
         url = f"{self.config_service.base_url}{endpoint}"
 
@@ -37,6 +38,9 @@ class AccountBaseService:
                 print("Resposta JSON é nula ou inválida.")
                 return {"error": "Nenhum dado retornado."}
 
+            # Processa as contas e salva no banco de dados
+            self.save_accounts(db, response_data["accounts"])
+
             # Retorna a resposta correta
             return response_data
 
@@ -46,3 +50,10 @@ class AccountBaseService:
         except json.JSONDecodeError:
             print("Erro ao decodificar JSON da resposta.")
             return {"error": "Erro ao decodificar a resposta da API."}
+
+    def save_accounts(self, db: Session, accounts: list):
+        # Salva as contas no banco de dados
+        for account in accounts:
+            conta = Conta(account_number=account["accountNumber"], type_fund=account["typeFund"])
+            db.add(conta)  # Adiciona a conta na sessão
+        db.commit()  # Confirma as alterações no banco de dados
