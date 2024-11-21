@@ -55,7 +55,7 @@ class AccountBaseService:
     def save_accounts(self, session: Session, account_data_list):
         for account_data in account_data_list:
             # Verifica se o número da conta já existe
-            existing_account = session.query(Conta).filter_by(account_number=account_data['account_number']).first()
+            existing_account = session.query(Conta).filter_by(account_number=account_data['accountNumber']).first()
             if not existing_account:
                 # Cria uma nova instância da conta
                 new_account = Conta(**account_data)
