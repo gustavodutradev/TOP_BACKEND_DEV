@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 # Carrega variáveis de ambiente
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL") + "?client_encoding=utf8"
+URL = os.getenv("DATABASE_PUBLIC_URL")
 
 # Configuração do SQLAlchemy
-engine = create_engine(DATABASE_URL)
+engine = create_engine(URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
