@@ -48,7 +48,7 @@ class FlaskApp:
             "suitability": SuitabilityController(self.app),
             "registration": RegistrationDataController(self.app),
             "account": AccountBaseController(),
-            "debentures": AnbimaDebenturesController(),
+            "debentures": AnbimaDebenturesController(self.app),
             "recommended_equities": RecommendedEquitiesController(),
             "stock_orders": StockOrdersController(self.app),
             "monthly_profit": MonthlyCustomerProfitController(self.app),
@@ -92,12 +92,6 @@ class FlaskApp:
             methods=["GET"],
         )
         self.app.add_url_rule(
-            "/api/v1/get-anbima-debentures/<date>",
-            "anbima_debentures",
-            self.anbima_debentures,
-            methods=["GET"],
-        )
-        self.app.add_url_rule(
             "/api/v1/get-recommended-equities/<date>",
             "get_recommended_equities",
             self.get_recommended_equities,
@@ -115,10 +109,6 @@ class FlaskApp:
     def get_account_base(self):
         """Get account base endpoint"""
         return self.controllers["account"].get_account_base()
-
-    def anbima_debentures(self, date: str):
-        """Get anbima debentures endpoint"""
-        return self.controllers["debentures"].get_anbima_debentures(date)
 
     def get_recommended_equities(self, date: str):
         """Get recommended equities endpoint"""
