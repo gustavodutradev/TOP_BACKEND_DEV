@@ -20,41 +20,13 @@ class AnbimaDebenturesController:
     def get_anbima_debentures(self, date):
         try:
             db = next(get_db())
-            anbima_debentures = self.anbima_debentures_service.get_anbima_debentures(db, date)
-            return jsonify(anbima_debentures)
+            result = self.anbima_debentures_service.get_anbima_debentures(db, date)
+            
+            if isinstance(result, dict) and 'error' in result:
+                logging.error(f"Erro retornado pelo serviço: {result['error']}")
+                return jsonify(result), 500
+                
+            return jsonify({"message": "Dados salvos com sucesso!", "result": result}), 200
         except Exception as e:
             logging.error(f"Erro ao buscar dados da Anbima: {e}")
-            return jsonify({"error": "Ocorreu um erro ao buscar dados da Anbima."}), 500
-
-
-
-
-
-        # # Obtém os dados da requisição JSON
-        # data = request.get_json()
-        # reference_date = data.get("referenceDate")
-
-        # if not reference_date:
-        #     return jsonify({"error": "Data de referência não fornecida."}), 400
-
-        # # Obtém a sessão do banco de dados
-        # db = next(get_db())
-
-        # try:
-        #     # Chama o serviço que retorna e persiste os dados
-        #     anbima_debentures = self.anbima_debentures_service.get_anbima_debentures(db, reference_date)
-        #     return jsonify(anbima_debentures)
-
-        # except Exception as e:
-        #     db.rollback()
-        #     return jsonify({"error": str(e)}), 500
-
-        # finally:
-        #     # Garante que a sessão será encerrada
-        #     db.close()
-
-
-
-    def anbima_debentures(self, date: str):
-        """Get anbima debentures endpoint"""
-        return self.controllers["debentures"].get_anbima_debentures(date)
+            return jsonify({"error": str(e)}), 500
