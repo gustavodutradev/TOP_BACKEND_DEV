@@ -37,7 +37,7 @@ def run_migrations_offline() -> None:
     script output.
     """
     # Obter a URL do banco de dados da variável de ambiente
-    url = os.getenv("DATABASE_URL")  # Usar a variável de ambiente DATABASE_URL
+    url = os.getenv("DATABASE_URL") + "?sslmode=require"  # Usar a variável de ambiente DATABASE_URL
     context.configure(
         url=url,
         target_metadata=target_metadata,
