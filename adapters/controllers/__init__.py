@@ -3,7 +3,7 @@ from .life_insurance_controller import LifeInsuranceController
 from .suitability_controller import SuitabilityController
 from .registration_data_controller import RegistrationDataController
 from .account_base_controller import AccountBaseController
-from .debentures_controller import DebenturesController
+from .debentures_controller import AnbimaDebenturesController
 from .stock_orders_controller import StockOrdersController
 from .recommended_equities_controller import RecommendedEquitiesController
 from .monthly_customer_profit_controller import MonthlyCustomerProfitController
