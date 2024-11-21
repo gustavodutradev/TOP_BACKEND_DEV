@@ -52,7 +52,7 @@ class AccountBaseService:
             print("Erro ao decodificar JSON da resposta.")
             return {"error": "Erro ao decodificar a resposta da API."}
 
-    def save_accounts(session, account_data_list):
+    def save_accounts(self, session: Session, account_data_list):
         for account_data in account_data_list:
             # Verifica se o número da conta já existe
             existing_account = session.query(Conta).filter_by(account_number=account_data['account_number']).first()
