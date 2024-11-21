@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Carrega variáveis de ambiente
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL") + "?client_encoding=utf8"
 
 # Configuração do SQLAlchemy
 engine = create_engine(DATABASE_URL)
