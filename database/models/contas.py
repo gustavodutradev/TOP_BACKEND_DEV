@@ -7,10 +7,8 @@ Base = declarative_base()
 class Conta(Base):
     __tablename__ = "contas"
 
-    account_number = Column(
-        String, primary_key=True, index=True
-    )  # Armazena o número da conta
-    type_fund = Column(Boolean)  # Tipo de fundo (True ou False)
+    account_number = Column(String, primary_key=True, index=True)
+    type_fund = Column(Boolean)
 
     def __repr__(self):
         return (

@@ -9,6 +9,7 @@ load_dotenv()
 
 # Importar a base que contém as informações de metadata
 from models.contas import Base
+from models.anbima_debentures import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,6 +26,7 @@ target_metadata = Base.metadata
 
 # Other values from the config can be acquired
 # Example: my_important_option = config.get_main_option("my_important_option")
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -50,20 +52,25 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-
-    In this scenario, we create an Engine and associate
-    a connection with the context.
-    """
-    # Criação do engine usando as configurações de URL
+    """Run migrations in 'online' mode."""
+    # Obter configuração da seção alembic
+    configuration = config.get_section(config.config_ini_section)
+    
+    # Substituir a URL com a variável de ambiente
+    configuration["sqlalchemy.url"] = os.getenv("DATABASE_PUBLIC_URL")
+    
+    # Criar engine com a configuração atualizada
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata
+        )
 
         with context.begin_transaction():
             context.run_migrations()

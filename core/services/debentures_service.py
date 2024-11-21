@@ -1,14 +1,16 @@
-from core.services.config_service import ConfigService
-import requests
 import json
+import requests
+from core.services.config_service import ConfigService
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from database.models import AnbimaDebentures
 
-
-class DebenturesService:
+class AnbimaDebenturesService:
     def __init__(self):
         self.config_service = ConfigService()
 
-    def get_anbima_debentures(self, reference_date):
-        endpoint = f"/iaas-debenture/api/v1/debenture"
+    def get_anbima_debentures(self, db: Session, reference_date):
+        endpoint = "/iaas-debenture/api/v1/debenture"
         url = f"{self.config_service.base_url}{endpoint}"
 
         params = {"referenceDate": reference_date}
@@ -34,18 +36,38 @@ class DebenturesService:
             # Tentando decodificar a resposta JSON
             response_data = response.json()
 
-            # Verifica se a resposta JSON é uma lista ou dicionário válido
-            if not response_data or not isinstance(response_data, (list, dict)):
+            # Verifica se a resposta JSON é válida
+            if response_data is None or not isinstance(response_data, (list, dict)):
                 print("Resposta JSON é nula ou inválida.")
                 return {"error": "Nenhum dado retornado."}
 
-            # Retorna a resposta correta (independentemente se é lista ou dict)
+            # Processa as debêntures e salva no banco de dados
+            if isinstance(response_data, list):
+                self.save_anbima_debentures(db, response_data)
+            elif isinstance(response_data, dict) and "debentures" in response_data:
+                self.save_anbima_debentures(db, response_data["debentures"])
+
+            # Retorna a resposta correta
             return response_data
 
         except requests.exceptions.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
             return {"error": str(e)}
-
         except json.JSONDecodeError:
             print("Erro ao decodificar JSON da resposta.")
             return {"error": "Erro ao decodificar a resposta da API."}
+
+    def save_anbima_debentures(self, session: Session, debentures_data_list):
+        for debenture_data in debentures_data_list:
+            # Verifica se o ISIN já existe no banco de dados
+            existing_debenture = session.query(AnbimaDebentures).filter_by(isin=debenture_data['isin']).first()
+            if not existing_debenture:
+                # Cria uma nova instância da debênture
+                new_debenture = AnbimaDebentures(**debenture_data)
+                session.add(new_debenture)
+        
+        try:
+            session.commit()
+        except IntegrityError:
+            session.rollback()
+            print("Erro de integridade: houve tentativa de inserir uma debênture duplicada.")
