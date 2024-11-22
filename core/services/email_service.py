@@ -19,7 +19,7 @@ from base64 import b64encode
 class EmailConfig:
     """Configuration for email sending"""
 
-    from_email: str = "compliance@topinvgroup.com"
+    from_email: str = "contato@topinvgroup.com"
     api_key_env_var: str = "SENDGRID_API_KEY"
 
 
