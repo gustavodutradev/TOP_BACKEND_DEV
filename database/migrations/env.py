@@ -8,8 +8,9 @@ from alembic import context
 load_dotenv()
 
 # Importar a base que contém as informações de metadata
-from models.contas import Base
-from models.anbima_debentures import Base
+from models.base import Base
+
+from models import Conta, AnbimaDebentures
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

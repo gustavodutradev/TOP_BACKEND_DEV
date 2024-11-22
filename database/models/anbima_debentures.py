@@ -1,8 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, Date
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
-
+from .base import Base
 
 class AnbimaDebentures(Base):
     __tablename__ = "anbima_debentures"

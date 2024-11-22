@@ -1,8 +1,5 @@
 from sqlalchemy import Column, String, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
-
+from .base import Base
 
 class Conta(Base):
     __tablename__ = "contas"
