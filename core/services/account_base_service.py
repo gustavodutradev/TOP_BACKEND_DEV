@@ -53,16 +53,31 @@ class AccountBaseService:
             return {"error": "Erro ao decodificar a resposta da API."}
 
     def save_accounts(self, session: Session, account_data_list):
-        for account_data in account_data_list:
-            # Verifica se o número da conta já existe
-            existing_account = session.query(Conta).filter_by(account_number=account_data['accountNumber']).first()
-            if not existing_account:
-                # Cria uma nova instância da conta
-                new_account = Conta(**account_data)
-                session.add(new_account)
-        
         try:
+            for account_data in account_data_list:
+                # Converte os dados da API para o formato do modelo
+                formatted_account = {
+                    'accountNumber': account_data.get('accountNumber'),
+                    'typeFund': account_data.get('typeFund')
+                }
+
+                # Verifica se a conta já existe
+                existing_account = session.query(Conta).filter_by(
+                    accountNumber=formatted_account['accountNumber']
+                ).first()
+
+                if not existing_account:
+                    new_account = Conta(**formatted_account)
+                    session.add(new_account)
+
             session.commit()
-        except IntegrityError:
+            return True
+
+        except IntegrityError as e:
             session.rollback()
-            print("Erro de integridade: houve tentativa de inserir uma conta duplicada.")
+            print(f"Erro de integridade ao salvar contas: {str(e)}")
+            return False
+        except Exception as e:
+            session.rollback()
+            print(f"Erro ao salvar contas: {str(e)}")
+            return False
