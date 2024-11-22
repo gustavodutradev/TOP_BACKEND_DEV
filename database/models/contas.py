@@ -5,7 +5,7 @@ class Conta(Base):
     __tablename__ = "contas"
 
     accountNumber = Column(String, primary_key=True, index=True)
-    type_fund = Column(Boolean)
+    typeFund = Column(Boolean)
 
     def __repr__(self):
         return (
