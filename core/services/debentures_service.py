@@ -59,15 +59,19 @@ class AnbimaDebenturesService:
 
     def save_anbima_debentures(self, session: Session, debentures_data_list):
         for debenture_data in debentures_data_list:
-            # Verifica se o ISIN já existe no banco de dados
-            existing_debenture = session.query(AnbimaDebentures).filter_by(isin=debenture_data['isin']).first()
+            if 'codigo_ativo' not in debenture_data:
+                print("Campo 'codigo_ativo' não encontrado nos dados da debênture.")
+                continue
+
+            existing_debenture = session.query(AnbimaDebentures).filter_by(codigo_ativo=debenture_data['codigo_ativo']).first()
             if not existing_debenture:
                 # Cria uma nova instância da debênture
                 new_debenture = AnbimaDebentures(**debenture_data)
                 session.add(new_debenture)
-        
+
         try:
             session.commit()
         except IntegrityError:
             session.rollback()
             print("Erro de integridade: houve tentativa de inserir uma debênture duplicada.")
+
