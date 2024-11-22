@@ -4,7 +4,7 @@ from .base import Base
 class Conta(Base):
     __tablename__ = "contas"
 
-    account_number = Column(String, primary_key=True, index=True)
+    accountNumber = Column(String, primary_key=True, index=True)
     type_fund = Column(Boolean)
 
     def __repr__(self):
