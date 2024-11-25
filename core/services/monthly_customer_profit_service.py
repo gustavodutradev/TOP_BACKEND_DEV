@@ -13,7 +13,7 @@ class MonthlyCustomerProfitService:
         """Requisita rentabilidade mensal do cliente."""
         endpoint = "/api-partner-report-hub/api/v1/report/customer-profitability"
         url = f"{self.config_service.base_url}{endpoint}"
-        period = {"referenceMonth": "09", "referenceYear": "2024"}
+        period = {"referenceMonth": "11", "referenceYear": "2024"}
 
         try:
             headers = self.config_service.get_headers()
