@@ -29,6 +29,7 @@ from adapters.controllers import (
     PositionsByAccountController,
     ExchangeController,
     RelationshipController,
+    BankingController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 from scheduler.custody_scheduler import CustodyScheduler
@@ -71,6 +72,7 @@ class FlaskApp:
             "life_insurance": LifeInsuranceController(self.app),
             "positions_by_account": PositionsByAccountController(self.app),
             "relationship": RelationshipController(self.app),
+            "banking": BankingController(self.app),
         }
 
     def _init_scheduler(self) -> None:

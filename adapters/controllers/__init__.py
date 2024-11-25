@@ -15,6 +15,7 @@ from .management_reports.commissions_controller import CommissionsController
 from .management_reports.nnm_controller import NNMController
 from .management_reports.funds_controller import FundsController
 from .management_reports.exchange_controller import ExchangeController
+from .management_reports.banking_controller import BankingController
 from .fixed_income_reports.cra_cri_controller import CraCriController
 from .fixed_income_reports.fixed_income_controller import FixedIncomeController
 from .fixed_income_reports.compromissadas_controller import CompromissadasController
