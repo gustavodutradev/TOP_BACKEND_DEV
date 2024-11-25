@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, Date
 from .base import Base
 
+
 class AnbimaDebentures(Base):
     __tablename__ = "anbima_debentures"
 

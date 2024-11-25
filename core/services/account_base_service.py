@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from database.models import Conta
 
+
 class AccountBaseService:
     def __init__(self):
         self.config_service = ConfigService()
@@ -57,14 +58,16 @@ class AccountBaseService:
             for account_data in account_data_list:
                 # Converte os dados da API para o formato do modelo
                 formatted_account = {
-                    'accountNumber': account_data.get('accountNumber'),
-                    'typeFund': account_data.get('typeFund')
+                    "accountNumber": account_data.get("accountNumber"),
+                    "typeFund": account_data.get("typeFund"),
                 }
 
                 # Verifica se a conta já existe
-                existing_account = session.query(Conta).filter_by(
-                    accountNumber=formatted_account['accountNumber']
-                ).first()
+                existing_account = (
+                    session.query(Conta)
+                    .filter_by(accountNumber=formatted_account["accountNumber"])
+                    .first()
+                )
 
                 if not existing_account:
                     new_account = Conta(**formatted_account)

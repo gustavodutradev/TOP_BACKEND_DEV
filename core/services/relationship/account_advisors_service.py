@@ -47,8 +47,8 @@ class RelationshipService:
             for reader in unziped_file:
                 for row in reader:
                     account_info = {
-                        'customer_account': row.get('account'),
-                        'advisor_cge': row.get('sgCGE'),
+                        "customer_account": row.get("account"),
+                        "advisor_cge": row.get("sgCGE"),
                     }
                     relationship_list.append(account_info)
 

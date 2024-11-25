@@ -26,11 +26,6 @@ class WebhookService:
         def stvm():
             return self.Logger.log_and_respond("STVM")
 
-        ## Comissoes dos ultimos 4 dias
-        @self.app.route("/api/v1/comissions", methods=["POST"])
-        def commissions():
-            return self.Logger.log_and_respond("Commissions")
-
         ## Rentabilidade Mensal
         @self.app.route("/api/v1/monthly-product-profit", methods=["POST"])
         def monthly_product_profit():

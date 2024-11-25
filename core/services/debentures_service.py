@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from database.models import AnbimaDebentures
 
+
 class AnbimaDebenturesService:
     def __init__(self):
         self.config_service = ConfigService()
@@ -59,11 +60,15 @@ class AnbimaDebenturesService:
 
     def save_anbima_debentures(self, session: Session, debentures_data_list):
         for debenture_data in debentures_data_list:
-            if 'codigo_ativo' not in debenture_data:
+            if "codigo_ativo" not in debenture_data:
                 print("Campo 'codigo_ativo' não encontrado nos dados da debênture.")
                 continue
 
-            existing_debenture = session.query(AnbimaDebentures).filter_by(codigo_ativo=debenture_data['codigo_ativo']).first()
+            existing_debenture = (
+                session.query(AnbimaDebentures)
+                .filter_by(codigo_ativo=debenture_data["codigo_ativo"])
+                .first()
+            )
             if not existing_debenture:
                 # Cria uma nova instância da debênture
                 new_debenture = AnbimaDebentures(**debenture_data)
@@ -73,5 +78,6 @@ class AnbimaDebenturesService:
             session.commit()
         except IntegrityError:
             session.rollback()
-            print("Erro de integridade: houve tentativa de inserir uma debênture duplicada.")
-
+            print(
+                "Erro de integridade: houve tentativa de inserir uma debênture duplicada."
+            )

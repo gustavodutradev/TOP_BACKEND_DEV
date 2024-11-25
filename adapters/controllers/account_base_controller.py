@@ -1,6 +1,9 @@
 from flask import jsonify
 from core.services.account_base_service import AccountBaseService
-from database.connection import get_db  # Assumindo que você tenha um método para obter a sessão do DB
+from database.connection import (
+    get_db,
+)  # Assumindo que você tenha um método para obter a sessão do DB
+
 
 class AccountBaseController:
     def __init__(self):

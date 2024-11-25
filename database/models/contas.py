@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Boolean
 from .base import Base
 
+
 class Conta(Base):
     __tablename__ = "contas"
 

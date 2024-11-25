@@ -46,9 +46,7 @@ class RelationshipController:
 
                 return (
                     jsonify(
-                        {
-                            "error": "Falha ao iniciar a requisição de contas vinculadas."
-                        }
+                        {"error": "Falha ao iniciar a requisição de contas vinculadas."}
                     ),
                     500,
                 )
