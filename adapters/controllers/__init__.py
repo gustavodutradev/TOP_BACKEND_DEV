@@ -1,4 +1,3 @@
-from .webhook_service import WebhookService
 from .life_insurance_controller import LifeInsuranceController
 from .suitability_controller import SuitabilityController
 from .registration_data_controller import RegistrationDataController
