@@ -2,7 +2,6 @@ from flask import Flask
 from typing import Tuple
 
 from adapters.controllers import (
-    WebhookService,
     SuitabilityController,
     RegistrationDataController,
     AccountBaseController,
@@ -45,7 +44,6 @@ class FlaskApp:
 
     def _init_controllers(self) -> None:
         """Initialize all controllers"""
-        self.webhook_service = WebhookService(self.app)
         self.controllers = {
             "suitability": SuitabilityController(self.app),
             "registration": RegistrationDataController(self.app),
