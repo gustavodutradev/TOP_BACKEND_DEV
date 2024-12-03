@@ -45,19 +45,24 @@ class RelationshipService:
             zip_service = ZipService()
 
             unziped_file = zip_service.unzip_csv_reader(zip_response)
-
-            relationship_list = []
-
+            
             for reader in unziped_file:
-                for row in reader:
-                    account_info = {
-                        "customer_account": row.get("account"),
-                        "advisor_cge": row.get("sgCGE"),
-                    }
-                    relationship_list.append(account_info)
+                logger.info("Writing to file '%s'", reader)
 
-            logger.info(f"Lista de contas: %s" % relationship_list)
-            return relationship_list
+            return True
+
+            # relationship_list = []
+
+            # for reader in unziped_file:
+            #     for row in reader:
+            #         account_info = {
+            #             "customer_account": row.get("account"),
+            #             "advisor_cge": row.get("sgCGE"),
+            #         }
+            #         relationship_list.append(account_info)
+
+            # logger.info(f"Lista de contas: %s" % relationship_list)
+            # return relationship_list
 
         except requests.RequestException as e:
             print(f"Erro na requisição: {str(e)}")
