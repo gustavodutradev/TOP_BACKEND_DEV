@@ -45,7 +45,7 @@ class RelationshipService:
             zip_service = ZipService()
 
             unziped_file = zip_service.unzip_csv_reader(zip_response)
-            
+
             for reader in unziped_file:
                 logger.info("Writing to file '%s'", reader)
 

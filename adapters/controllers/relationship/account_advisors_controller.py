@@ -12,47 +12,42 @@ class RelationshipController:
         self.logger = Logger(app)
 
     def routes(self):
-        @self.app.route(
+        self.app.add_url_rule(
             "/api/v1/relationship-accounts-advisors",
+            "relationship_accounts_advisors_handler",
+            self.handler,
             methods=["POST"],
-            endpoint="relationship_accounts_handler",
         )
-        def handler():
-            """Lida com a solicitação inicial e também processa webhooks."""
-            try:
-                if request.is_json:
-                    data = request.get_json(silent=True)
 
-                    if "response" in data:
-                        self.logger.log_and_respond("Webhook recebido.")
-                        return self._process_webhook(data)
-
-                self.logger.log_and_respond(
-                    "Iniciando requisição de contas vinculadas."
-                )
-                response = self.relationship_service.get_account_advisors_relationship()
-
-                if response:
-                    return (
-                        jsonify(
-                            {
-                                "message": "Requisição aceita. Aguardando processamento via webhook."
-                            }
-                        ),
-                        202,
-                    )
-
+    def handler(self):
+        """Lida com a solicitação inicial e também processa webhooks."""
+        try:
+            if request.is_json:
+                data = request.get_json(silent=True)
+                if "response" in data:
+                    self.logger.log_and_respond("Webhook recebido.")
+                    return self._process_webhook(data)
+            self.logger.log_and_respond("Iniciando requisição de contas vinculadas.")
+            response = self.relationship_service.get_account_advisors_relationship()
+            if response:
                 return (
                     jsonify(
-                        {"error": "Falha ao iniciar a requisição de contas vinculadas."}
+                        {
+                            "message": "Requisição aceita. Aguardando processamento via webhook."
+                        }
                     ),
-                    500,
+                    202,
                 )
-
-            except Exception as e:
-                self.logger.logger.error(f"Erro na requisição: {str(e)}")
-                self.logger.logger.error(traceback.format_exc())
-                return jsonify({"error": "Internal server error"}), 500
+            return (
+                jsonify(
+                    {"error": "Falha ao iniciar a requisição de contas vinculadas."}
+                ),
+                500,
+            )
+        except Exception as e:
+            self.logger.logger.error(f"Erro na requisição: {str(e)}")
+            self.logger.logger.error(traceback.format_exc())
+            return jsonify({"error": "Internal server error"}), 500
 
     def _process_webhook(self, data):
         """Processa o payload enviado pela API via webhook."""
