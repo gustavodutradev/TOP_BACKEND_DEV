@@ -23,7 +23,7 @@ class PositionsByPartnerController:
             "/api/v1/positions/positions-by-partner",
             "positions_by_partner_handler",
             self.handler,
-            methods=["POST"],
+            methods=["GET"],
         )
 
     def handler(self) -> Tuple[Dict[str, Any], int]:
