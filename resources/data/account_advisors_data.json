@@ -7804,5 +7804,29 @@
         "clientName": "PEDRO DE SOUZA PINTO PAULA AZEVEDO",
         "nome_assessor": "POLLIANY TAMIRYS GONCALVES GOMES",
         "sgCGE": "5916355"
+    },
+    {
+        "account": "2952276",
+        "clientName": "Bernardo Louzada Moreira",
+        "nome_assessor": "BERNARDO LOUZADA MOREIRA",
+        "sgCGE": "2780221"
+    },
+    {
+        "account": "4749556",
+        "clientName": "Nordnei Soares De Paiva Campos Moreira",
+        "nome_assessor": "BERNARDO LOUZADA MOREIRA",
+        "sgCGE": "2780221"
+    },
+    {
+        "account": "4180985",
+        "clientName": "Leticia Gama De Paiva Alves",
+        "nome_assessor": "BERNARDO LOUZADA MOREIRA",
+        "sgCGE": "2780221"
+    },
+    {
+        "account": "4421766",
+        "clientName": "Priscila Soares De Paiva Campos Moreira",
+        "nome_assessor": "BERNARDO LOUZADA MOREIRA",
+        "sgCGE": "2780221"
     }
 ]
