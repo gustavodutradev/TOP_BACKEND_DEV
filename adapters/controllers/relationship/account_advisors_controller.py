@@ -1,6 +1,5 @@
 from flask import jsonify, request
 from core.services.relationship.account_advisors_service import RelationshipService
-from core.services.token_service import TokenService
 from utils.logging_requests import Logger
 import traceback
 
@@ -8,12 +7,11 @@ import traceback
 class RelationshipController:
     def __init__(self, app):
         self.relationship_service = RelationshipService()
-        self.token_service = TokenService()
         self.app = app
-        self.register_routes()
+        self.routes()
         self.logger = Logger(app)
 
-    def register_routes(self):
+    def routes(self):
         @self.app.route(
             "/api/v1/relationship-accounts-advisors",
             methods=["POST"],
