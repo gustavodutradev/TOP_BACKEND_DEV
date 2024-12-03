@@ -7738,5 +7738,71 @@
         "clientName": "Rodrigo Vicente Ribeiro",
         "nome_assessor": "LUCAS CORREA DA COSTA SAID",
         "sgCGE": "1985903"
+    },
+    {
+        "account": "8190593",
+        "clientName": "GSA ALIMENTOS LTDA",
+        "nome_assessor": "JOAO EVANGELISTA ASSUMPCAO TEIXEIRA NETO",
+        "sgCGE": "415764"
+    },
+    {
+        "account": "8190622",
+        "clientName": "UPER DIGITAL LTDA",
+        "nome_assessor": "JOAO EVANGELISTA ASSUMPCAO TEIXEIRA NETO",
+        "sgCGE": "415764"
+    },
+    {
+        "account": "8190377",
+        "clientName": "ANDREA CRISTINA DA SILVA PAVANELLO",
+        "nome_assessor": "BRUNO LINHARES MAIA",
+        "sgCGE": "959547"
+    },
+    {
+        "account": "8185544",
+        "clientName": "LUCAS HENRIQUE RAMOS COTA",
+        "nome_assessor": "POLLYANNA RAMOS MORAIS RIBEIRO",
+        "sgCGE": "3336546"
+    },
+    {
+        "account": "8177250",
+        "clientName": "MARCOS ANTONIO DE AGUIAR",
+        "nome_assessor": "RAFAEL MONTEIRO FERREIRA RODRIGUES",
+        "sgCGE": "983217"
+    },
+    {
+        "account": "8175402",
+        "clientName": "LEGALIZE AUDITORIA E CONSULTORIA CONTABIL LTDA",
+        "nome_assessor": "JOAO EVANGELISTA ASSUMPCAO TEIXEIRA NETO",
+        "sgCGE": "415764"
+    },
+    {
+        "account": "8175401",
+        "clientName": "LEGALIZE ANALISE EM GESTAO DE NEGOCIOS LTDA",
+        "nome_assessor": "JOAO EVANGELISTA ASSUMPCAO TEIXEIRA NETO",
+        "sgCGE": "415764"
+    },
+    {
+        "account": "4452082",
+        "clientName": "Mariangela Araujo De Carvalho",
+        "nome_assessor": "VICTOR NOGUEIRA CASAGRANDE",
+        "sgCGE": "2089432"
+    },
+    {
+        "account": "2320422",
+        "clientName": "APICE HEALTHCARE EQUIPAMENTOS MEDICOS HOSPITALARES LTDA",
+        "nome_assessor": "JOAO EVANGELISTA ASSUMPCAO TEIXEIRA NETO",
+        "sgCGE": "415764"
+    },
+    {
+        "account": "4690593",
+        "clientName": "Carlos Maximo Ribeiro Da Luz",
+        "nome_assessor": "BERNARDO LOUZADA MOREIRA",
+        "sgCGE": "2780221"
+    },
+    {
+        "account": "8173703",
+        "clientName": "PEDRO DE SOUZA PINTO PAULA AZEVEDO",
+        "nome_assessor": "POLLIANY TAMIRYS GONCALVES GOMES",
+        "sgCGE": "5916355"
     }
 ]
