@@ -84,11 +84,11 @@ class CommissionsController:
                 "message": "Não foram encontrados dados para o relatório de Comissões."
             }, HTTPStatus.NO_CONTENT
 
-        report_dir = self.commissions_service.send_commissions_report()
-        self.logger.logger.info(
-            f"Relatório de Comissões gerado e enviado com sucesso. Diretório: {report_dir}"
-        )
-        return {"message": "Relatório de Comissões gerado e enviado."}, HTTPStatus.OK
+        # report_dir = self.commissions_service.send_commissions_report()
+        # self.logger.logger.info(
+        #     f"Relatório de Comissões gerado e enviado com sucesso. Diretório: {report_dir}"
+        # )
+        # return {"message": "Relatório de Comissões gerado e enviado."}, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
