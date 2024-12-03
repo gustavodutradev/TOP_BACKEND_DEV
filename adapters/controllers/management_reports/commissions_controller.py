@@ -76,7 +76,7 @@ class CommissionsController:
             return {"error": "CSV URL not found."}, HTTPStatus.BAD_REQUEST
 
         csv_data = self.commissions_service.process_csv_from_url(csv_url)
-        if csv_data is None or csv_data.empty:
+        if csv_data is None:
             self.logger.logger.info(
                 "Não foram encontrados dados para o relatório de Comissões."
             )
