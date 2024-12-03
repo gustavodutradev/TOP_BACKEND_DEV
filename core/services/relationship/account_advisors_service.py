@@ -1,6 +1,10 @@
 from core.services.config_service import ConfigService
 import requests
 from core.services.zip_service import ZipService
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class RelationshipService:
@@ -52,6 +56,7 @@ class RelationshipService:
                     }
                     relationship_list.append(account_info)
 
+            logger.info(f"Lista de contas: %s" % relationship_list)
             return relationship_list
 
         except requests.RequestException as e:
