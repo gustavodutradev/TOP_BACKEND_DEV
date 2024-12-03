@@ -11,6 +11,9 @@ from .management_reports.base_btg_controller import BaseBTGController
 from .management_reports.posicoes_controller import PositionReportController
 from .management_reports.monthly_tir_controller import MonthlyTIRController
 from .management_reports.commissions_controller import CommissionsController
+from .management_reports.closed_commissions_controller import (
+    ClosedCommissionsController,
+)
 from .management_reports.nnm_controller import NNMController
 from .management_reports.funds_controller import FundsController
 from .management_reports.exchange_controller import ExchangeController
@@ -26,3 +29,4 @@ from .operations.pre_operations_controller import PreOperationsController
 from .custody.custody_by_date_controller import CustodyByDateController
 from .custody.custody_controller import CustodyController
 from .position.positions_by_account_controller import PositionsByAccountController
+from .position.positions_by_partner_controller import PositionsByPartnerController

@@ -1,5 +1,7 @@
 from flask import request
-from core.services.position.positions_by_partner_service import PositionsByPartnerService
+from core.services.position.positions_by_partner_service import (
+    PositionsByPartnerService,
+)
 from core.services.token_service import TokenService
 from utils.logging_requests import Logger
 from typing import Dict, Tuple, Any
@@ -7,7 +9,7 @@ import traceback
 from http import HTTPStatus
 
 
-class BaseBTGController:
+class PositionsByPartnerController:
     def __init__(self, app):
         self.positions_by_partner_service = PositionsByPartnerService()
         self.token_service = TokenService()
@@ -18,7 +20,10 @@ class BaseBTGController:
     def register_routes(self) -> None:
         """Register the API routes for the controller."""
         self.app.add_url_rule(
-            "/api/v1/positions/positions-by-partner", "positions_by_partner_handler", self.handler, methods=["POST"]
+            "/api/v1/positions/positions-by-partner",
+            "positions_by_partner_handler",
+            self.handler,
+            methods=["POST"],
         )
 
     def handler(self) -> Tuple[Dict[str, Any], int]:

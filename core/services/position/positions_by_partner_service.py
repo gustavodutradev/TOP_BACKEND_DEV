@@ -1,9 +1,8 @@
 import json
 import requests
 from core.services.config_service import ConfigService
-# from core.services.zip_service import ZipService
+from core.services.zip_service import ZipService
 import logging
-import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -52,24 +51,24 @@ class PositionsByPartnerService:
         except json.JSONDecodeError:
             print("Erro ao decodificar JSON da resposta.")
             return {"error": "Erro ao decodificar a resposta da API."}
-        
-    # def process_csv_from_url(self, csv_url):
-    #     """Realiza o download do CSV zipado e extrai as informações"""
-    #     try:
-    #         zip_response = requests.get(csv_url)
-    #         if zip_response.status_code != 200:
-    #             raise Exception(
-    #                 f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}"
-    #             )
-    #         zip_service = ZipService()
-    #         unziped_file = zip_service.unzip_csv_reader(zip_response)
-    #         wallets_list = []
-    #         for reader in unziped_file:
-    #             for row in reader:
-    #                 wallet = row.get("cod_carteira")
-    #                 if wallet:
-    #                     wallets_list.append(wallet)
-    #         return wallets_list
-    #     except requests.RequestException as e:
-    #         print(f"Erro na requisição: {str(e)}")
-    #         return None
+
+    def process_csv_from_url(self, csv_url):
+        """Realiza o download do CSV zipado e extrai as informações"""
+        try:
+            zip_response = requests.get(csv_url)
+            if zip_response.status_code != 200:
+                raise Exception(
+                    f"Erro ao baixar o arquivo ZIP: {zip_response.status_code}"
+                )
+            zip_service = ZipService()
+            unziped_file = zip_service.unzip_csv_reader(zip_response)
+            wallets_list = []
+            for reader in unziped_file:
+                for row in reader:
+                    wallet = row.get("cod_carteira")[0]
+                    if wallet:
+                        wallets_list.append(wallet)
+            return wallets_list
+        except requests.RequestException as e:
+            print(f"Erro na requisição: {str(e)}")
+            return None

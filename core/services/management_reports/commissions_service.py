@@ -2,6 +2,7 @@ import requests
 import io
 import pandas as pd
 import logging
+
 # import json
 # from datetime import datetime
 # from pathlib import Path
@@ -9,6 +10,7 @@ import logging
 # import os
 
 from core.services.config_service import ConfigService
+
 # from core.services.email_service import EmailService
 
 logging.basicConfig(level=logging.INFO)
@@ -77,9 +79,8 @@ class CommissionsService:
             csv_reader = pd.read_csv(csv_content, delimiter=",")
 
             data = [row for row in csv_reader]
-            
-            return data
 
+            return data
 
         except requests.RequestException as e:
             logger.error(f"Erro na requisição: {str(e)}")
