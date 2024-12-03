@@ -74,8 +74,12 @@ class CommissionsService:
                 )
 
             csv_content = io.StringIO(csv_response.text)
-            data = pd.read_csv(csv_content, delimiter=",")
-            return f"CSV processado com sucesso: {data}"
+            csv_reader = pd.read_csv(csv_content, delimiter=",")
+
+            data = [row for row in csv_reader]
+            
+            return data
+
 
         except requests.RequestException as e:
             logger.error(f"Erro na requisição: {str(e)}")
