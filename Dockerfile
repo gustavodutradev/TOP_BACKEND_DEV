@@ -31,4 +31,4 @@ COPY . .
 EXPOSE 5000
 
 # Comando para iniciar o Gunicorn com 4 workers e usando app como entrada
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "app:application"]
