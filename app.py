@@ -134,3 +134,7 @@ if __name__ == "__main__":
 
     app = FlaskApp()
     app.run()
+else:
+    # Expose WSGI callable for gunicorn
+    application = FlaskApp().app
+
