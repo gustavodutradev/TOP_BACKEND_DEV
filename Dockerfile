@@ -1,5 +1,5 @@
 # Exemplo de Dockerfile
-FROM python:3.9
+FROM python:3.10
 
 WORKDIR /app
 
