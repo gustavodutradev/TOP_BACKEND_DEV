@@ -32,6 +32,7 @@ from adapters.controllers import (
     RelationshipController,
     BankingController,
     CreditCardController,
+    MonthlyNNMController,
 )
 from scheduler.pending_orders_scheduler import PendingOrdersScheduler
 from scheduler.custody_scheduler import CustodyScheduler
@@ -65,6 +66,7 @@ class FlaskApp:
             "commissions": CommissionsController(self.app),
             "closed_commissions": ClosedCommissionsController(self.app),
             "nnm": NNMController(self.app),
+            "monthly_nnm": MonthlyNNMController(self.app),
             "funds": FundsController(self.app),
             "exchange": ExchangeController(self.app),
             "operations": OperationsController(self.app),

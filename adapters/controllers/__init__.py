@@ -14,6 +14,7 @@ from .management_reports.commissions_controller import CommissionsController
 from .management_reports.closed_commissions_controller import (
     ClosedCommissionsController,
 )
+from .management_reports.monthly_nnm_controller import MonthlyNNMController
 from .management_reports.nnm_controller import NNMController
 from .management_reports.funds_controller import FundsController
 from .management_reports.exchange_controller import ExchangeController
