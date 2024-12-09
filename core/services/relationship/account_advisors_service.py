@@ -17,7 +17,7 @@ class RelationshipService:
     def get_account_advisors_relationship(self) -> Optional[bool]:
         """
         Request linked accounts from the client.
-        
+
         Returns:
             bool: True if request is successful, None otherwise
         """
@@ -42,17 +42,19 @@ class RelationshipService:
     def process_csv_from_url(self, csv_url: str) -> Optional[bool]:
         """
         Download zipped CSV and extract information.
-        
+
         Args:
             csv_url (str): URL of the zipped CSV file
-        
+
         Returns:
             Optional[bool]: True if processing is successful, None otherwise
         """
         try:
             zip_response = requests.get(csv_url)
             if zip_response.status_code != 200:
-                raise Exception(f"Error downloading ZIP file: {zip_response.status_code}")
+                raise Exception(
+                    f"Error downloading ZIP file: {zip_response.status_code}"
+                )
 
             zip_service = ZipService()
             unzipped_file = zip_service.unzip_csv_reader(zip_response)

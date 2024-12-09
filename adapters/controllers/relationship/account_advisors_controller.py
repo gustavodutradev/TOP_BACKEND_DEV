@@ -25,7 +25,7 @@ class RelationshipController:
     def handler(self) -> Tuple[Dict[str, Any], int]:
         """
         Handle the initial request and process webhooks.
-        
+
         Returns:
             Tuple containing response data and HTTP status code
         """
@@ -45,7 +45,7 @@ class RelationshipController:
     def _handle_initial_request(self) -> Tuple[Dict[str, Any], int]:
         """
         Handle the initial linked accounts request.
-        
+
         Returns:
             Tuple containing response data and HTTP status code
         """
@@ -63,10 +63,10 @@ class RelationshipController:
     def _process_webhook(self, data: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
         """
         Process the webhook payload from the API.
-        
+
         Args:
             data: The webhook payload data
-        
+
         Returns:
             Tuple containing response data and HTTP status code
         """
@@ -80,9 +80,7 @@ class RelationshipController:
         csv_data = self.relationship_service.process_csv_from_url(csv_url)
         if csv_data is None:
             self.logger.logger.info("No linked accounts found.")
-            return {
-                "message": "No linked accounts found."
-            }, HTTPStatus.NO_CONTENT
+            return {"message": "No linked accounts found."}, HTTPStatus.NO_CONTENT
 
         self.logger.logger.info("Linked accounts processed successfully.")
         return {"message": "Linked accounts processed successfully."}, HTTPStatus.OK
@@ -90,10 +88,10 @@ class RelationshipController:
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
         Extract CSV URL from webhook payload.
-        
+
         Args:
             data: The webhook payload data
-        
+
         Returns:
             The CSV URL if found, empty string otherwise
         """
@@ -102,10 +100,10 @@ class RelationshipController:
     def _handle_error(self, error: Exception) -> Tuple[Dict[str, Any], int]:
         """
         Handle and log any exceptions that occur during processing.
-        
+
         Args:
             error: The exception that occurred
-        
+
         Returns:
             Tuple containing error response and HTTP status code
         """
