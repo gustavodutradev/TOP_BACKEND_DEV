@@ -16,7 +16,10 @@ class MonthlyNNMController:
     def register_routes(self) -> None:
         """Register the API routes for the controller."""
         self.app.add_url_rule(
-            "/api/v1/rg-monthly-nnm", "rg_monthly-nnm_handler", self.handler, methods=["POST"]
+            "/api/v1/rg-monthly-nnm",
+            "rg_monthly-nnm_handler",
+            self.handler,
+            methods=["POST"],
         )
 
     def handler(self) -> Tuple[Dict[str, Any], int]:
@@ -44,7 +47,9 @@ class MonthlyNNMController:
         Returns:
             Tuple containing response data and HTTP status code
         """
-        self.logger.log_and_respond("Iniciando requisição de relatório gerencial mensal de NNM.")
+        self.logger.log_and_respond(
+            "Iniciando requisição de relatório gerencial mensal de NNM."
+        )
 
         if not self.monthly_nnm_service.get_monthly_nnm_report():
             return {
@@ -72,7 +77,9 @@ class MonthlyNNMController:
 
         csv_data = self.monthly_nnm_service.process_csv_from_url(csv_url)
         if not csv_data:
-            self.logger.logger.info("Não foram encontrados dados para o relatório gerencial mensal de NNM")
+            self.logger.logger.info(
+                "Não foram encontrados dados para o relatório gerencial mensal de NNM"
+            )
             return {
                 "message": "Não foram encontrados dados para o relatório gerencial mensal de NNM"
             }, HTTPStatus.NO_CONTENT
