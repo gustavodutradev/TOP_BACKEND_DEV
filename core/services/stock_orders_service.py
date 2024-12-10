@@ -231,7 +231,7 @@ class StockOrdersService:
             orders_by_client = self._group_orders_by_client(pending_orders)
             body += EmailTemplateBuilder.build_consolidated_email(orders_by_client)
         else:
-            body += "<p>Não foram encontradas ordens pendentes.</p>"
+            body += "<p>Não foram encontradas ordens pendentes de aprovação.</p>"
 
             if partially_executed_orders:
                 orders_by_client = self._group_orders_by_client(
