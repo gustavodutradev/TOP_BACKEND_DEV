@@ -85,6 +85,8 @@ class ClosedCommissionsController:
             return {
                 "message": "Não foram encontrados dados para o relatório de Comissões."
             }, HTTPStatus.NO_CONTENT
+        
+        return {"message": "Relatório de Comissões gerado."}, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """

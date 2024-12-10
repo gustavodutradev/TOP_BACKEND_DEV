@@ -88,7 +88,7 @@ class CommissionsController:
         # self.logger.logger.info(
         #     f"Relatório de Comissões gerado e enviado com sucesso. Diretório: {report_dir}"
         # )
-        # return {"message": "Relatório de Comissões gerado e enviado."}, HTTPStatus.OK
+        return {"message": "Relatório de Comissões gerado."}, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
