@@ -78,7 +78,7 @@ class MonthlyNNMController:
             }, HTTPStatus.NO_CONTENT
 
         self.logger.logger.info("Relatório gerencial mensal de NNM gerado com sucesso.")
-        return csv_data, HTTPStatus.OK
+        return {"message": "Relatório gerencial mensal de NNM gerado com sucesso."}, HTTPStatus.OK
 
     def _extract_csv_url(self, data: Dict[str, Any]) -> str:
         """
